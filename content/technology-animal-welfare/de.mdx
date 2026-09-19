@@ -1,0 +1,123 @@
+---
+title: "Wie Technik den Tierschutz unterstützen kann, ohne Menschen zu ersetzen"
+publishedAt: "2026-09-20"
+updatedAt: "2026-09-20"
+author: "Livvux"
+summary: "Wie WordPress, kleine Automatisierungen und ein Facebook-Website-Abgleich doppelte Arbeit im Tierschutz verringern können — und warum ich Pfotenweb gegründet habe."
+---
+
+Die Beschreibung des Tieres ist geschrieben. Die Fotos sind ausgewählt. Die Aktualisierung steht auf Facebook.
+
+Jetzt muss jemand alles noch einmal auf die Website übertragen.
+
+Genau bei solchen Aufgaben soll Technik helfen. Nicht bei der Entscheidung, wer ein Tier adoptieren darf. Nicht als Ersatz für Gespräche mit Ehrenamtlichen. Sondern indem sie wiederkehrende Arbeit übernimmt.
+
+Bei einem früheren Website-Projekt im Tierschutz habe ich dafür ein privates System entwickelt, das aus Facebook-Tieralben Steckbriefe für eine Website erstellt. Den Quellcode veröffentliche ich nicht. Das Prinzip dahinter ist aber ein gutes Beispiel dafür, wie Technik den Tierschutz entlasten kann.
+
+Die Erfahrungen daraus haben auch dazu beigetragen, dass ich [Pfotenweb](https://pfotenweb.de/) gegründet habe.
+
+## Erst die Aufgabe, dann das Werkzeug
+
+Meine erste Frage ist nicht: „Welche App sollen wir kaufen?“ Sondern: **„Welche Informationen tragen wir gerade doppelt ein?“**
+
+Ein gutes Beispiel ist der Vermittlungsstatus. Ein Mensch bestätigt, dass ein Tier vermittelt wurde. Danach soll die Website diese Entscheidung widerspiegeln.
+
+Den bestätigten Status zu übertragen, ist eine Aufgabe für Software. Die Entscheidung selbst ist es nicht.
+
+Dasselbe Prinzip funktioniert bei Bildgrößen, Website-Entwürfen, Erinnerungen oder der Weiterleitung von Anfragen an die richtige Person.
+
+## WordPress kann Teil der Lösung sein
+
+WordPress kann deutlich mehr als Blogartikel veröffentlichen.
+
+Mit [eigenen Inhaltstypen](https://developer.wordpress.org/plugins/post-types/) können Tierprofile einen festen, strukturierten Platz in der Verwaltung bekommen. Man kann sich das wie eine beschriftete Schublade vorstellen: Jedes Tier hat einen eigenen Datensatz.
+
+WordPress bietet außerdem eine [REST API](https://developer.wordpress.org/rest-api/). Eine API ist vereinfacht gesagt eine festgelegte Möglichkeit, über die Programme miteinander sprechen. Eine kleine Anwendung kann freigegebene Informationen an WordPress senden, statt dass jemand sie noch einmal in ein Formular kopieren muss.
+
+Nicht jeder Verein braucht dafür eine komplett neue Plattform. Oft ist es sinnvoller, eine funktionierende WordPress-Seite zu behalten und nur die umständlichen Arbeitsschritte zu verbessern.
+
+## So funktioniert mein Facebook-Website-Abgleich
+
+Hinter meinem Abgleich stand eine einfache Frage:
+
+**Kann ein Team Tierinformationen weiterhin in seinen Facebook-Alben pflegen, ohne dieselben Steckbriefe auf der Website erneut erstellen zu müssen?**
+
+Facebook lieferte in diesem Projekt die Tierinformationen. WordPress speicherte die importierten Profile. Astro baute daraus die öffentliche Website. Die Übertragung lief nur in eine Richtung.
+
+### 1. Nur die passenden Alben lesen
+
+Das Programm liest Alben über die Facebook-Schnittstelle und sucht nach einem vereinbarten Muster im Titel, zum Beispiel nach einem Status wie „auf Suche“, „reserviert“ oder „vermittelt“.
+
+Es versucht nicht, aus jedem Facebook-Beitrag automatisch ein Tierprofil zu machen.
+
+### 2. Text in klare Felder aufteilen
+
+Das System erkennt Angaben wie Name, Alter, Größe, Aufenthaltsort, Gesundheit und Charakter und trennt diese vom längeren Beschreibungstext.
+
+Das ist regelbasiert. Es ist keine KI, die das Tier beurteilt. Fehlen Angaben, können sie unbekannt bleiben. Die Software muss nichts erfinden.
+
+### 3. Dasselbe Tier wiedererkennen
+
+Namen sind keine sicheren Kennungen. Zwei Tiere können gleich heißen.
+
+Deshalb speichert der Abgleich die Facebook-Album-ID beim Profil. Auch Foto-IDs werden verwendet. So kann ein späterer Durchlauf bestehende Inhalte aktualisieren, statt immer neue Kopien anzulegen.
+
+### 4. Bilder vorbereiten und vorhandene Arbeit wiederverwenden
+
+Neue Fotos werden heruntergeladen und in passenden Größen für die Website vorbereitet. Bereits verarbeitete Bilder können wiederverwendet werden, wenn die gespeicherten Daten die Prüfungen bestehen.
+
+Der Abgleich vergleicht außerdem den neuen Inhalt mit dem vorhandenen Stand. Hat sich nichts Relevantes geändert, können WordPress-Update und Website-Neubau übersprungen werden.
+
+**Manchmal ist das richtige Ergebnis einer Automatisierung, dass nichts passiert.**
+
+### 5. Bei verdächtigen Ergebnissen stoppen
+
+Eine Automatisierung sollte Antworten nicht blind übernehmen.
+
+Der Import liest die Albumliste mehrfach und führt die Ergebnisse zusammen. Zusätzlich stoppt eine Schutzregel den Vorgang, wenn die neue Tieranzahl unerwartet mehr als 10 Prozent unter dem vorherigen Bestand liegt.
+
+Das ist keine Garantie gegen jeden Fehler. Es ist eine Sicherheitsregel: Verdächtige Daten sollen den Prozess stoppen, statt automatisch einen großen Teil der Website zu löschen.
+
+### 6. Speichern und kontrollieren
+
+Der Abgleich überträgt den vorbereiteten Stand an WordPress und liest ihn zur Kontrolle wieder aus. Muss die öffentliche Website neu gebaut werden, wird dieser Vorgang angestoßen und anschließend geprüft, ob die erwartete Inhaltsversion tatsächlich veröffentlicht wurde.
+
+Der wichtige Punkt ist nicht, dass Automatisierung jeden Fehler verhindert. Wiederkehrende Arbeit braucht **klare Regeln, Prüfungen und einen sicheren Fehlerfall**.
+
+## Wo n8n und kleine Bots helfen können
+
+Mein ursprünglicher Abgleich besteht aus eigenem Code. [n8n](https://n8n.io/) ist eine andere Möglichkeit, kleinere Arbeitsschritte miteinander zu verbinden. Es ist nicht die Software hinter dieser Umsetzung.
+
+Ein einfacher Ablauf könnte so aussehen:
+
+**Formular → Daten prüfen → WordPress-Entwurf erstellen → Redaktion informieren → Mensch prüft → veröffentlichen**
+
+n8n kann WordPress mit Zeitplänen, Webhooks und anderen Diensten verbinden. Auch ein kleiner Bot kann solche Aufgaben übernehmen: eine eng begrenzte Anweisung ausführen, das Ergebnis melden und bei einem Problem stoppen.
+
+Dafür muss er weder ein Chatbot sein noch immer KI einsetzen.
+
+## Automatisierung soll Menschen nicht entfernen
+
+Das ist für mich der wichtigste Punkt.
+
+Automatisierung bedeutet nicht, Menschen aus dem Tierschutz zu entfernen. Sie soll kleine, wiederholbare Schritte einfacher machen.
+
+Software kann einen bestätigten Vermittlungsstatus übertragen. **Menschen legen den Status fest.**
+
+Software kann eine Anfrage für die zuständige Person vorbereiten. **Menschen sprechen mit Interessenten.**
+
+Software kann einen Entwurf erstellen. **Menschen können ihn vor der Veröffentlichung prüfen.**
+
+Öffentliche Tierprofile und private Anfragen sollten außerdem getrennt bleiben. Programme sollten nur die Zugriffe erhalten, die sie wirklich brauchen. Und eine Automatisierung muss sich einfach stoppen lassen.
+
+## Warum ich Pfotenweb gegründet habe
+
+Die Arbeit an diesem Problem hat in mir den Wunsch geweckt, mehr als eine einzelne Website zu entwickeln.
+
+Deshalb habe ich [Pfotenweb](https://pfotenweb.de/) gegründet: um die tägliche Website-Arbeit von Tierschutzvereinen einfacher zu machen.
+
+Der frühere Facebook-Abgleich zeigt einen Teil der Überlegungen dahinter. Er ist keine Zusage, dass jedes Detail dieser privaten Umsetzung in jeder Pfotenweb-Konfiguration vorhanden ist.
+
+WordPress, n8n, kleine Bots, eigene Anwendungen und speziell entwickelte Dienste können alle sinnvoll sein. Entscheidend ist, ob die Menschen, die damit arbeiten, das System verstehen, ihm vertrauen und es bei Bedarf korrigieren können.
+
+**Technik soll wiederkehrende Schritte übernehmen — nicht die Menschen aus dem Tierschutz nehmen.**
