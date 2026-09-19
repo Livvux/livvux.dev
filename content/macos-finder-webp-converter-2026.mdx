@@ -45,7 +45,7 @@ The copied workflow appears in the Finder context menu — if it does not show u
 
 Double-click the workflow in `~/Library/Services/` (it opens in Automator), open the Run AppleScript action, and edit the top of the script:
 
-```applescript
+```text
 set quality to 82              -- 0–100 (80–85 is a good starting point)
 set method to 6                -- 0–6 (6 = best compression, slower)
 set keepMetadata to true       -- true = keep EXIF/ICC/XMP, false = strip
