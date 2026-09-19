@@ -1,0 +1,166 @@
+- generic [active] [ref=f2e1]:
+  - generic [ref=f2e5]:
+    - link "Back to Blog" [ref=f2e7] [cursor=pointer]:
+      - /url: /blog
+    - generic [ref=f2e10]:
+      - 'heading "KI-Musik und Ethik 2026: Zustimmung, Rechte, Verantwortung" [level=1] [ref=f2e11]'
+      - paragraph [ref=f2e12]: September 19, 2026
+    - article [ref=f2e15]:
+      - paragraph [ref=f2e16]: Ein Musikwerkzeug kann kreativ hilfreich sein und trotzdem kritische Fragen verdienen. Wer KI-gestützten Ausdruck unterstützt, muss deshalb weder jede Trainingspraxis noch jede synthetische Stimme oder jedes Versprechen zur Vermarktung der Ergebnisse akzeptieren.
+      - paragraph [ref=f2e17]: "Für unabhängige Kreative ist die Frage ganz praktisch: Wie lässt sich experimentieren, ohne die Arbeit, Identität und das Vertrauen anderer Menschen als frei verfügbares Material zu behandeln?"
+      - paragraph [ref=f2e18]: "Mein Ausgangspunkt ist, Dinge zu trennen, die häufig in einem beruhigenden Wort verschwinden: „erlaubt“. Ein Dienst kann dir den Download einer Datei ermöglichen. Das beantwortet noch nicht, ob du ihr Ausgangsmaterial hochladen durftest, ob du am Ergebnis Urheberrechte beanspruchen kannst oder ob deine Präsentation das Publikum täuscht."
+      - heading "Die Anbieterlizenz klärt nicht automatisch alle Rechte" [level=2] [ref=f2e19]
+      - paragraph [ref=f2e20]: Betrachte die Erlaubnis eines KI-Anbieters als einen Teil der Veröffentlichungsentscheidung, nicht als die gesamte Entscheidung.
+      - paragraph [ref=f2e21]: Prüfe, was die Bedingungen für dein Konto und deinen vorgesehenen Einsatz erlauben. Bewahre die relevante Fassung mit Datum auf. Kläre, ob für kommerzielle Nutzung, Weitergabe, Namensnennung oder hochgeladene Aufnahmen zusätzliche Bedingungen gelten. Ein alter Screenshot der Preisseite ersetzt nicht die maßgeblichen Nutzungsbedingungen.
+      - paragraph [ref=f2e22]:
+        - text: "Danach geht es um das musikalische Ausgangsmaterial. Das U.S. Copyright Office unterscheidet die Komposition von der Tonaufnahme: Es handelt sich um getrennte Werke mit möglicherweise unterschiedlichen Rechteinhabern. Sein Leitfaden für Musiker betont außerdem, dass bei bestehender Musik die geplanten Nutzungen mit den jeweiligen Rechten abgeglichen werden müssen."
+        - superscript [ref=f2e23]:
+          - link "1" [ref=f2e24] [cursor=pointer]:
+            - /url: "#user-content-fn-musicians"
+      - paragraph [ref=f2e25]: Deshalb ist „Der Generator erlaubt den Export“ keine vollständige Antwort, wenn fremde Texte, Melodien oder Aufnahmen im Stück stecken. Ein KI-Arbeitsschritt ersetzt keine erforderliche Rechteklärung. Welcher rechtliche Weg möglich ist, hängt vom Material, der Nutzung und dem jeweiligen Rechtsraum ab.
+      - heading "Urheberrechte am Ergebnis sind eine andere Frage" [level=2] [ref=f2e26]
+      - paragraph [ref=f2e27]: Ein Ergebnis nutzen zu dürfen und anderen seine Übernahme verbieten zu können, ist nicht dasselbe.
+      - paragraph [ref=f2e28]:
+        - text: Das U.S. Copyright Office erklärte in seiner Berichtsankündigung vom Januar 2025, dass KI-Unterstützung einen Schutz nicht automatisch ausschließt. Erforderlich sei jedoch ein ausreichender menschlicher Beitrag zu den Ausdruckselementen. Bloße Prompts begründen für sich genommen keinen Schutz maschinell bestimmter Ausdruckselemente. Kreative menschliche Arrangements oder Bearbeitungen können dagegen schutzfähig sein.
+        - superscript [ref=f2e29]:
+          - link "2" [ref=f2e30] [cursor=pointer]:
+            - /url: "#user-content-fn-copyright"
+      - paragraph [ref=f2e31]:
+        - text: Das ist eine Einordnung für die USA, keine weltweit geltende Regel und keine Garantie für deinen Track. In Deutschland verlangt § 2 Absatz 2 UrhG für geschützte Werke eine persönliche geistige Schöpfung. Wie das bei einer konkreten hybriden Produktion zu beurteilen ist, erfordert einen Blick auf den tatsächlichen Beitrag.
+        - superscript [ref=f2e32]:
+          - link "3" [ref=f2e33] [cursor=pointer]:
+            - /url: "#user-content-fn-germany"
+      - paragraph [ref=f2e34]: Die sinnvolle Konsequenz ist Dokumentation statt übertriebener Gewissheit. Bewahre eigene Texte, Aufnahmen, Arrangement-Versionen und wesentliche Bearbeitungen auf. Versprich einem Kunden nicht allein deshalb ausschließliche Rechte an jedem generierten Bestandteil, weil du ein Abonnement bezahlt hast.
+      - heading "Eine erkennbare Stimme ist nicht einfach ein Preset" [level=2] [ref=f2e35]
+      - paragraph [ref=f2e36]: "Meine ethische Grundregel lautet: Bevor ich die erkennbare Stimme eines Menschen nachbilden lasse, brauche ich eine konkrete, informierte Zustimmung. Dazu gehört der vorgesehene Zusammenhang und nicht nur der Zugang zu einer Aufnahme."
+      - paragraph [ref=f2e37]: Wer als Sänger einem Song zustimmt, stimmt aus meiner Sicht nicht automatisch zu, für beliebige andere Projekte als synthetische Stimme zur Verfügung zu stehen. Eine verantwortliche Vereinbarung sollte Zweck, Dauer, Verbreitung, Vergütung, Speicherung und den Umgang mit späteren Nutzungen nach Ende der Zusammenarbeit regeln. Das sind empfohlene Schutzmaßnahmen, keine universelle juristische Checkliste.
+      - paragraph [ref=f2e38]: Präsentiere eine erfundene Stimme nicht als Aufnahme eines realen Menschen. Beschreibe bei einverstandenen Mitwirkenden deren Rolle korrekt. Bei deiner eigenen Stimme solltest du prüfen, welche Rechte du dem Dienst einräumst und was mit hochgeladenem Material geschieht.
+      - paragraph [ref=f2e39]: Die kreative Alternative zur Imitation ist Präzision. Beschreibe Stimmlage, Vortrag, Nähe, Phrasierung und Energie statt einer erkennbaren Person. Das ergibt eine bessere Vorgabe. Es garantiert allerdings nicht, dass ein Ergebnis frei von problematischen Ähnlichkeiten ist.
+      - heading "Fragen zum Training gehören dazu" [level=2] [ref=f2e40]
+      - paragraph [ref=f2e41]: Kreative sollten nicht so tun müssen, als würden Fragen zum Modelltraining verschwinden, nur weil ein Werkzeug Spaß macht.
+      - paragraph [ref=f2e42]:
+        - text: Die Human Artistry Campaign fordert Zustimmung und Vergütung bei der Nutzung geschützter Arbeiten und künstlerischer Identität, während sie technische Unterstützung für kreatives Arbeiten anerkennt. Das ist die Position einer Interessenvertretung aus dem Kreativbereich und sollte auch als solche benannt werden.
+        - superscript [ref=f2e43]:
+          - link "4" [ref=f2e44] [cursor=pointer]:
+            - /url: "#user-content-fn-artists"
+      - paragraph [ref=f2e45]: Unterscheide bei einem Anbieter zwischen einer konkreten Beschreibung lizenzierter Quellen und einer allgemeinen Aussage zur Rechtmäßigkeit. Prüfe, welche Informationen es zu Trainingsmaterial, Erlaubnissen und Beschwerdemöglichkeiten gibt. Wo Informationen fehlen, benenne die Lücke, statt Sicherheit zu erfinden oder ohne Belege eine Rechtsverletzung zu behaupten.
+      - paragraph [ref=f2e46]: Mir wäre ein kreativer Zugang auf Grundlage klarerer Vereinbarungen lieber als die Vorstellung, einzelne Nutzer müssten komplette Modelle selbst überprüfen. Entwickler tragen Verantwortung, die sich nicht durch den Satz „Handle ethisch“ unter einem Eingabefeld erledigen lässt.
+      - heading "Transparenz hat 2026 einen konkreten rechtlichen Rahmen" [level=2] [ref=f2e47]
+      - paragraph [ref=f2e48]:
+        - text: Die Europäische Kommission kündigte die Anwendung neuer Transparenzanforderungen des AI Act ab dem 2. August 2026 an. Welche Pflichten genau greifen, hängt von Rolle, System, Einsatz und einschlägigen Übergangsregeln ab.
+        - superscript [ref=f2e49]:
+          - link "5" [ref=f2e50] [cursor=pointer]:
+            - /url: "#user-content-fn-timeline"
+      - paragraph [ref=f2e51]:
+        - text: Artikel 50 unterscheidet technische Kennzeichnungspflichten der Anbieter von bestimmten Offenlegungspflichten der Betreiber. Bei Deepfakes in offensichtlich künstlerischen oder fiktionalen Werken ist weiterhin eine angemessene Offenlegung vorgesehen, die den Werkgenuss nicht beeinträchtigt. Das ist weder eine pauschale Ausnahme für Kunst noch eine einheitliche Kennzeichnungspflicht für jeden KI-unterstützten Song.
+        - superscript [ref=f2e52]:
+          - link "6" [ref=f2e53] [cursor=pointer]:
+            - /url: "#user-content-fn-aiact"
+      - paragraph [ref=f2e54]: Trenne diese Rechtsfragen von deinem eigenen redaktionellen Anspruch. Ich würde wesentliche generierte Performances auch dort beschreiben, wo keine konkrete gesetzliche Kennzeichnung vorgeschrieben ist. Das Publikum sollte nicht selbst herausfinden müssen, ob ein dargestellter Sänger, Gastmusiker oder Aufnahmetermin überhaupt existiert hat.
+      - paragraph [ref=f2e55]: Eine hilfreiche Kennzeichnung benennt den Beitrag. „KI-generierte instrumentale Grundlage; Text und zusätzliche Gesangsaufnahmen von den genannten Mitwirkenden“ sagt mehr als „mit Technologie erstellt“. Verwende eine solche Formulierung nur, wenn sie den Prozess tatsächlich beschreibt. Sie ist ein Kommunikationsbeispiel, keine Bescheinigung rechtlicher Konformität.
+      - heading "Halte die Veröffentlichungsentscheidung knapp fest" [level=2] [ref=f2e56]
+      - paragraph [ref=f2e57]: "Eine Dokumentation sollte verständlich sein, ohne dafür einen Monat Chatverlauf erneut lesen zu müssen. Ich würde drei Bereiche beim Projekt ablegen:"
+      - list [ref=f2e58]:
+        - listitem [ref=f2e59]:
+          - strong [ref=f2e60]: "Material und Erlaubnisse:"
+          - text: verwendete Aufnahmen, Texte, Samples und Stimmen, ihre Herkunft sowie die Nachweise für ihre Nutzung.
+        - listitem [ref=f2e61]:
+          - strong [ref=f2e62]: "Prozess und Beiträge:"
+          - text: Anbieter, Modellinformationen, Generierungsdatum, maßgebliche Bedingungen, Mitwirkende und die übernommenen menschlichen Texte, Performances oder Bearbeitungen.
+        - listitem [ref=f2e63]:
+          - strong [ref=f2e64]: "Veröffentlichung:"
+          - text: offene Fragen, freigegebene Credits, vorgesehene Kennzeichnung und die Person, die der Veröffentlichung zugestimmt hat.
+      - paragraph [ref=f2e65]: Fülle Lücken nicht mit „wird schon passen“. Eine ungeklärte Erlaubnis ist ein Grund, Material auszutauschen, die Zustimmung zu klären oder vor der Veröffentlichung fachlichen Rat einzuholen.
+      - paragraph [ref=f2e66]: Bleib auch beim Nutzen dieser Dokumentation präzise. Sie kann einen Prozess nachvollziehbar machen. Sie begründet nicht selbst einen Urheberrechtsschutz, klärt keine fremden Rechte und garantiert keine Annahme durch einen Distributor.
+      - heading "Ethik sollte dir helfen, zu deiner Arbeit zu stehen" [level=2] [ref=f2e67]
+      - paragraph [ref=f2e68]: Ich möchte nicht, dass kreative Ethik zu einem Wettbewerb um größtmögliche Reinheit wird. Sie sollte helfen, die eigene Arbeit ehrlich vertreten zu können.
+      - paragraph [ref=f2e69]: Dazu gehört, erklären zu können, welche Entscheidungen von dir stammen, auf wessen Beiträge du dich stützt, welche Erlaubnisse du geprüft hast und was unklar bleibt. Dazu gehört, Mitwirkende zu vergüten, statt ihre Identität als Abkürzung zu behandeln. Und dazu gehört, ein attraktives Ergebnis abzulehnen, wenn seine Veröffentlichung von einer Täuschung abhängen würde.
+      - paragraph [ref=f2e70]: "Innerhalb dieser Grenzen kann KI ein Werkzeug für Experimente und persönlichen Ausdruck bleiben. Die Grenzen machen diese Haltung sogar belastbarer: nicht „Alles, was ein Modell erzeugt, ist akzeptabel“, sondern „So habe ich es eingesetzt, und diese Entscheidungen kann ich vertreten“."
+      - paragraph [ref=f2e71]:
+        - emphasis [ref=f2e72]: Dieser Artikel vermittelt allgemeine Informationen und einen ethischen Orientierungsrahmen, keine Rechtsberatung für eine konkrete Veröffentlichung. Rechtliche und produktbezogene Quellen wurden am 19. September 2026 geprüft.
+      - generic [ref=f2e73]:
+        - heading "Footnotes" [level=2] [ref=f2e74]
+        - list [ref=f2e75]:
+          - listitem [ref=f2e76]:
+            - paragraph [ref=f2e77]:
+              - text: U.S. Copyright Office, „What Musicians Should Know about Copyright“.
+              - link "Offizieller Leitfaden" [ref=f2e78] [cursor=pointer]:
+                - /url: https://www.copyright.gov/engage/musicians/
+              - text: . Abgerufen am 19. September 2026.
+              - link "Back to reference 1" [ref=f2e79] [cursor=pointer]:
+                - /url: "#user-content-fnref-musicians"
+                - text: ↩
+          - listitem [ref=f2e80]:
+            - paragraph [ref=f2e81]:
+              - text: U.S. Copyright Office, „Copyright Office Releases Part 2 of Artificial Intelligence Report“, 29. Januar 2025.
+              - link "Offizielle Mitteilung" [ref=f2e82] [cursor=pointer]:
+                - /url: https://www.copyright.gov/newsnet/2025/1060.html
+              - text: . Abgerufen am 19. September 2026. Einordnung des US-Rechts, keine international vereinheitlichte Rechtslage.
+              - link "Back to reference 2" [ref=f2e83] [cursor=pointer]:
+                - /url: "#user-content-fnref-copyright"
+                - text: ↩
+          - listitem [ref=f2e84]:
+            - paragraph [ref=f2e85]:
+              - text: Urheberrechtsgesetz, § 2, insbesondere Absatz 2.
+              - link "Amtlicher Gesetzestext" [ref=f2e86] [cursor=pointer]:
+                - /url: https://www.gesetze-im-internet.de/urhg/__2.html
+              - text: . Abgerufen am 19. September 2026.
+              - link "Back to reference 3" [ref=f2e87] [cursor=pointer]:
+                - /url: "#user-content-fnref-germany"
+                - text: ↩
+          - listitem [ref=f2e88]:
+            - paragraph [ref=f2e89]:
+              - text: Human Artistry Campaign, Grundprinzipien.
+              - link "Website des Bündnisses" [ref=f2e90] [cursor=pointer]:
+                - /url: https://www.humanartistrycampaign.com/
+              - text: . Abgerufen am 19. September 2026. Interessenvertretung aus der Kreativwirtschaft.
+              - link "Back to reference 4" [ref=f2e91] [cursor=pointer]:
+                - /url: "#user-content-fnref-artists"
+                - text: ↩
+          - listitem [ref=f2e92]:
+            - paragraph [ref=f2e93]:
+              - text: Europäische Kommission, „Commission starts enforcing AI Act rules and new transparency requirements on 2 August“, 31. Juli 2026.
+              - link "Offizielle Mitteilung" [ref=f2e94] [cursor=pointer]:
+                - /url: https://digital-strategy.ec.europa.eu/en/news/commission-starts-enforcing-ai-act-rules-and-new-transparency-requirements-2-august
+              - text: . Abgerufen am 19. September 2026.
+              - link "Back to reference 5" [ref=f2e95] [cursor=pointer]:
+                - /url: "#user-content-fnref-timeline"
+                - text: ↩
+          - listitem [ref=f2e96]:
+            - paragraph [ref=f2e97]:
+              - text: Verordnung (EU) 2024/1689, Artikel 50, insbesondere Absätze 2 und 4.
+              - link "Amtlicher EU-Rechtstext" [ref=f2e98] [cursor=pointer]:
+                - /url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng
+              - text: . Abgerufen am 19. September 2026. Zusammen mit aktuellen Umsetzungshinweisen der Kommission und einschlägigen Änderungen zu lesen.
+              - link "Back to reference 6" [ref=f2e99] [cursor=pointer]:
+                - /url: "#user-content-fnref-aiact"
+                - text: ↩
+    - navigation [ref=f2e100]:
+      - generic [ref=f2e101]:
+        - 'link "Previous KI und ADHS 2026: Unterstützung ohne Produktivitätsdruck" [ref=f2e102] [cursor=pointer]':
+          - /url: /blog/ki-adhs-unterstuetzung-2026
+          - generic [ref=f2e103]: Previous
+          - generic [ref=f2e106]: "KI und ADHS 2026: Unterstützung ohne Produktivitätsdruck"
+        - 'link "Next Vom Gefühl zum Klang: Mit KI-Musik Gefühle ausdrücken" [ref=f2e107] [cursor=pointer]':
+          - /url: /blog/ki-musik-gefuehle-ausdruecken
+          - generic [ref=f2e108]: Next
+          - generic [ref=f2e111]: "Vom Gefühl zum Klang: Mit KI-Musik Gefühle ausdrücken"
+  - generic [ref=f2e112]:
+    - link [ref=f2e113] [cursor=pointer]:
+      - /url: /
+    - link [ref=f2e119] [cursor=pointer]:
+      - /url: /blog
+    - link [ref=f2e124] [cursor=pointer]:
+      - /url: https://github.com/Livvux
+      - img "GitHub" [ref=f2e127]
+    - link [ref=f2e129] [cursor=pointer]:
+      - /url: https://www.linkedin.com/in/lucaskleipoedszus/
+      - img "LinkedIn" [ref=f2e132]
+    - link [ref=f2e134] [cursor=pointer]:
+      - /url: https://x.com/Livvux
+      - img "X" [ref=f2e137]
+    - link [ref=f2e139] [cursor=pointer]:
+      - /url: https://www.youtube.com/livvux
+      - img "youtube" [ref=f2e142]
+    - button [ref=f2e146] [cursor=pointer]
+  - alert [ref=f2e149]

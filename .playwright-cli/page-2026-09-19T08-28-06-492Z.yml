@@ -1,0 +1,508 @@
+- generic [active] [ref=f3e1]:
+  - link "Skip to content" [ref=f3e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=f3e3]:
+    - generic [ref=f3e4]:
+      - link "StreamerLoft home" [ref=f3e5] [cursor=pointer]:
+        - /url: /en
+        - generic [ref=f3e9]: StreamerLoft
+      - navigation "Main navigation" [ref=f3e10]:
+        - link "Features" [ref=f3e11] [cursor=pointer]:
+          - /url: /en#features
+        - link "Preview" [ref=f3e12] [cursor=pointer]:
+          - /url: /en#preview
+        - link "Guides" [ref=f3e13] [cursor=pointer]:
+          - /url: /en/guides
+        - link "Tools" [ref=f3e14] [cursor=pointer]:
+          - /url: /en/tools
+        - link "Shop" [ref=f3e15] [cursor=pointer]:
+          - /url: /en/shop
+        - link "Downloads" [ref=f3e16] [cursor=pointer]:
+          - /url: /en/downloads
+        - link "Help" [ref=f3e17] [cursor=pointer]:
+          - /url: /en/help
+        - button "FAQ" [ref=f3e18] [cursor=pointer]
+      - generic [ref=f3e19]:
+        - combobox "Language" [ref=f3e20] [cursor=pointer]:
+          - option "🇬🇧 English" [selected]
+          - option "🇩🇪 Deutsch"
+          - option "🇪🇸 Español"
+        - link "Get the kit" [ref=f3e21] [cursor=pointer]:
+          - /url: /en/shop
+  - generic [ref=f3e22]:
+    - main [ref=f3e23]:
+      - generic [ref=f3e24]:
+        - generic [ref=f3e25]:
+          - generic [ref=f3e26]:
+            - generic [ref=f3e27]: YOUR OWN CORNER OF THE INTERNET
+            - heading "Your stream. Your home." [level=1] [ref=f3e29]:
+              - text: Your stream.
+              - generic [ref=f3e30]: Your home.
+            - heading "The WordPress kit for Twitch creators." [level=2] [ref=f3e31]
+            - paragraph [ref=f3e32]: Your livestream, best clips, and community. Finally, a place to call your own.
+            - generic [ref=f3e33]:
+              - link "Get the website kit" [ref=f3e34] [cursor=pointer]:
+                - /url: "#packages"
+              - link "View demo" [ref=f3e35] [cursor=pointer]:
+                - /url: /en/demo
+            - paragraph [ref=f3e36]: Built for WordPress. Hosting not included.
+          - generic [ref=f3e40]:
+            - generic [ref=f3e41]:
+              - generic [ref=f3e42]: 01 / Midnight
+              - generic [ref=f3e43]: Fictional creator. Real possibilities.
+            - generic [ref=f3e45]:
+              - generic [ref=f3e50]: rynex.stream
+              - generic [ref=f3e51]:
+                - generic [ref=f3e52]:
+                  - button "Rynex preview home" [ref=f3e53] [cursor=pointer]: Rynex.
+                  - tablist "Creator pages" [ref=f3e54]:
+                    - tab "Home" [selected] [ref=f3e55] [cursor=pointer]
+                    - tab "Clips" [ref=f3e56] [cursor=pointer]
+                    - tab "About" [ref=f3e57] [cursor=pointer]
+                  - generic [ref=f3e58]:
+                    - img "Twitch" [ref=f3e59]
+                    - img "YouTube" [ref=f3e62]
+                    - img "Instagram" [ref=f3e65]
+                  - button "Follow" [ref=f3e69] [cursor=pointer]
+                - tabpanel "Home" [ref=f3e70]:
+                  - generic [ref=f3e71]:
+                    - button "Explore stream preview" [ref=f3e72] [cursor=pointer]:
+                      - img "Fictional creator Rynex in her cozy streaming room" [ref=f3e73]
+                      - generic [ref=f3e74]: LIVE PREVIEW
+                      - generic [ref=f3e76]: Cozy games & good company
+                    - complementary [ref=f3e84]:
+                      - generic [ref=f3e87]:
+                        - strong [ref=f3e88]: Rynex
+                        - generic [ref=f3e89]: Just Chatting
+                      - paragraph [ref=f3e90]: Variety games, good vibesand a cozy community.
+                      - button "Follow" [ref=f3e91] [cursor=pointer]
+                  - generic [ref=f3e92]:
+                    - heading "Recent clips" [level=3] [ref=f3e93]
+                    - button "View all" [ref=f3e94] [cursor=pointer]
+                  - generic [ref=f3e98]:
+                    - button "0:45 That clutch though 2 days ago" [ref=f3e99] [cursor=pointer]:
+                      - generic [ref=f3e100]: 0:45
+                      - strong [ref=f3e105]: That clutch though
+                      - generic [ref=f3e106]: 2 days ago
+                    - button "1:12 One more adventure 4 days ago" [ref=f3e107] [cursor=pointer]:
+                      - generic [ref=f3e108]: 1:12
+                      - strong [ref=f3e113]: One more adventure
+                      - generic [ref=f3e114]: 4 days ago
+                    - button "0:58 The view was worth it 6 days ago" [ref=f3e115] [cursor=pointer]:
+                      - generic [ref=f3e116]: 0:58
+                      - strong [ref=f3e121]: The view was worth it
+                      - generic [ref=f3e122]: 6 days ago
+                    - button "1:03 Chat made my day 1 week ago" [ref=f3e123] [cursor=pointer]:
+                      - generic [ref=f3e124]: 1:03
+                      - strong [ref=f3e129]: Chat made my day
+                      - generic [ref=f3e130]: 1 week ago
+            - generic [ref=f3e131]:
+              - generic [ref=f3e132]: Rynex · Midnight theme
+              - link "Explore the WordPress demo" [ref=f3e133] [cursor=pointer]:
+                - /url: /en/demo
+        - generic [ref=f3e137]:
+          - generic [ref=f3e138]: WordPress
+          - generic [ref=f3e139]: Core / Pro / Midnight
+          - link "Kit features" [ref=f3e140] [cursor=pointer]:
+            - /url: "#features"
+            - text: Kit features ↓
+      - region [ref=f3e141]:
+        - generic [ref=f3e142]:
+          - generic [ref=f3e143]: MORE THAN A STREAM
+          - heading "Make every visit worth staying for." [level=2] [ref=f3e144]
+          - paragraph [ref=f3e145]: From the first hello to the next live show. Bring the pieces of your creator world together on a website you own.
+        - generic [ref=f3e146]:
+          - article [ref=f3e147]:
+            - generic [ref=f3e148]: Fictional creator. Real possibilities.
+            - generic [ref=f3e150]:
+              - text: Core · extended with Pro
+              - heading "The stream takes center stage." [level=3] [ref=f3e151]
+              - paragraph [ref=f3e152]: Welcome viewers with a click-to-load Twitch player and your creator profile. Pro adds chat, channel collections and more ways to watch. Pro automatically uses your Twitch avatar and offline screen. Your own uploaded images always take priority.
+          - article [ref=f3e153]:
+            - generic [ref=f3e154]: Fictional creator. Real possibilities.
+            - generic [ref=f3e156]:
+              - text: Pro
+              - heading "Great moments deserve an encore." [level=3] [ref=f3e157]
+              - paragraph [ref=f3e158]: Give clips and VODs a place beyond the feed. Pro brings your highlights together in browsable collections.
+          - article [ref=f3e159]:
+            - generic [ref=f3e160]: Fictional creator. Real possibilities.
+            - generic [ref=f3e162]:
+              - text: Core · templates in Website Kit
+              - heading "Let them meet the person behind the play button." [level=3] [ref=f3e163]
+              - paragraph [ref=f3e164]: Start with a creator profile in Core. The Website Kit adds a coordinated About template for your story and setup.
+          - article [ref=f3e165]:
+            - generic [ref=f3e167]:
+              - generic [ref=f3e170]:
+                - generic [ref=f3e171]: TUE
+                - generic [ref=f3e172]: Cozy games & catch-ups
+                - time [ref=f3e173]: 7:00 PM
+              - generic [ref=f3e174]:
+                - generic [ref=f3e175]: THU
+                - generic [ref=f3e176]: A new adventure
+                - time [ref=f3e177]: 7:00 PM
+              - generic [ref=f3e178]:
+                - generic [ref=f3e179]: SAT
+                - generic [ref=f3e180]: Community game night
+                - time [ref=f3e181]: 6:00 PM
+            - generic [ref=f3e182]:
+              - text: Core · Twitch sync in Pro
+              - heading "Turn “when are you live?” into “see you there.”" [level=3] [ref=f3e183]
+              - paragraph [ref=f3e184]: Publish a weekly schedule with Core. Pro can synchronize your Twitch schedule, so viewers know when to come back.
+          - article [ref=f3e185]:
+            - generic [ref=f3e187]:
+              - generic [ref=f3e191]: Rynex.
+              - generic [ref=f3e192]: Clips
+              - generic [ref=f3e196]: Meet the community
+            - generic [ref=f3e200]:
+              - text: Pro
+              - heading "One home for your community." [level=3] [ref=f3e201]
+              - paragraph [ref=f3e202]: Bring your destinations together. Pro includes community links and a standalone links page for your bio.
+      - region [ref=f3e203]:
+        - generic [ref=f3e204]:
+          - generic [ref=f3e205]:
+            - generic [ref=f3e206]: MAKE YOURSELF AT HOME
+            - heading "Five pages. One unmistakably you." [level=2] [ref=f3e207]
+            - paragraph [ref=f3e208]: Explore the Midnight look with Rynex, our fictional creator. Then open the WordPress demo to see the kit in action.
+          - generic [ref=f3e209]:
+            - tablist "Creator pages" [ref=f3e210]:
+              - tab "Home" [selected] [ref=f3e211] [cursor=pointer]
+              - tab "Clips" [ref=f3e212] [cursor=pointer]
+              - tab "About" [ref=f3e213] [cursor=pointer]
+              - tab "Schedule" [ref=f3e214] [cursor=pointer]
+              - tab "Links" [ref=f3e215] [cursor=pointer]
+            - tabpanel "Home" [ref=f3e216]:
+              - generic [ref=f3e217]:
+                - generic [ref=f3e222]: rynex.stream
+                - generic [ref=f3e223]:
+                  - generic [ref=f3e224]:
+                    - button "Rynex preview home" [ref=f3e225] [cursor=pointer]: Rynex.
+                    - tablist "Creator pages" [ref=f3e226]:
+                      - tab "Home" [selected] [ref=f3e227] [cursor=pointer]
+                      - tab "Clips" [ref=f3e228] [cursor=pointer]
+                      - tab "About" [ref=f3e229] [cursor=pointer]
+                      - tab "Schedule" [ref=f3e230] [cursor=pointer]
+                    - generic [ref=f3e231]:
+                      - img "Twitch" [ref=f3e232]
+                      - img "YouTube" [ref=f3e235]
+                      - img "Instagram" [ref=f3e238]
+                    - button "Follow" [ref=f3e242] [cursor=pointer]
+                  - tabpanel "Home" [ref=f3e243]:
+                    - generic [ref=f3e244]:
+                      - button "Explore stream preview" [ref=f3e245] [cursor=pointer]:
+                        - img "Fictional creator Rynex in her cozy streaming room" [ref=f3e246]
+                        - generic [ref=f3e247]: LIVE PREVIEW
+                        - generic [ref=f3e249]: Cozy games & good company
+                      - complementary [ref=f3e256]:
+                        - generic [ref=f3e259]:
+                          - strong [ref=f3e260]: Rynex
+                          - generic [ref=f3e261]: Just Chatting
+                        - paragraph [ref=f3e262]: Variety games, good vibesand a cozy community.
+                        - button "Follow" [ref=f3e263] [cursor=pointer]
+                    - generic [ref=f3e264]:
+                      - heading "Recent clips" [level=3] [ref=f3e265]
+                      - button "View all" [ref=f3e266] [cursor=pointer]
+                    - generic [ref=f3e269]:
+                      - button "0:45 That clutch though 2 days ago" [ref=f3e270] [cursor=pointer]:
+                        - generic [ref=f3e271]: 0:45
+                        - strong [ref=f3e276]: That clutch though
+                        - generic [ref=f3e277]: 2 days ago
+                      - button "1:12 One more adventure 4 days ago" [ref=f3e278] [cursor=pointer]:
+                        - generic [ref=f3e279]: 1:12
+                        - strong [ref=f3e284]: One more adventure
+                        - generic [ref=f3e285]: 4 days ago
+                      - button "0:58 The view was worth it 6 days ago" [ref=f3e286] [cursor=pointer]:
+                        - generic [ref=f3e287]: 0:58
+                        - strong [ref=f3e292]: The view was worth it
+                        - generic [ref=f3e293]: 6 days ago
+                      - button "1:03 Chat made my day 1 week ago" [ref=f3e294] [cursor=pointer]:
+                        - generic [ref=f3e295]: 1:03
+                        - strong [ref=f3e300]: Chat made my day
+                        - generic [ref=f3e301]: 1 week ago
+              - generic [ref=f3e302]:
+                - generic [ref=f3e303]: Fictional creator. Real possibilities.
+                - link "Explore Home WordPress demo" [ref=f3e304] [cursor=pointer]:
+                  - /url: /en/demo?page=home
+      - region [ref=f3e308]:
+        - generic [ref=f3e309]:
+          - generic [ref=f3e310]: FROM DOWNLOAD TO YOUR OWN DOMAIN
+          - heading "Your next chapter starts in WordPress." [level=2] [ref=f3e311]
+          - link "Read the setup guide" [ref=f3e312] [cursor=pointer]:
+            - /url: /en/help
+        - list [ref=f3e316]:
+          - listitem [ref=f3e317]:
+            - generic [aria-hidden] [ref=f3e318]: "01"
+            - generic [ref=f3e319]:
+              - heading "Install your kit." [level=3] [ref=f3e320]
+              - paragraph [ref=f3e321]: Start with Core. Add Pro for more features and the Midnight theme for the complete look.
+          - listitem [ref=f3e322]:
+            - generic [aria-hidden] [ref=f3e323]: "02"
+            - generic [ref=f3e324]:
+              - heading "Make it yours." [level=3] [ref=f3e325]
+              - paragraph [ref=f3e326]: Use the guided setup and native block editor to add your profile, content and weekly schedule.
+          - listitem [ref=f3e327]:
+            - generic [aria-hidden] [ref=f3e328]: "03"
+            - generic [ref=f3e329]:
+              - heading "Open the doors." [level=3] [ref=f3e330]
+              - paragraph [ref=f3e331]: Preview your pages, then publish on your own WordPress hosting and domain. Both are separate from the kit.
+      - region [ref=f3e332]:
+        - generic [ref=f3e333]:
+          - generic [ref=f3e334]: FIND YOUR STARTING POINT
+          - heading "A little corner. Or the whole loft." [level=2] [ref=f3e335]
+          - paragraph [ref=f3e336]: Start with the essentials or bring the complete Midnight experience to your website.
+        - generic [ref=f3e337]:
+          - article [ref=f3e338]:
+            - generic [ref=f3e339]: WordPress
+            - heading "Free" [level=3] [ref=f3e340]
+            - paragraph [ref=f3e341]: A simple place to start.
+            - generic [ref=f3e342]: US$0
+            - list [ref=f3e343]:
+              - listitem [ref=f3e344]: Click-to-load Twitch player
+              - listitem [ref=f3e347]: Creator profile & weekly schedule
+              - listitem [ref=f3e350]: WordPress block, shortcode & guided setup
+              - listitem [ref=f3e353]: Automatic live status for one Twitch, YouTube or Kick channel
+            - link "Download Free" [ref=f3e356] [cursor=pointer]:
+              - /url: /api/download?file=core
+          - article [ref=f3e357]:
+            - generic [ref=f3e358]: WordPress
+            - heading "Pro" [level=3] [ref=f3e359]
+            - paragraph [ref=f3e360]: For your existing website.
+            - generic [ref=f3e361]:
+              - text: US$39
+              - generic [ref=f3e362]: one-time
+            - list [ref=f3e363]:
+              - listitem [ref=f3e364]: Everything in Free
+              - listitem [ref=f3e367]: Twitch directories, clips, VODs & synchronized schedule
+              - listitem [ref=f3e370]: Eight layouts, chat & your own covers
+              - listitem [ref=f3e373]: YouTube and Kick source adapters (API credentials required)
+              - listitem [ref=f3e376]: Community links & standalone link page
+              - listitem [ref=f3e379]: "Named status bars: up to twelve channels, colors & page rules"
+            - generic [ref=f3e382]:
+              - generic [ref=f3e383]:
+                - checkbox "I agree to the terms and cancellation information and have read the privacy notice." [ref=f3e384]
+                - generic [ref=f3e385]:
+                  - text: I agree to the
+                  - link "terms and cancellation information" [ref=f3e386] [cursor=pointer]:
+                    - /url: /en/terms
+                  - text: and have read the
+                  - link "privacy notice" [ref=f3e387] [cursor=pointer]:
+                    - /url: /en/privacy
+                  - text: .
+              - button "Buy now" [ref=f3e388] [cursor=pointer]
+          - article [ref=f3e389]:
+            - generic [ref=f3e390]: The complete look
+            - heading "Website Kit" [level=3] [ref=f3e391]
+            - paragraph [ref=f3e392]: The complete streamer home.
+            - generic [ref=f3e393]:
+              - text: US$79
+              - generic [ref=f3e394]: one-time
+            - list [ref=f3e395]:
+              - listitem [ref=f3e396]: Everything in Pro
+              - listitem [ref=f3e399]: Midnight WordPress theme
+              - listitem [ref=f3e402]: Coordinated Home, About, Clips & Schedule templates
+            - generic [ref=f3e405]:
+              - generic [ref=f3e406]:
+                - checkbox "I agree to the terms and cancellation information and have read the privacy notice." [ref=f3e407]
+                - generic [ref=f3e408]:
+                  - text: I agree to the
+                  - link "terms and cancellation information" [ref=f3e409] [cursor=pointer]:
+                    - /url: /en/terms
+                  - text: and have read the
+                  - link "privacy notice" [ref=f3e410] [cursor=pointer]:
+                    - /url: /en/privacy
+                  - text: .
+              - button "Buy now" [ref=f3e411] [cursor=pointer]
+        - paragraph [ref=f3e412]: Paid packages include twelve months of updates and support for one website. Hosting and domain are separate. See the shop for availability, features and terms.
+        - paragraph [ref=f3e413]: USD prices include applicable VAT (19% in Germany). The final total and tax are shown before payment. Pro and Kit include 12 months of updates, downloads and product support for one website. Installed GPL software continues working afterwards. Hosting, domain, custom development and third-party services are separate.
+        - paragraph [ref=f3e414]: "Secure payment through Stripe: cards, Apple Pay, Google Pay, Klarna, Link and Amazon Pay. Available payment methods depend on your country, device and approval by the payment provider."
+        - region [ref=f3e415]:
+          - generic [ref=f3e416]:
+            - heading "Which edition fits your website?" [level=2] [ref=f3e417]
+            - paragraph [ref=f3e418]: Free gives you the essentials. Pro adds streaming tools. Website Kit includes the same Pro features and limits, plus the Midnight theme and matching templates.
+          - paragraph [ref=f3e419]: Scroll horizontally to compare all three editions. You can also focus the table area and use the arrow keys.
+          - region "Which edition fits your website?" [ref=f3e420]:
+            - table [ref=f3e421]:
+              - caption [ref=f3e422]: Which edition fits your website?
+              - rowgroup [ref=f3e423]:
+                - row [ref=f3e424]:
+                  - columnheader "Feature & scope" [ref=f3e425]
+                  - columnheader "Free US$0" [ref=f3e426]:
+                    - text: Free
+                    - generic [ref=f3e427]: US$0
+                  - columnheader "Pro US$39 one-time" [ref=f3e428]:
+                    - text: Pro
+                    - generic [ref=f3e429]:
+                      - text: US$39
+                      - generic [ref=f3e430]: one-time
+                  - columnheader "Website Kit US$79 one-time" [ref=f3e431]:
+                    - text: Website Kit
+                    - generic [ref=f3e432]:
+                      - text: US$79
+                      - generic [ref=f3e433]: one-time
+              - rowgroup [ref=f3e434]:
+                - row [ref=f3e435]:
+                  - rowheader "Essentials" [ref=f3e436]
+                - row [ref=f3e437]:
+                  - rowheader "Creator profile & social links" [ref=f3e438]
+                  - cell "Profile, local images and basic social links" [ref=f3e439]
+                  - cell "Profile, local images and basic social links" [ref=f3e440]
+                  - cell "Profile, local images and basic social links" [ref=f3e441]
+                - row [ref=f3e442]:
+                  - rowheader "Weekly schedule" [ref=f3e443]
+                  - cell "Manually managed weekly schedule" [ref=f3e444]
+                  - cell "Manually managed weekly schedule" [ref=f3e445]
+                  - cell "Manually managed weekly schedule" [ref=f3e446]
+                - row [ref=f3e447]:
+                  - rowheader "Twitch player" [ref=f3e448]
+                  - cell "Loads after a visitor clicks" [ref=f3e449]
+                  - cell "Loads after a visitor clicks" [ref=f3e450]
+                  - cell "Loads after a visitor clicks" [ref=f3e451]
+                - row [ref=f3e452]:
+                  - rowheader "WordPress setup" [ref=f3e453]
+                  - cell "Guided setup, native block and shortcode" [ref=f3e454]
+                  - cell "Guided setup, native block and shortcode" [ref=f3e455]
+                  - cell "Guided setup, native block and shortcode" [ref=f3e456]
+              - rowgroup [ref=f3e457]:
+                - row [ref=f3e458]:
+                  - rowheader "Streaming & content" [ref=f3e459]
+                - row [ref=f3e460]:
+                  - rowheader "Automatic live status" [ref=f3e461]
+                  - 'cell "One channel: Twitch, YouTube or Kick; own API connection" [ref=f3e462]'
+                  - cell "Up to twelve channels per named bar, across all three platforms" [ref=f3e463]
+                  - cell "Up to twelve channels per named bar, across all three platforms" [ref=f3e464]
+                - row [ref=f3e465]:
+                  - rowheader "Streaming directories" [ref=f3e466]
+                  - cell "Not included" [ref=f3e467]
+                  - cell "Twitch channels, teams, games and filters" [ref=f3e468]
+                  - cell "Twitch channels, teams, games and filters" [ref=f3e469]
+                - row [ref=f3e470]:
+                  - rowheader "Collection capacity" [ref=f3e471]
+                  - cell "Not included" [ref=f3e472]
+                  - cell "Up to 1,000 configured channels or 100 explicit media IDs per collection, depending on source" [ref=f3e473]
+                  - cell "Up to 1,000 configured channels or 100 explicit media IDs per collection, depending on source" [ref=f3e474]
+                - row [ref=f3e475]:
+                  - rowheader "Clips, VODs & featured picks" [ref=f3e476]
+                  - cell "Not included" [ref=f3e477]
+                  - cell "Browsable collections; up to 12 pinned profile clips" [ref=f3e478]
+                  - cell "Browsable collections; up to 12 pinned profile clips" [ref=f3e479]
+                - row [ref=f3e480]:
+                  - rowheader "Twitch schedule sync" [ref=f3e481]
+                  - cell "Not included" [ref=f3e482]
+                  - cell "Read-only synchronization from Twitch" [ref=f3e483]
+                  - cell "Read-only synchronization from Twitch" [ref=f3e484]
+                - row [ref=f3e485]:
+                  - rowheader "Twitch chat" [ref=f3e486]
+                  - cell "Not included" [ref=f3e487]
+                  - cell "Loads after separate visitor confirmation" [ref=f3e488]
+                  - cell "Loads after separate visitor confirmation" [ref=f3e489]
+                - row [ref=f3e490]:
+                  - rowheader "YouTube & Kick" [ref=f3e491]
+                  - cell "External channel links" [ref=f3e492]
+                  - cell "Video, live and channel adapters; separate API credentials required" [ref=f3e493]
+                  - cell "Video, live and channel adapters; separate API credentials required" [ref=f3e494]
+                - row [ref=f3e495]:
+                  - rowheader "Additional links & link page" [ref=f3e496]
+                  - cell "Basic profile links" [ref=f3e497]
+                  - cell "Up to 30 additional entries and a standalone link page" [ref=f3e498]
+                  - cell "Up to 30 additional entries and a standalone link page" [ref=f3e499]
+                - row [ref=f3e500]:
+                  - rowheader "Status bar placement" [ref=f3e501]
+                  - cell "Block, shortcode, global top or bottom bar" [ref=f3e502]
+                  - cell "Also page rules and platform selection" [ref=f3e503]
+                  - cell "Also page rules and platform selection" [ref=f3e504]
+                - row [ref=f3e505]:
+                  - rowheader "Status bar design" [ref=f3e506]
+                  - cell "Light/dark, accent color, hide offline" [ref=f3e507]
+                  - cell "Also custom colors, stream details and expanded layout" [ref=f3e508]
+                  - cell "Also custom colors, stream details and expanded layout" [ref=f3e509]
+              - rowgroup [ref=f3e510]:
+                - row [ref=f3e511]:
+                  - rowheader "Design" [ref=f3e512]
+                - row [ref=f3e513]:
+                  - rowheader "Streaming layouts & covers" [ref=f3e514]
+                  - cell "Not included" [ref=f3e515]
+                  - cell "8 layouts; up to 100 local covers per collection" [ref=f3e516]
+                  - cell "8 layouts; up to 100 local covers per collection" [ref=f3e517]
+                - row [ref=f3e518]:
+                  - rowheader "Midnight theme" [ref=f3e519]
+                  - cell "Use your own theme" [ref=f3e520]
+                  - cell "Use your own theme" [ref=f3e521]
+                  - cell "Midnight theme included" [ref=f3e522]
+                - row [ref=f3e523]:
+                  - rowheader "Matching page templates" [ref=f3e524]
+                  - cell "Use your own theme" [ref=f3e525]
+                  - cell "Use your own theme" [ref=f3e526]
+                  - cell "Home, About, Clips and Schedule" [ref=f3e527]
+              - rowgroup [ref=f3e528]:
+                - row [ref=f3e529]:
+                  - rowheader "Updates & support" [ref=f3e530]
+                - row [ref=f3e531]:
+                  - rowheader "Updates & downloads" [ref=f3e532]
+                  - cell "Free Core updates" [ref=f3e533]
+                  - cell "12 months of Pro updates and downloads" [ref=f3e534]
+                  - cell "12 months of Pro and Midnight updates and downloads" [ref=f3e535]
+                - row [ref=f3e536]:
+                  - rowheader "Product support" [ref=f3e537]
+                  - cell "No paid product support included" [ref=f3e538]
+                  - cell "12 months for one website" [ref=f3e539]
+                  - cell "12 months for one website" [ref=f3e540]
+                - row [ref=f3e541]:
+                  - rowheader "After the purchase period" [ref=f3e542]
+                  - cell "Core stays free" [ref=f3e543]
+                  - cell "Installed software keeps working; optional renewal, no subscription" [ref=f3e544]
+                  - cell "Installed software keeps working; optional renewal, no subscription" [ref=f3e545]
+                - row [ref=f3e546]:
+                  - rowheader "Hosting & domain" [ref=f3e547]
+                  - cell "Arrange separately" [ref=f3e548]
+                  - cell "Arrange separately" [ref=f3e549]
+                  - cell "Arrange separately" [ref=f3e550]
+          - generic [ref=f3e551]:
+            - paragraph [ref=f3e552]: "Collection limits depend on the source: automatic clips support up to five Twitch channels, archives and synchronized schedules one channel each. Source pages show up to 48 items (25 schedule segments or twelve mixed channels). These are collection and page limits, not simultaneous player counts."
+            - paragraph [ref=f3e553]: Automatic data needs your own provider API credentials. YouTube and Kick adapters have controlled test coverage; live account verification is still pending. New YouTube broadcasts are discovered hourly, known video status refreshes each minute. Provider quotas and embedding restrictions apply. Twitch players below 400 pixels open externally.
+      - region [ref=f3e554]:
+        - generic [ref=f3e555]:
+          - generic [ref=f3e556]: A FEW GOOD QUESTIONS
+          - heading "Before you move in." [level=2] [ref=f3e557]
+          - link "Visit Help" [ref=f3e558] [cursor=pointer]:
+            - /url: /en/help
+        - generic [ref=f3e562]:
+          - group [ref=f3e563]:
+            - generic "What is StreamerLoft?" [ref=f3e564] [cursor=pointer]:
+              - text: What is StreamerLoft?
+              - generic [aria-hidden] [ref=f3e565]: +
+          - group [ref=f3e566]:
+            - generic "Are hosting and a domain included?" [ref=f3e567] [cursor=pointer]:
+              - text: Are hosting and a domain included?
+              - generic [aria-hidden] [ref=f3e568]: +
+          - group [ref=f3e569]:
+            - generic "Which platforms are supported?" [ref=f3e570] [cursor=pointer]:
+              - text: Which platforms are supported?
+              - generic [aria-hidden] [ref=f3e571]: +
+          - group [ref=f3e572]:
+            - generic "Do I need to code?" [ref=f3e573] [cursor=pointer]:
+              - text: Do I need to code?
+              - generic [aria-hidden] [ref=f3e574]: +
+          - group [ref=f3e575]:
+            - generic "What happens when my stream is offline?" [ref=f3e576] [cursor=pointer]:
+              - text: What happens when my stream is offline?
+              - generic [aria-hidden] [ref=f3e577]: +
+          - group [ref=f3e578]:
+            - generic "Is this a subscription?" [ref=f3e579] [cursor=pointer]:
+              - text: Is this a subscription?
+              - generic [aria-hidden] [ref=f3e580]: +
+      - generic [ref=f3e582]:
+        - generic [ref=f3e583]: YOUR NEXT CHAPTER STARTS HERE
+        - heading "Give your stream a home." [level=2] [ref=f3e584]
+        - link "Get the website kit" [ref=f3e585] [cursor=pointer]:
+          - /url: "#packages"
+    - contentinfo [ref=f3e586]:
+      - generic [ref=f3e587]: © 2026 StreamerLoft · by lkmedia
+      - link "Questions? We've got you" [ref=f3e588] [cursor=pointer]:
+        - /url: "#faq"
+      - link "Imprint" [ref=f3e589] [cursor=pointer]:
+        - /url: /en/imprint
+      - link "Privacy" [ref=f3e590] [cursor=pointer]:
+        - /url: /en/privacy
+      - link "Terms" [ref=f3e591] [cursor=pointer]:
+        - /url: /en/terms
+      - link "Downloads" [ref=f3e592] [cursor=pointer]:
+        - /url: /en/downloads

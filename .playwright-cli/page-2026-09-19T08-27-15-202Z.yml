@@ -1,0 +1,134 @@
+- generic [active] [ref=e1]:
+  - main [ref=e5]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]: Hi, I'm Lucas
+        - generic [ref=e12]: Freelance software developer since 2015. I build web apps, WordPress products, browser extensions and AI integrations — and make music as Livvux.
+      - generic [ref=e14]: LK
+    - generic [ref=e18]:
+      - heading "About" [level=2] [ref=e20]
+      - paragraph [ref=e23]:
+        - text: "Since 2015 I've been self-employed as a freelance developer. I design and ship products end to end:"
+        - link "StreamerLoft" [ref=e24] [cursor=pointer]:
+          - /url: https://streamerloft.com
+        - text: ", a WordPress kit that gives Twitch creators a home for their stream,"
+        - link "pfotenweb.de" [ref=e25] [cursor=pointer]:
+          - /url: https://pfotenweb.de
+        - text: ", a self-hosted website for animal welfare organizations, and a growing set of open-source tools on"
+        - link "GitHub" [ref=e26] [cursor=pointer]:
+          - /url: https://github.com/Livvux
+        - text: — from WordPress AI plugins to FiveM tooling. Based in Karlsruhe, Germany. Away from the keyboard, I produce emotional EDM as
+        - link "Livvux" [ref=e27] [cursor=pointer]:
+          - /url: https://livvux.com
+        - text: .
+    - generic [ref=e29]:
+      - heading "Skills" [level=2] [ref=e31]
+      - generic [ref=e32]:
+        - generic [ref=e33]: TypeScript
+        - generic [ref=e39]: React
+        - generic [ref=e47]: Next.js
+        - generic [ref=e55]: Node.js
+        - generic [ref=e62]: PHP
+        - generic [ref=e65]: WordPress
+        - generic [ref=e68]: Python
+        - generic [ref=e74]: PostgreSQL
+        - generic [ref=e88]: Astro
+        - generic [ref=e91]: Lua
+    - generic [ref=e97]:
+      - generic [ref=e98]:
+        - generic [ref=e99]: My Projects
+        - generic [ref=e103]:
+          - heading "Check out my latest work" [level=2] [ref=e104]
+          - paragraph [ref=e105]: I've worked on a variety of projects, from simple websites to complex web applications. Here are a few of my favorites.
+      - generic [ref=e106]:
+        - generic [ref=e108] [cursor=pointer]:
+          - generic [ref=e109]:
+            - link [ref=e110]:
+              - /url: https://streamerloft.com
+            - link "Website" [ref=e113]:
+              - /url: https://streamerloft.com
+          - generic [ref=e118]:
+            - generic [ref=e119]:
+              - generic [ref=e120]:
+                - heading "StreamerLoft" [level=3] [ref=e121]
+                - time
+              - link "Open StreamerLoft" [ref=e122]:
+                - /url: https://streamerloft.com
+            - paragraph [ref=e127]: "A WordPress kit for Twitch creators: creator profile, click-to-load player, schedule, clips and community pages. Ships as a free Core edition, a Pro tier with multi-channel collections and a complete Midnight theme kit."
+            - generic [ref=e128]:
+              - generic [ref=e129]: WordPress
+              - generic [ref=e130]: PHP
+              - generic [ref=e131]: TypeScript
+        - generic [ref=e133] [cursor=pointer]:
+          - generic [ref=e134]:
+            - link [ref=e135]:
+              - /url: https://pfotenweb.de
+            - generic [ref=e137]:
+              - link "Website" [ref=e138]:
+                - /url: https://pfotenweb.de
+              - link [ref=e143]:
+                - /url: https://github.com/Livvux/pfotenweb
+                - generic [ref=e144]:
+                  - img "GitHub" [ref=e145]
+                  - text: Source
+          - generic [ref=e147]:
+            - generic [ref=e148]:
+              - generic [ref=e149]:
+                - heading "pfotenweb.de" [level=3] [ref=e150]
+                - time [ref=e151]: 2026 - Present
+              - link "Open pfotenweb.de" [ref=e152]:
+                - /url: https://pfotenweb.de
+            - paragraph [ref=e157]: MIT-licensed, self-hosted website for animal welfare organizations. Install it yourself, adapt it to your shelter and run it — no vendor lock-in.
+            - generic [ref=e158]:
+              - generic [ref=e159]: TypeScript
+              - generic [ref=e160]: Docker
+              - generic [ref=e161]: Next.js
+        - generic [ref=e163] [cursor=pointer]:
+          - generic [ref=e164]:
+            - link [ref=e165]:
+              - /url: https://github.com/Livvux
+            - link [ref=e168]:
+              - /url: https://github.com/Livvux
+              - generic [ref=e169]:
+                - img "GitHub" [ref=e170]
+                - text: GitHub
+          - generic [ref=e172]:
+            - generic [ref=e173]:
+              - generic [ref=e174]:
+                - heading "Open Source" [level=3] [ref=e175]
+                - time
+              - link "Open Open Source" [ref=e176]:
+                - /url: https://github.com/Livvux
+            - paragraph [ref=e181]: "My public GitHub work: WordPress plugins for AI translation engines, an MCP client for WordPress, a Chrome extension for local full-text search and backups, FiveM tooling and more."
+            - generic [ref=e182]:
+              - generic [ref=e183]: TypeScript
+              - generic [ref=e184]: PHP
+              - generic [ref=e185]: Python
+              - generic [ref=e186]: Lua
+    - generic [ref=e189]:
+      - generic [ref=e190]: Contact
+      - generic [ref=e193]:
+        - heading "Get in Touch" [level=2] [ref=e194]
+        - paragraph [ref=e195]:
+          - text: Want to chat? Just shoot me a dm
+          - link "with a direct question on X" [ref=e196] [cursor=pointer]:
+            - /url: https://x.com/Livvux
+          - text: and I'll respond whenever I can. I will ignore all soliciting.
+  - generic [ref=e197]:
+    - link [ref=e198] [cursor=pointer]:
+      - /url: /
+    - link [ref=e204] [cursor=pointer]:
+      - /url: /blog
+    - link [ref=e209] [cursor=pointer]:
+      - /url: https://github.com/Livvux
+      - img "GitHub" [ref=e212]
+    - link [ref=e214] [cursor=pointer]:
+      - /url: https://www.linkedin.com/in/lucaskleipoedszus/
+      - img "LinkedIn" [ref=e217]
+    - link [ref=e219] [cursor=pointer]:
+      - /url: https://x.com/Livvux
+      - img "X" [ref=e222]
+    - link [ref=e224] [cursor=pointer]:
+      - /url: https://www.youtube.com/livvux
+      - img "youtube" [ref=e227]
+    - button [ref=e231] [cursor=pointer]

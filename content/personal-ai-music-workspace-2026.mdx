@@ -1,0 +1,129 @@
+---
+title: "Build a Personal AI Music Workspace: A Practical 2026 Blueprint"
+publishedAt: "2026-09-19"
+updatedAt: "2026-09-19"
+author: "Livvux"
+summary: "Design a personal AI music workspace with local capture, reviewed briefs, optional generation, clear permissions, and a reliable handoff to your DAW."
+---
+
+The AI music tool I would build is not an infinite song generator. It is a small workspace that remembers the idea, keeps private material private by default, and helps a creator make the next decision.
+
+For someone who loses momentum between a voice note and a production session, the missing feature may not be a better model. It may be a clear path back to the project.
+
+Here is a practical blueprint for that kind of system in 2026. This is an architecture proposal, not a claim that a finished application has been built or that the design has been clinically validated for ADHD.
+
+## Begin with the workflow you want to preserve
+
+The core path should be short:
+
+```text
+Capture → Review the brief → Explore → Choose → Edit → Review release
+```
+
+Capture should work without a cloud account or a generation request. The person records an idea, saves a text note, or attaches an original audio file. The application stores it before asking for optional details.
+
+Review turns that material into a brief the person actually approves. Exploration comes afterward. Generated alternatives stay separate from accepted material, and publication remains a deliberate decision.
+
+W3C's supplemental cognitive-accessibility guidance recommends minimizing unnecessary steps, limiting interruptions, and avoiding data loss. It is a useful design reference here, not a medical endorsement of this proposed workflow.[^coga]
+
+The first screen should answer three questions: Which project am I in? What was I trying to make? What is the next action? A dashboard of generated tracks can wait.
+
+## Keep capture local and cloud processing optional
+
+A first version could store text, recordings, and project metadata locally. Add transcription as an optional step rather than a requirement for saving an idea.
+
+The open-source whisper.cpp project documents offline, on-device speech transcription, including examples on Apple hardware. It is one concrete building block for this architecture, not a claim that every device will process every model at a useful speed.[^whisper]
+
+Keep the original recording beside the transcript. Ask the user to review lyrics, names, or meaningful phrases before those words become an accepted brief. A failed transcription must not prevent access to the recording.
+
+Local storage does not excuse weak security. In this design, protect the device and backups, keep credentials out of project exports, and clearly separate synced folders from material intended to stay on one machine. Before any cloud upload, show exactly which assets will leave the device and why.
+
+Do not make consent a decorative checkbox. The application should refuse an external upload unless the relevant asset has an explicit authorization state.
+
+## Make project state readable without the AI
+
+Store the important decisions in a small manifest, not only inside a conversation. The example below is an application-owned data format, not the request schema of a particular AI provider.
+
+```json
+{
+  "schema_version": 1,
+  "project_id": "quiet-return-001",
+  "intent": "Relief without a triumphant ending",
+  "phase": "captured",
+  "source_assets": [
+    {
+      "path": "input/voice-note.wav",
+      "origin": "self_recorded",
+      "rights_status": "unreviewed",
+      "external_upload_allowed": false
+    }
+  ],
+  "accepted_brief": null,
+  "next_action": "Review the local transcript.",
+  "limits": {
+    "max_candidates": 3,
+    "max_cloud_spend_eur": 2.00
+  },
+  "release": {
+    "approved": false,
+    "approved_asset_sha256": null
+  }
+}
+```
+
+The example deliberately starts with permissions unresolved and release disabled. A self-recorded file can still contain someone else's speech or music. The origin field is useful context, not proof of clearance.
+
+The candidate and spending limits are adjustable example settings, not current provider prices or an estimate of how many generations two euros will buy. Enforce them in application logic; a prompt asking a model to respect a budget is not a spending control.
+
+Validate the manifest, preserve version history, and write changes atomically so an interrupted save cannot replace a working file with a partial one. A user should be able to read the current goal even when the model service is unavailable.
+
+## Use models for proposals, not permission decisions
+
+A language model can propose a brief from a transcript, extract musical constraints, or suggest a next action. It should not approve its own interpretation or change upload permissions.
+
+For example, keep “the user asked for an unresolved ending” separate from “the model suggests a suspended final chord.” The first is a recorded intention. The second is an option to audition.
+
+Google's safety guidance warns that generative systems can produce inaccurate outputs and recommends evaluation appropriate to the application. That supports a practical boundary: a fluent answer is still unreviewed data.[^safety]
+
+Validate structured responses against the application's schema. Reject unexpected fields. Do not execute instructions embedded in transcripts or generated text. Permission changes, file deletion, and release approval should belong to explicit interface actions, not model-generated messages.
+
+For a small first version, skip autonomous agents entirely. A bounded request followed by a clear review screen is easier to inspect.
+
+## Add generation behind a replaceable connector
+
+Only add a music-generation service after the capture and review path works.
+
+Google's Lyria RealTime documentation describes interactive instrumental generation over a persistent WebSocket connection and labels the model experimental. It demonstrates that a continuously steerable exploration mode is technically available; it does not guarantee production suitability for this app.[^realtime]
+
+Keep provider-specific authentication, formats, and session behavior behind a connector. The rest of the application should work with its own concepts: project, request, candidate, accepted asset, and review status.
+
+Never place a secret provider key in a public browser bundle. Use an appropriately secured backend for a web deployment or protected credential storage in a local application. Keep provider secrets out of logs.
+
+When a request times out, show that its outcome is unknown. Record a job identifier and reconcile status where the provider supports it before retrying. Where reconciliation is unavailable, require a deliberate retry with a warning about possible duplicate work or charges. Silence is not evidence that nothing happened.
+
+## Treat the DAW handoff as a real feature
+
+The workspace should export a useful project package rather than promise to replace every production tool.
+
+Include the selected audio, the approved brief, the original input where appropriate, a concise decision log, and provenance information. Record actual audio properties from the exported file. Mark tempo or key as unknown unless they have been established, and distinguish a model-requested tempo from a verified one.
+
+Do not claim separated stems when the provider only returned a stereo mix. Label transformations such as resampling or normalization when your application performs them. Preserve an untouched source copy.
+
+The re-entry note is part of the export: “Open this session. Compare these two endings. Keep the opening sparse.” That may be more useful to the creator than another batch of candidates.
+
+## Make approval belong to an exact file
+
+A green approval badge should refer to a particular export, not an entire project forever.
+
+Store a hash of the approved file, the approval time, and the reviewer. When the audio or credits change, require another review. Keep permissions for publishing separate from permissions for generating, and do not enable automatic publication in the initial design.
+
+Before calling the prototype dependable, test interrupted saves, unavailable models, malformed responses, revoked upload permission, budget exhaustion, and an edited export after approval. Also test the simple path without any AI: capture, reopen, read the note, and continue.
+
+An accessibility-focused review should involve intended users, not just a developer deciding the interface looks calm. Ask whether people can recover from interruptions and understand what will happen before they act.
+
+I would judge the first version by how well it preserves work and supports deliberate decisions—not by how much audio it generates. The system has done its job when the creator can return, recognize their intention, and keep making the piece.
+
+[^coga]: W3C, “Making Content Usable for People with Cognitive and Learning Disabilities.” [Supplemental accessibility guidance](https://www.w3.org/TR/coga-usable/). Accessed September 19, 2026. A Working Group Note/work in progress, not clinical evidence for an ADHD intervention.
+[^whisper]: ggml-org, whisper.cpp. [Official project repository and documentation](https://github.com/ggml-org/whisper.cpp). Accessed September 19, 2026. Offline examples establish a capability, not a performance benchmark for this proposed application.
+[^safety]: Google AI for Developers, “Safety and factuality guidance.” [Official guidance](https://ai.google.dev/gemini-api/docs/safety-guidance). Accessed September 19, 2026.
+[^realtime]: Google AI for Developers, “Real-time music generation using Lyria RealTime.” [Official API documentation](https://ai.google.dev/gemini-api/docs/realtime-music-generation). Accessed September 19, 2026. Experimental status and provider interfaces may change.

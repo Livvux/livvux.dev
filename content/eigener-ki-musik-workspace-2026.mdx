@@ -1,0 +1,129 @@
+---
+title: "Einen eigenen KI-Musik-Workspace bauen: Der Bauplan f\u00fcr 2026"
+publishedAt: "2026-09-19"
+updatedAt: "2026-09-19"
+author: "Livvux"
+summary: "Ein Bauplan f\u00fcr deinen KI-Musik-Workspace: lokale Ideenerfassung, gepr\u00fcfte Vorgaben, optionale Generierung, klare Freigaben und die \u00dcbergabe an deine DAW."
+---
+
+Das KI-Musikwerkzeug, das ich bauen würde, wäre kein Generator für endlos viele Songs. Es wäre ein kleiner Workspace, der die Idee bewahrt, privates Material standardmäßig privat hält und bei der nächsten Entscheidung hilft.
+
+Wer zwischen Sprachnotiz und Produktionssession den Anschluss verliert, braucht möglicherweise nicht zuerst ein besseres Modell. Vielleicht fehlt einfach ein klarer Weg zurück ins Projekt.
+
+Hier ist ein technischer Bauplan für ein solches System im Jahr 2026. Er beschreibt eine Architektur, keine bereits fertiggestellte Anwendung und auch keine klinisch geprüfte Unterstützung bei ADHS.
+
+## Beginne mit dem Arbeitsablauf, den du erhalten möchtest
+
+Der zentrale Weg sollte kurz sein:
+
+```text
+Erfassen → Vorgabe prüfen → Erkunden → Auswählen → Bearbeiten → Veröffentlichung prüfen
+```
+
+Das Erfassen muss ohne Cloud-Konto und ohne Generierungsauftrag funktionieren. Ein Mensch nimmt eine Idee auf, speichert eine Textnotiz oder hängt eine eigene Audiodatei an. Die Anwendung sichert das Material, bevor sie optionale Angaben verlangt.
+
+Bei der Prüfung entsteht daraus eine Vorgabe, der die Person tatsächlich zustimmt. Erst danach beginnt das Experimentieren. Generierte Varianten bleiben von übernommenem Material getrennt. Die Veröffentlichung bleibt eine bewusste Entscheidung.
+
+Die ergänzende W3C-Leitlinie zur kognitiven Barrierefreiheit empfiehlt weniger unnötige Schritte, begrenzte Unterbrechungen und Schutz vor Datenverlust. Sie ist hier eine sinnvolle Gestaltungshilfe, keine medizinische Empfehlung für diesen vorgeschlagenen Workflow.[^coga]
+
+Der erste Bildschirm sollte drei Fragen beantworten: In welchem Projekt bin ich? Was wollte ich gestalten? Was ist die nächste Handlung? Eine Übersicht generierter Tracks kann warten.
+
+## Erfasse lokal und mache Cloud-Verarbeitung optional
+
+Eine erste Version könnte Texte, Aufnahmen und Projektmetadaten lokal speichern. Die Transkription käme als optionaler Schritt dazu und nicht als Voraussetzung, um eine Idee festzuhalten.
+
+Das Open-Source-Projekt whisper.cpp dokumentiert Offline-Spracherkennung direkt auf dem Gerät, unter anderem mit Beispielen auf Apple-Hardware. Es ist ein konkreter möglicher Baustein, kein Versprechen, dass jedes Gerät mit jedem Modell ausreichend schnell arbeitet.[^whisper]
+
+Bewahre die Originalaufnahme neben der Abschrift auf. Lass Liedzeilen, Namen und bedeutungsvolle Formulierungen prüfen, bevor daraus eine bestätigte Vorgabe wird. Eine fehlgeschlagene Transkription darf den Zugriff auf die Aufnahme nicht blockieren.
+
+Lokale Speicherung entschuldigt keine schwache Absicherung. Schütze in diesem Entwurf Gerät und Backups, halte Zugangsdaten aus Projektexporten heraus und unterscheide synchronisierte Ordner klar von Material, das auf einem einzigen Gerät bleiben soll. Zeige vor einem Cloud-Upload genau, welche Dateien das Gerät verlassen und wozu.
+
+Zustimmung darf kein dekoratives Kontrollkästchen sein. Die Anwendung sollte einen externen Upload ablehnen, solange für das betreffende Material keine ausdrückliche Freigabe vorliegt.
+
+## Mache den Projektstand ohne KI verständlich
+
+Speichere wichtige Entscheidungen in einer kleinen Manifestdatei und nicht ausschließlich in einem Chat. Das folgende Beispiel ist ein eigenes Datenformat der Anwendung, kein Anfrageschema eines bestimmten KI-Anbieters.
+
+```json
+{
+  "schema_version": 1,
+  "project_id": "quiet-return-001",
+  "intent": "Erleichterung ohne triumphales Ende",
+  "phase": "captured",
+  "source_assets": [
+    {
+      "path": "input/voice-note.wav",
+      "origin": "self_recorded",
+      "rights_status": "unreviewed",
+      "external_upload_allowed": false
+    }
+  ],
+  "accepted_brief": null,
+  "next_action": "Lokale Abschrift prüfen.",
+  "limits": {
+    "max_candidates": 3,
+    "max_cloud_spend_eur": 2.00
+  },
+  "release": {
+    "approved": false,
+    "approved_asset_sha256": null
+  }
+}
+```
+
+Das Beispiel beginnt bewusst mit ungeklärten Rechten und deaktivierter Veröffentlichung. Auch eine selbst aufgenommene Datei kann fremde Stimmen oder Musik enthalten. Die Herkunftsangabe liefert Kontext, aber keinen Nachweis geklärter Rechte.
+
+Die Grenzen für Varianten und Ausgaben sind veränderbare Beispielwerte. Sie sind weder aktuelle Anbieterpreise noch eine Schätzung, wie viele Generierungen zwei Euro ermöglichen. Setze diese Grenzen in der Anwendungslogik durch. Ein Prompt, der das Modell um Sparsamkeit bittet, ist keine Kostenkontrolle.
+
+Validiere das Manifest, bewahre frühere Versionen und schreibe Änderungen atomar, sodass ein abgebrochener Speichervorgang keine funktionierende Datei durch eine unvollständige ersetzt. Das aktuelle Ziel sollte auch dann lesbar bleiben, wenn der Modelldienst nicht erreichbar ist.
+
+## Modelle machen Vorschläge, keine Freigaben
+
+Ein Sprachmodell kann aus einer Abschrift eine Vorgabe vorschlagen, musikalische Grenzen herausarbeiten oder einen nächsten Schritt formulieren. Es sollte weder seine eigene Interpretation freigeben noch Upload-Berechtigungen verändern.
+
+Trenne zum Beispiel „Die Person möchte ein offenes Ende“ von „Das Modell schlägt einen schwebenden Schlussakkord vor“. Das Erste ist eine festgehaltene Absicht. Das Zweite ist eine Möglichkeit zum Anhören.
+
+Googles Sicherheitshinweise warnen vor unzutreffenden generierten Ausgaben und empfehlen eine zum Einsatz passende Prüfung. Daraus ergibt sich eine praktische Grenze: Auch eine überzeugend formulierte Antwort bleibt zunächst ungeprüftes Material.[^safety]
+
+Prüfe strukturierte Antworten gegen das Schema der Anwendung. Lehne unerwartete Felder ab. Führe keine Anweisungen aus, die in Abschriften oder generierten Texten stecken. Berechtigungsänderungen, Dateilöschungen und Veröffentlichungsfreigaben gehören in ausdrücklich ausgelöste Bedienhandlungen, nicht in Modellantworten.
+
+Für eine kleine erste Version würde ich vollständig auf autonome Agenten verzichten. Eine begrenzte Anfrage mit anschließender klarer Prüfansicht lässt sich leichter nachvollziehen.
+
+## Ergänze Generierung über eine austauschbare Schnittstelle
+
+Ein Musikgenerierungsdienst kommt erst dazu, wenn Erfassen und Prüfen zuverlässig funktionieren.
+
+Googles Dokumentation zu Lyria RealTime beschreibt interaktive Instrumentalgenerierung über eine dauerhafte WebSocket-Verbindung und kennzeichnet das Modell als experimentell. Sie zeigt, dass ein fortlaufend steuerbarer Erkundungsmodus technisch verfügbar ist. Seine Eignung für den produktiven Einsatz in dieser Anwendung ist damit nicht garantiert.[^realtime]
+
+Kapsele anbieterspezifische Anmeldung, Formate und Sitzungsabläufe in einem austauschbaren Modul. Der Rest der Anwendung arbeitet mit eigenen Begriffen: Projekt, Anfrage, Variante, übernommene Datei und Prüfstatus.
+
+Ein geheimer API-Schlüssel gehört niemals in ein öffentlich ausgeliefertes Browser-Bundle. Verwende bei einer Webanwendung ein entsprechend abgesichertes Backend oder bei einer lokalen Anwendung einen geschützten Zugangsdaten-Speicher. Halte solche Schlüssel aus Protokollen heraus.
+
+Wenn eine Anfrage in einen Timeout läuft, zeige ihren Ausgang als unbekannt an. Speichere eine Auftragskennung und gleiche den Status vor einem erneuten Versuch ab, soweit der Anbieter das unterstützt. Ist kein Abgleich möglich, verlange einen bewussten Wiederholungsauftrag mit Hinweis auf mögliche doppelte Verarbeitung oder Kosten. Eine ausbleibende Antwort beweist nicht, dass nichts passiert ist.
+
+## Plane die Übergabe an die Musiksoftware mit ein
+
+Der Workspace sollte ein brauchbares Projektpaket exportieren, statt den Ersatz sämtlicher Produktionswerkzeuge zu versprechen.
+
+Dazu gehören ausgewähltes Audio, bestätigte Vorgabe, gegebenenfalls Originalmaterial, ein knappes Entscheidungsprotokoll und Angaben zur Herkunft. Lies die tatsächlichen Audioeigenschaften aus der exportierten Datei. Kennzeichne Tempo oder Tonart als unbekannt, solange sie nicht festgestellt wurden. Unterscheide ein beim Modell angefordertes Tempo von einem überprüften Wert.
+
+Versprich keine getrennten Spuren, wenn der Anbieter nur einen Stereomix geliefert hat. Dokumentiere Umwandlungen wie Resampling oder Normalisierung, wenn deine Anwendung sie durchführt. Bewahre eine unveränderte Quelldatei.
+
+Die Wiedereinstiegsnotiz gehört zum Export: „Diese Session öffnen. Diese beiden Enden vergleichen. Den Anfang sparsam halten.“ Für die Person kann das hilfreicher sein als eine weitere Sammlung generierter Varianten.
+
+## Binde die Freigabe an eine konkrete Datei
+
+Eine grüne Freigabemarkierung sollte für einen bestimmten Export gelten und nicht unbegrenzt für ein ganzes Projekt.
+
+Speichere einen Hash der freigegebenen Datei, den Freigabezeitpunkt und die prüfende Person. Ändern sich Audio oder Credits, wird eine erneute Prüfung notwendig. Trenne die Berechtigung zum Veröffentlichen von der Berechtigung zum Generieren. Aktiviere im ersten Entwurf keine automatische Veröffentlichung.
+
+Bevor du den Prototyp als zuverlässig bezeichnest, teste abgebrochene Speichervorgänge, nicht verfügbare Modelle, fehlerhafte Antworten, entzogene Upload-Freigaben, ausgeschöpfte Budgets und veränderte Exporte nach einer Freigabe. Prüfe außerdem den einfachen Weg ohne KI: erfassen, erneut öffnen, Notiz lesen, weiterarbeiten.
+
+Bei der Prüfung der Zugänglichkeit sollten Menschen aus der Zielgruppe mitwirken. Es reicht nicht, dass ein Entwickler die Oberfläche ruhig findet. Frage, ob Menschen nach Unterbrechungen zurückfinden und vor einer Handlung verstehen, was passieren wird.
+
+Die erste Version würde ich daran messen, wie gut sie Arbeit bewahrt und bewusste Entscheidungen unterstützt – nicht daran, wie viel Audio sie erzeugt. Sie erfüllt ihren Zweck, wenn jemand zurückkommen, die eigene Absicht wiedererkennen und am Stück weiterarbeiten kann.
+
+[^coga]: W3C, „Making Content Usable for People with Cognitive and Learning Disabilities“. [Ergänzende Hinweise zur Barrierefreiheit](https://www.w3.org/TR/coga-usable/). Abgerufen am 19. September 2026. Working Group Note in Weiterentwicklung, keine klinischen Belege für eine ADHS-Intervention.
+[^whisper]: ggml-org, whisper.cpp. [Offizielles Projekt-Repository mit Dokumentation](https://github.com/ggml-org/whisper.cpp). Abgerufen am 19. September 2026. Offline-Beispiele belegen eine Fähigkeit, keinen Leistungsbenchmark dieser vorgeschlagenen Anwendung.
+[^safety]: Google AI for Developers, „Safety and factuality guidance“. [Offizielle Hinweise](https://ai.google.dev/gemini-api/docs/safety-guidance). Abgerufen am 19. September 2026.
+[^realtime]: Google AI for Developers, „Real-time music generation using Lyria RealTime“. [Offizielle API-Dokumentation](https://ai.google.dev/gemini-api/docs/realtime-music-generation). Abgerufen am 19. September 2026. Experimenteller Status und Anbieterschnittstellen können sich ändern.
