@@ -7,67 +7,74 @@ import { MDXContent } from "@content-collections/mdx/react";
 import { mdxComponents } from "@/mdx-components";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  findPost,
+  getPosts,
+  hrefFor,
+  postId,
+  postLang,
+  translationOf,
+  type PostLang,
+} from "@/lib/posts";
 
-function getSortedPosts() {
-  return [...allPosts].sort((a, b) => {
-    if (new Date(a.publishedAt) > new Date(b.publishedAt)) {
-      return -1;
-    }
-    return 1;
-  });
+function formatPostDate(date: string, lang: PostLang) {
+  return formatDate(new Date(date), lang === "de" ? "de-DE" : "en-US");
 }
 
 export async function generateStaticParams() {
-  return allPosts.map((post) => ({
-    slug: post._meta.path.replace(/\.mdx$/, ""),
-  }));
+  return allPosts.map((post) => {
+    const id = postId(post);
+    return { slug: postLang(post) === "de" ? [id, "de"] : [id] };
+  });
 }
 
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{
-    slug: string;
+    slug: string[];
   }>;
 }): Promise<Metadata | undefined> {
   const { slug } = await params;
-  const post = allPosts.find((p) => p._meta.path.replace(/\.mdx$/, "") === slug);
+  const post = findPost(slug);
 
   if (!post) {
     return undefined;
   }
 
-  let {
-    title,
-    publishedAt: publishedTime,
-    summary: description,
-    image,
-  } = post;
+  const id = postId(post);
+  const lang = postLang(post);
+  const canonicalHref =
+    lang === "de" ? `/blog/${id}/de` : `/blog/${id}`;
+  const { title, publishedAt: publishedTime, summary: description, image } = post;
+  const translation = translationOf(post);
+  const ogImage = `${DATA.url}/blog/og${lang === "de" ? `/${id}/de` : `/${id}`}`;
 
   return {
     title,
     description,
+    alternates: {
+      canonical: `${DATA.url}${canonicalHref}`,
+      ...(translation && {
+        languages: {
+          en: `${DATA.url}/blog/${id}`,
+          de: `${DATA.url}/blog/${id}/de`,
+        },
+      }),
+    },
     openGraph: {
       title,
       description,
       type: "article",
       publishedTime,
-      url: `${DATA.url}/blog/${slug}`,
-      ...(image && {
-        images: [
-          {
-            url: `${DATA.url}${image}`,
-          },
-        ],
-      }),
+      url: `${DATA.url}${canonicalHref}`,
+      images: image ? [{ url: `${DATA.url}${image}` }] : [{ url: ogImage, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      ...(image && {
-        images: [`${DATA.url}${image}`],
-      }),
+      images: [image ? `${DATA.url}${image}` : ogImage],
     },
   };
 }
@@ -76,25 +83,26 @@ export default async function Blog({
   params,
 }: {
   params: Promise<{
-    slug: string;
+    slug: string[];
   }>;
 }) {
   const { slug } = await params;
-  const sortedPosts = getSortedPosts();
-  const currentIndex = sortedPosts.findIndex(
-    (p) => p._meta.path.replace(/\.mdx$/, "") === slug
-  );
-  const post = sortedPosts[currentIndex];
+  const post = findPost(slug);
 
   if (!post) {
     notFound();
   }
 
+  const id = postId(post);
+  const lang = postLang(post);
+  const translation = translationOf(post);
+  const sortedPosts = getPosts();
+  const currentIndex = sortedPosts.findIndex((p) => postId(p) === id);
   const previousPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
-  const nextPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null;
+  const nextPost =
+    currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null;
 
-  const getSlug = (post: (typeof sortedPosts)[0]) =>
-    post._meta.path.replace(/\.mdx$/, "");
+  const canonicalHref = hrefFor(post);
 
   const jsonLdContent = JSON.stringify({
     "@context": "https://schema.org",
@@ -103,10 +111,9 @@ export default async function Blog({
     datePublished: post.publishedAt,
     dateModified: post.publishedAt,
     description: post.summary,
-    image: post.image
-      ? `${DATA.url}${post.image}`
-      : `${DATA.url}/blog/${slug}/opengraph-image`,
-    url: `${DATA.url}/blog/${slug}`,
+    inLanguage: lang,
+    image: post.image ? `${DATA.url}${post.image}` : `${DATA.url}/blog/og${lang === "de" ? `/${id}/de` : `/${id}`}`,
+    url: `${DATA.url}${canonicalHref}`,
     author: {
       "@type": "Person",
       name: DATA.name,
@@ -132,9 +139,31 @@ export default async function Blog({
         <h1 className="title font-semibold text-3xl md:text-4xl tracking-tighter leading-tight">
           {post.title}
         </h1>
-        <p className="text-sm text-muted-foreground">
-          {formatDate(post.publishedAt)}
-        </p>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <p className="text-sm text-muted-foreground">
+            {formatPostDate(post.publishedAt, lang)}
+          </p>
+          {translation && (
+            <div className="flex items-center rounded-lg border border-border text-xs font-medium overflow-hidden" role="group" aria-label="Language">
+              {(["en", "de"] as const).map((l) => {
+                const active = l === lang;
+                return active ? (
+                  <span key={l} aria-current="true" className="px-2 py-0.5 bg-accent text-foreground uppercase">
+                    {l}
+                  </span>
+                ) : (
+                  <Link
+                    key={l}
+                    href={hrefFor(translation)}
+                    className="px-2 py-0.5 text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors uppercase"
+                  >
+                    {l}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
       <div className="my-6 flex w-full items-center">
         <div
@@ -155,7 +184,7 @@ export default async function Blog({
         <div className="flex flex-col sm:flex-row justify-between gap-4">
           {previousPost ? (
             <Link
-              href={`/blog/${getSlug(previousPost)}`}
+              href={hrefFor(previousPost)}
               className="group flex-1 flex flex-col gap-1 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
             >
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -172,7 +201,7 @@ export default async function Blog({
 
           {nextPost ? (
             <Link
-              href={`/blog/${getSlug(nextPost)}`}
+              href={hrefFor(nextPost)}
               className="group flex-1 flex flex-col gap-1 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors text-right"
             >
               <span className="flex items-center justify-end gap-1 text-xs text-muted-foreground">

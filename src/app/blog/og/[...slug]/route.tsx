@@ -1,30 +1,28 @@
  
 
 import { ImageResponse } from "next/og";
-import { allPosts } from "content-collections";
+import { findPost } from "@/lib/posts";
 import { DATA } from "@/data/resume";
 
 export const runtime = "edge";
 
-export const alt = "Blog Post";
-export const size = {
+const size = {
     width: 1200,
     height: 630,
 };
-export const contentType = "image/png";
 
 const getFontData = async () => {
     try {
         const [cabinetGrotesk, clashDisplay] = await Promise.all([
             fetch(
                 new URL(
-                    "../../../../public/fonts/CabinetGrotesk-Medium.ttf",
+                    "../../../../../public/fonts/CabinetGrotesk-Medium.ttf",
                     import.meta.url
                 )
             ).then((res) => res.arrayBuffer()),
             fetch(
                 new URL(
-                    "../../../../public/fonts/ClashDisplay-Semibold.ttf",
+                    "../../../../../public/fonts/ClashDisplay-Semibold.ttf",
                     import.meta.url
                 )
             ).then((res) => res.arrayBuffer()),
@@ -121,15 +119,14 @@ const styles = {
     },
 } as const;
 
-export default async function Image({
-    params,
-}: {
-    params: Promise<{ slug: string }>;
-}) {
+export async function GET(
+    _request: Request,
+    { params }: { params: Promise<{ slug: string[] }> }
+) {
     try {
         const fontData = await getFontData();
         const { slug } = await params;
-        const post = allPosts.find((p) => p._meta.path.replace(/\.mdx$/, "") === slug);
+        const post = findPost(slug);
         const imageUrl = DATA.avatarUrl
             ? new URL(DATA.avatarUrl, DATA.url).toString()
             : undefined;
