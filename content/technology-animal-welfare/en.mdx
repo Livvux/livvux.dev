@@ -1,0 +1,123 @@
+---
+title: "How Technology Can Help Animal Welfare Without Replacing People"
+publishedAt: "2026-09-20"
+updatedAt: "2026-09-20"
+author: "Livvux"
+summary: "How WordPress, small automations and a Facebook-to-website sync can reduce repeated work in animal welfare — and why I founded Pfotenweb."
+---
+
+Someone has already written the animal's description. The photos have been chosen. The update is on Facebook.
+
+Now someone needs to copy it all to the website.
+
+This is exactly the kind of work I want technology to help with. Not deciding who should adopt an animal. Not replacing conversations with volunteers. Just taking repeated work off someone's list.
+
+An earlier animal-welfare website project gave me a practical way to explore this. I built a private system that turns Facebook animal albums into website profiles. I am not publishing its source code here, but the idea is worth sharing.
+
+The lessons from that work also helped shape why I founded [Pfotenweb](https://pfotenweb.de/).
+
+## Start with the task, not the tool
+
+My first question is not: "Which app should we buy?" It is: **"What are we entering twice?"**
+
+An animal's adoption status is a simple example. A person confirms that an animal has been adopted. The website then needs to reflect that decision.
+
+Moving the confirmed status is a job for software. Making the decision is not.
+
+The same idea works for resizing photos, preparing website drafts, sending reminders or routing enquiries to the right person.
+
+## WordPress can be part of the solution
+
+WordPress can do much more than publish blog posts.
+
+With [custom post types](https://developer.wordpress.org/plugins/post-types/), animal profiles can have their own structured place in the admin area. Think of it as a labelled drawer: every animal gets one record instead of information being spread across pages and posts.
+
+WordPress also provides a [REST API](https://developer.wordpress.org/rest-api/). An API is simply a defined way for one program to talk to another. A small app can send approved information to WordPress instead of asking a volunteer to copy it into another form.
+
+That does not mean every rescue needs a custom platform. Sometimes the best solution is to keep a working WordPress site and automate only the awkward parts around it.
+
+## How my Facebook-to-website sync works
+
+The question behind my sync was simple:
+
+**Could a team maintain animal information in its existing Facebook albums without rebuilding the same profiles on its website?**
+
+In this project, Facebook supplied the animal information. WordPress stored the imported profiles. Astro built the public website. The flow was one-way: website edits were not sent back to Facebook.
+
+### 1. Read only the right albums
+
+The importer reads albums through Facebook's API and looks for an agreed title pattern, including statuses such as looking for a home, reserved or adopted.
+
+It does not try to turn every Facebook post into an animal profile.
+
+### 2. Turn text into structured fields
+
+The system recognises labels such as name, age, size, location, health and character and separates them from the longer description.
+
+This is rule-based parsing, not an AI judging the animal. Missing information can stay unknown. The software does not need to invent an answer.
+
+### 3. Recognise the same animal again
+
+Names are not reliable identifiers. Two animals can have the same name.
+
+The sync therefore keeps the Facebook album ID with the profile. Photo IDs are used in the same way. Stable IDs allow the next run to update existing data instead of creating duplicates.
+
+### 4. Prepare images and reuse previous work
+
+New photos are downloaded and prepared in responsive sizes for the website. Images that were already processed can be reused when their stored records still pass the consistency checks.
+
+The sync also compares the incoming content with the current version. If nothing relevant changed, it can skip the WordPress update and website rebuild.
+
+**Sometimes the correct result of automation is that nothing happens.**
+
+### 5. Stop when something looks wrong
+
+Automation should not blindly trust every response.
+
+The importer reads the album list several times and combines the results. It also stops if the new animal count is unexpectedly more than 10 percent below the previous count.
+
+That does not prove that every smaller change is correct. It is a safety guard: suspicious data should stop the process instead of automatically deleting a large part of the website.
+
+### 6. Save and verify
+
+The sync sends the prepared snapshot to WordPress and reads it back to verify the result. If the public website needs a rebuild, it triggers one and checks whether the expected content version was actually published.
+
+The important lesson is not that automation removes every possible error. It is that repeated work needs **clear rules, checks and a safe failure state**.
+
+## Where n8n and small bots fit
+
+My original sync is custom code. [n8n](https://n8n.io/) is a different option for connecting smaller steps; it is not the software behind that implementation.
+
+For example:
+
+**Form submission → validate data → create WordPress draft → notify editor → human reviews → publish**
+
+n8n can connect WordPress with scheduled tasks, webhooks and other services. A small bot can do the same kind of work: follow a narrow instruction, report the result and stop when it cannot continue safely.
+
+It does not need to be a chatbot, and it does not always need AI.
+
+## Automation should not remove humans
+
+This is the part that matters most to me.
+
+Automation does not mean removing people from animal welfare. It means making small, repeatable steps easier.
+
+Software can move a confirmed adoption status. **People decide the status.**
+
+Software can prepare an enquiry for the right volunteer. **People speak with the applicant.**
+
+Software can create a draft. **People can review it before it becomes public.**
+
+Public animal profiles and private enquiries should also remain separate. Tools should receive only the access they actually need, and a team should be able to stop an automation easily.
+
+## Why I founded Pfotenweb
+
+Working on this problem made me want to build something beyond a single website.
+
+That is why I founded [Pfotenweb](https://pfotenweb.de/): to make everyday website work easier for animal-welfare organisations.
+
+The earlier Facebook sync is an example of the thinking behind that work, not a promise that every part of that private implementation exists in every Pfotenweb setup.
+
+WordPress, n8n, small bots, custom applications and purpose-built services can all be useful. The real question is whether the people doing the work can understand the system, trust it and correct it.
+
+**Technology should take over repeated steps — not take people out of animal welfare.**
