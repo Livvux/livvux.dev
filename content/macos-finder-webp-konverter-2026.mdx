@@ -1,0 +1,76 @@
+---
+title: "Bilder per Finder-Schnellaktion zu WebP konvertieren (macOS)"
+publishedAt: "2026-09-19"
+updatedAt: "2026-09-19"
+author: "Livvux"
+summary: "Eine kleine macOS-Finder-Schnellaktion, die ausgewählte Bilder per Rechtsklick mit cwebp zu WebP konvertiert — Installation, Einstellungen und Fehlerbehebung."
+---
+
+Die meisten Bilder auf einer Website müssen inzwischen kein JPEG mehr sein. WebP wird von jedem aktuellen Browser unterstützt und liefert bei vergleichbarer Qualität meist deutlich kleinere Dateien. Die Hürde war nie das Format — sondern der Extra-Schritt: Terminal oder App öffnen für jede Ladung Screenshots.
+
+Deshalb habe ich das kleinste Tool gebaut, das diesen Schritt entfernt: eine Finder-Schnellaktion. Bilder auswählen, Rechtsklick, **Schnellaktionen → ConvertImages (WebP)** — und neben dem Original liegt eine `.webp`-Datei.
+
+Open Source: [github.com/Livvux/webp-conv](https://github.com/Livvux/webp-conv)
+
+## Was sie tut
+
+Unter der Haube ist es eine einzelne Automator-Aktion („AppleScript ausführen"), die [cwebp](https://developers.google.com/speed/webp/docs/cwebp) aufruft — den WebP-Encoder von Google. Die Standardwerte:
+
+- **Qualität 82** — in meinen Tests ein guter Kompromiss aus Dateigröße und sichtbaren Artefakten bei Screenshots und Fotos. 80–85 ist ein sinnvoller Bereich zum Ausprobieren.
+- **Methode 6** — langsamste Einstellung mit bester Kompression. Bei einer Rechtsklick-Aktion sind die extra Sekunden es wert.
+- **Metadaten bleiben** — EXIF, ICC-Farbprofile und XMP überleben die Konvertierung. `keepMetadata` auf `false`, wenn gestrippte Dateien gewünscht sind.
+- **Überschreibt nie** — existiert das `.webp`-Ziel bereits, wird die Datei übersprungen und im Log vermerkt.
+- **Gleicher Ordner** — die Ausgabe landet neben dem Original, kein Dialog, keine verschobenen Dateien.
+
+## Installation
+
+Homebrew und cwebp werden benötigt:
+
+```sh
+brew install webp
+```
+
+Dann den Workflow holen — aus dem [Repo](https://github.com/Livvux/webp-conv) oder als [Direktdownload](/convertimages-webp.workflow.zip) — und das mitgelieferte Install-Script laufen lassen:
+
+```sh
+unzip convertimages-webp.workflow.zip
+cp -R "ConvertImages (WebP).workflow" ~/Library/Services/
+```
+
+(Das Repo enthält zusätzlich ein `./install.sh`, das dasselbe mit cwebp-Check macht.)
+
+Die Schnellaktion erscheint im Finder-Kontextmenü — taucht sie nicht sofort auf: einmal ab- und wieder anmelden, oder aktivieren über Rechtsklick → Schnellaktionen → **Anpassen…**
+
+## Einstellungen ändern
+
+Den Workflow in `~/Library/Services/` doppelklicken (öffnet Automator), die AppleScript-Aktion öffnen und oben im Script editieren:
+
+```applescript
+set quality to 82              -- 0–100 (80–85 ist guter Startpunkt)
+set method to 6                -- 0–6 (6 = beste Kompression, langsamer)
+set keepMetadata to true       -- true = EXIF/ICC/XMP behalten, false = strip
+set overwriteExisting to false -- false = Ziel überspringen, wenn vorhanden
+set addSuffix to ""            -- "" = nur .webp-Endung, oder z. B. "-webp"
+```
+
+`addSuffix` ist nützlich, wenn beide Dateien mit erkennbaren Namen bleiben sollen, etwa `foto-webp.webp` — für saubere URLs empfehle ich es leer zu lassen.
+
+## Wenn etwas schiefgeht
+
+Die Aktion schweigt bei Erfolg absichtlich. Schlägt eine Konvertierung fehl, landet alles in `/tmp/convert-to-webp.log`. Die zwei häufigsten Fälle:
+
+- **`cwebp not found`** — das Script läuft über `/bin/zsh -lc`, Homebrew-Pfade auf Apple Silicon (`/opt/homebrew/bin`) werden also automatisch gefunden. Liegt cwebp woanders, gehört es auf den `PATH` der Login-Shell.
+- **Schnellaktion fehlt im Menü** — Systemeinstellungen → Allgemein → Anmeldeobjekte, oder Rechtsklick → Schnellaktionen → Anpassen…, und „ConvertImages (WebP)" anhaken.
+
+## Warum cwebp statt `sips`
+
+macOS bringt `sips` mit, das in neueren Versionen WebP unterstützt. Für diesen Job bevorzuge ich trotzdem cwebp: Es legt die Qualitäts- und Effort-Regler offen, die für vorhersagbare Ergebnisse zählen, es ist der Referenz-Encoder, und sein Verhalten ist auf jeder Maschine identisch — wichtig, sobald man ein Tool veröffentlicht, das andere installieren. `sips` bleibt ein brauchbarer Fallback, wenn man gar nichts installieren will.
+
+## Lohnt es sich?
+
+Das ist vielleicht eine Stunde Einrichtung für eine Aufgabe, die vorher jedes Mal Minuten gekostet hat. Es folgt der Regel, zu der ich immer wieder zurückkomme: Die beste Automatisierung entfernt einen Schritt, sie baut kein Dashboard auf.
+
+Workflow, Installer und das komplette Script liegen im Repo: [github.com/Livvux/webp-conv](https://github.com/Livvux/webp-conv). PRs und Issue-Reports willkommen.
+
+[^cwebp]: Google, „cwebp — Compress an image file to a WebP file." [Offizielle Dokumentation](https://developers.google.com/speed/webp/docs/cwebp). Abgerufen am 19. September 2026. Flags für Qualität (`-q`), Effort (`-m`) und Metadaten (`-metadata`) sind dort dokumentiert.
+[^caniuse]: „Can I use: WebP image format." [Browser-Support-Tabelle](https://caniuse.com/webp). Abgerufen am 19. September 2026. Alle Evergreen-Browser unterstützen WebP, einschließlich Safari 14+.
