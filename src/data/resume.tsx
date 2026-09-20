@@ -6,6 +6,7 @@ import { Typescript } from "@/components/ui/svgs/typescript";
 import { Nodejs } from "@/components/ui/svgs/nodejs";
 import { Python } from "@/components/ui/svgs/python";
 import { Postgresql } from "@/components/ui/svgs/postgresql";
+import { Wordpress } from "@/components/ui/svgs/wordpress";
 
 export const DATA = {
   name: "Lucas Kleipoedszus",
@@ -24,7 +25,7 @@ export const DATA = {
     { name: "Next.js", icon: NextjsIconDark },
     { name: "Node.js", icon: Nodejs },
     { name: "PHP", icon: undefined },
-    { name: "WordPress", icon: undefined },
+    { name: "WordPress", icon: Wordpress },
     { name: "Python", icon: Python },
     { name: "PostgreSQL", icon: Postgresql },
     { name: "Astro", icon: undefined },
