@@ -82,7 +82,7 @@ export function SyncComparison({ locale = "en" }: { locale?: Locale }) {
   return (
     <div className={cn("not-prose my-8 grid gap-4 md:grid-cols-2 md:gap-6")}>
       <Card title={t.manual.title} caption={t.manual.caption}>
-        <div ref={manualRef} className="flex h-52 flex-col items-center justify-between px-1">
+        <div ref={manualRef} className="relative flex h-52 flex-col items-center justify-between px-1">
           <Node label={t.manualFrom} />
           <div className="relative flex flex-1 items-center justify-center">
             <div className="h-full border-l-2 border-dashed border-muted-foreground/40" />
@@ -92,7 +92,7 @@ export function SyncComparison({ locale = "en" }: { locale?: Locale }) {
         </div>
       </Card>
       <Card title={t.sync.title} caption={t.sync.caption}>
-        <div ref={syncRef} className="flex h-52 flex-col items-center justify-between px-1">
+        <div ref={syncRef} className="relative flex h-52 flex-col items-center justify-between px-1">
           <Node ref={facebookRef} label={t.nodes.facebook} />
           <Node ref={importerRef} label={t.nodes.importer} />
           <Node ref={wordpressRef} label={t.nodes.wordpress} />
