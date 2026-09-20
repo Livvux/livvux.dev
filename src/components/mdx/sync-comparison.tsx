@@ -82,17 +82,17 @@ export function SyncComparison({ locale = "en" }: { locale?: Locale }) {
   return (
     <div className={cn("not-prose my-8 grid gap-4 md:grid-cols-2 md:gap-6")}>
       <Card title={t.manual.title} caption={t.manual.caption}>
-        <div ref={manualRef} className="flex h-48 flex-col items-center justify-between px-1 sm:h-28 sm:flex-row">
+        <div ref={manualRef} className="flex h-52 flex-col items-center justify-between px-1">
           <Node label={t.manualFrom} />
           <div className="relative flex flex-1 items-center justify-center">
-            <div className="h-full border-l-2 border-dashed border-muted-foreground/40 sm:h-auto sm:w-full sm:border-l-0 sm:border-t-2" />
+            <div className="h-full border-l-2 border-dashed border-muted-foreground/40" />
             <Copy className="absolute left-1/2 top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border bg-card p-1 text-muted-foreground" />
           </div>
           <Node label={t.manualTo} />
         </div>
       </Card>
       <Card title={t.sync.title} caption={t.sync.caption}>
-        <div ref={syncRef} className="flex h-48 flex-col items-center justify-between px-1 sm:h-28 sm:flex-row">
+        <div ref={syncRef} className="flex h-52 flex-col items-center justify-between px-1">
           <Node ref={facebookRef} label={t.nodes.facebook} />
           <Node ref={importerRef} label={t.nodes.importer} />
           <Node ref={wordpressRef} label={t.nodes.wordpress} />
