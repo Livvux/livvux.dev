@@ -1,0 +1,181 @@
+---
+title: "Is WordPress Growing Again? Not Yet — But It Still Runs the Web"
+publishedAt: "2026-09-21"
+author: "Livvux"
+summary: "WordPress lost market share through 2025 and 2026. It is not growing again yet, but the data shows why writing it off in the AI website-builder era would be a mistake."
+---
+
+There is a tempting story about WordPress in 2026: AI website builders arrived, people rushed to replace old WordPress sites, migrations went wrong, organic traffic disappeared, and users started moving back.
+
+I understand why that story feels plausible. A modern AI builder can make a rebuild look almost trivial. A prompt can produce a clean landing page in minutes. Moving a real website is different. A mature site is not only its design. It is URLs, redirects, metadata, internal links, structured data, media, ecommerce behavior, integrations, editorial workflows, user accounts and years of accumulated search signals.
+
+But after looking at the current data, I would not publish the claim that **WordPress is growing again**. Not yet.
+
+As of September 21, 2026, [W3Techs reports](https://w3techs.com/technologies/overview/content_management/) WordPress on **40.2% of all measured websites** and **58.8% of websites with a known CMS**. That makes it the market leader by an enormous margin. It does not make the current trend positive. W3Techs' monthly CMS-share series has WordPress moving from 60.8% in September 2025 to 58.8% in September 2026.
+
+WordPress can be declining and dominant at the same time.
+
+<MarketShareChart
+  title="WordPress share of the known CMS market"
+  description="Monthly W3Techs observations. The direction through September 2026 is still down, not up."
+  min={58}
+  max={61}
+  source="W3Techs, Market share trends for content management systems, accessed September 21, 2026."
+  data={[
+    { label: "Sep 25", value: 60.8 },
+    { label: "Nov 25", value: 60.5 },
+    { label: "Jan 26", value: 60.2 },
+    { label: "Mar 26", value: 59.9 },
+    { label: "May 26", value: 59.6 },
+    { label: "Jul 26", value: 59.2 },
+    { label: "Sep 26", value: 58.9 },
+    { label: "Sep 20", value: 58.8 }
+  ]}
+/>
+
+## The decline is real
+
+The decline did not begin with one dramatic collapse. It was gradual first.
+
+Historical W3Techs data reported by [Search Engine Journal](https://www.searchenginejournal.com/wordpress-market-share-in-decline/576042/) puts WordPress at 43.6% of all websites in January 2025, 43.5% in April, 43.4% in July, 43.3% in October and 43.0% in January 2026. The decline then accelerated: 42.8% in February, 42.7% in March, 42.5% in April and about 41.9% by late May 2026.
+
+By August, W3Techs was reporting roughly 40.7%. On September 20 it reported 40.2%.
+
+These numbers are not directly interchangeable with the 58.8% figure. **40.2% is WordPress's share of all websites in the W3Techs survey. 58.8% is its share among websites whose CMS W3Techs can identify.** Mixing those denominators is one of the easiest ways to make the trend look better or worse than it is.
+
+The correct conclusion is less dramatic: WordPress has lost several percentage points from its peak, and there is no reliable rebound in the current W3Techs series.
+
+## And yet: nothing is close to WordPress
+
+Decline is only half the picture.
+
+On September 20, 2026, W3Techs measured Shopify at 7.8% of the known CMS market, Wix at 6.2%, Squarespace at 3.6%, Joomla at 1.6%, and Webflow at 1.2%. WordPress was at 58.8%.
+
+<MarketShareChart
+  title="CMS market share in September 2026"
+  description="Share among websites where W3Techs identifies a content management system."
+  type="bar"
+  min={0}
+  max={60}
+  source="W3Techs, September 20, 2026."
+  data={[
+    { label: "WordPress", value: 58.8 },
+    { label: "Shopify", value: 7.8 },
+    { label: "Wix", value: 6.2 },
+    { label: "Squarespace", value: 3.6 },
+    { label: "Joomla", value: 1.6 },
+    { label: "Webflow", value: 1.2 }
+  ]}
+/>
+
+WordPress is therefore not a legacy niche fighting for survival. It remains the default CMS layer for a huge part of the web.
+
+That scale creates advantages which are difficult to reproduce quickly: hosting support, developers, agencies, documentation, themes, plugins, WooCommerce, migration tooling and a massive installed base. A new builder can have a better onboarding experience without immediately replacing that ecosystem.
+
+This is where I think some discussion around AI website builders becomes too simplistic.
+
+## AI made creating a website easier. It did not make migration risk disappear.
+
+AI builders changed the first ten minutes of web development.
+
+That matters. A person can describe a business and get a usable interface instead of starting from an empty editor. Tools can generate layouts, copy, components and code at a speed that would have looked absurd a few years ago.
+
+But **generation and migration are different problems**.
+
+If you create a new five-page site, switching platforms can be easy. If you replace an established WordPress property with hundreds or thousands of indexed URLs, it becomes an information-architecture and search-migration project.
+
+Google's own [site migration documentation](https://developers.google.com/search/docs/crawling-indexing/site-move-with-url-changes) says significant site changes can cause temporary ranking fluctuations while Google recrawls and reindexes pages. Google recommends mapping old URLs to new ones, using permanent server-side redirects, updating internal links and sitemaps, monitoring Search Console, and generally keeping redirects for at least a year.
+
+Google also explicitly recommends changing **one major thing at a time** when possible. Changing the domain, CMS, URL structure, content and design in one launch makes failures harder to isolate.
+
+This is why “the new page looks better” is not enough.
+
+A migration can accidentally remove an old article that still earns links. It can flatten a useful URL structure. It can change canonicals, metadata or structured data. It can lose image URLs, pagination, category archives or product data. It can redirect hundreds of distinct pages to a homepage. It can simply forget the old URLs existed.
+
+None of those problems are unique to AI builders. Developers have broken SEO migrations for decades. AI mainly changes how quickly someone can decide that a rebuild is easy.
+
+## Did people leave WordPress for AI builders and then return?
+
+This is the part where evidence matters most.
+
+I think failed or disappointing migrations **can** send individual site owners back to WordPress. That is a reasonable mechanism. But I could not find market-level evidence showing that it is currently causing a WordPress rebound.
+
+In fact, one useful W3Techs signal points in the other direction. Its [September 20 technology-change report for Framer](https://w3techs.com/technologies/changes/cm-framer) says **4.81% of websites currently using Framer were recently using WordPress**, while **0.74% of websites that recently stopped using Framer are now using WordPress**.
+
+Those percentages use different populations, so they are not a clean migration balance and should not be subtracted from each other. But they do show that WordPress-to-Framer migrations are visible in the current data. They do **not** establish a mass return to WordPress.
+
+Framer itself remains small: about 0.2% of all measured websites and 0.3% of the known CMS market. W3Techs lists Lovable at around 0.1% of the CMS market. Hostinger Website Builder is around 0.3%. The new tools matter culturally and can grow quickly without yet approaching WordPress's installed base.
+
+That is the more interesting story: **AI builders have changed expectations faster than they have changed the installed web.**
+
+## WordPress is also absorbing AI
+
+Treating this as “WordPress versus AI” is becoming outdated.
+
+WordPress 7.0, released in May 2026, added official AI-oriented infrastructure. The [WordPress 7.0 Field Guide](https://make.wordpress.org/core/2026/05/14/wordpress-7-0-field-guide/) describes a provider-agnostic WP AI Client, AI connectors and client-side abilities. The [WordPress Developer Blog](https://developer.wordpress.org/news/2026/07/build-your-first-ai-powered-wordpress-plugin/) shows how the Abilities API, AI Client and MCP Adapter can be combined so AI agents can discover and execute WordPress functionality.
+
+That is strategically important.
+
+WordPress does not need to beat AI builders by pretending prompts do not exist. It can make AI another interface to the platform. The CMS remains the durable content, permission, commerce and plugin layer while AI helps create, edit, automate and operate it.
+
+For an open ecosystem, a provider-agnostic approach is also a better fit than tying the entire site to one model vendor.
+
+## Why WordPress still has a strong case
+
+The strongest argument for WordPress in 2026 is not nostalgia. It is **optionality**.
+
+You can change hosts. You can change themes. You can replace a page builder. You can write a plugin. You can expose data through REST. You can use it headlessly. You can run WooCommerce. You can add custom post types. You can automate it. You can now connect AI workflows to standardized abilities. And if one vendor disappears or changes pricing, the entire website does not necessarily disappear with it.
+
+That flexibility has a cost. WordPress can become bloated. Plugin stacks can become messy. Security and updates need attention. A poorly built WordPress site can be slow and unpleasant to maintain.
+
+Open systems give you freedom; they do not automatically give you good architecture.
+
+The answer is not to install 60 plugins because WordPress allows it. The answer is to keep the stack small, understand what each dependency does, cache correctly, control third-party scripts and treat the database and URL structure as infrastructure.
+
+In other words: WordPress benefits from the same discipline as any serious web application.
+
+## SEO is not a WordPress feature — continuity is the advantage
+
+WordPress does not rank because it is WordPress. Google does not award a special WordPress bonus.
+
+Its practical SEO advantage is that mature WordPress sites often already contain the things that are expensive to recreate: stable URLs, archives, media, internal links, structured content, editorial history and integrations with SEO tooling.
+
+If a migration preserves all of that correctly, moving away can be perfectly reasonable. Google says permanent redirects such as 301 and 308 can transfer signals and do not inherently cause PageRank loss.
+
+The problem is execution.
+
+An AI builder can create an excellent new frontend. It cannot magically know every historical URL, every backlink worth preserving, every canonical decision or every business rule in an old WooCommerce installation unless that context is supplied and the migration is tested.
+
+The easier rebuilding becomes, the more important migration engineering becomes.
+
+## What would a real WordPress comeback look like?
+
+I would want evidence before calling it a comeback.
+
+The clearest signal would be several months of W3Techs data showing WordPress's share of all websites and its share of known-CMS websites stabilizing and then increasing. I would also watch technology-change reports: are meaningful numbers of sites moving from newer builders back to WordPress? Are new WordPress installations offsetting churn? Does the trend persist rather than appearing as one daily measurement?
+
+Right now, the data says **dominance under pressure**, not rebound.
+
+That is still a significant position. WordPress can lose share while remaining larger than its nearest competitors by multiples. And if its AI infrastructure matures, the platform does not have to choose between the old web and the AI web.
+
+It can be infrastructure for both.
+
+## My view
+
+I still think WordPress is underestimated in 2026.
+
+Not because the decline is fake. It is not. Not because everyone who tries an AI builder comes back. The available data does not support that claim.
+
+I think WordPress remains important because building a page and operating a website are different jobs.
+
+AI has made the first job dramatically easier. The second still requires content ownership, stable architecture, migrations, permissions, integrations, commerce, maintainability and the ability to change direction later.
+
+WordPress has spent more than two decades accumulating solutions to those boring problems. Those boring problems are exactly what becomes important after the impressive demo is over.
+
+If WordPress starts growing again, I suspect it will not be because AI builders failed. It will be because WordPress learns to combine what they made easier with what WordPress already does well: ownership, extensibility, continuity and an ecosystem that is still unmatched in scale.
+
+For now, the headline should be precise:
+
+**WordPress is not growing again yet. But at 40.2% of the measured web and 58.8% of the known CMS market, it is nowhere close to irrelevant.**
+
+*Statistics checked September 21, 2026. W3Techs updates its measurements daily, so exact percentages will change. Market-share estimates depend on detection methodology and should be treated as measurements of W3Techs' surveyed web, not a literal census of every domain on the internet.*
