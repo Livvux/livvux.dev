@@ -1,0 +1,91 @@
+---
+title: "Code Must Be Free: Why Open Source Matters"
+publishedAt: "2026-09-21"
+author: "Livvux"
+summary: "Why I want transparent software, shared knowledge and open AI: my favorite developer tools, GLM, DeepSeek, Qwen and Kimi."
+---
+
+**Code must be free.**
+
+Free to inspect, use, change and share. Not a demand that developers work unpaid. Users deserve to know what they are getting. A polished interface is not enough.
+
+## We learn from each other
+
+Development should not mean solving the same problems in isolation. Reading an implementation, following a bug report and studying a fix teach things a product demo cannot.
+
+Open source makes that knowledge reusable. A contribution can improve the original project. A fork can take it in another direction. The next developer does not have to start from zero.
+
+For me, transparency means readable source, a clear license and build instructions. Publicly visible code alone is not enough: [open source also grants rights to modify and redistribute it](https://opensource.org/osd). It does not guarantee security. It makes independent inspection possible.
+
+## Four of my favorite projects
+
+<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: "1.5rem", margin: "1.5rem 0" }}>
+  <figure style={{ margin: 0 }}>
+    <a href="https://github.com/vercel-labs/agent-browser">
+      <img src="https://raw.githubusercontent.com/vercel-labs/agent-browser/main/docs/src/app/favicon.ico" alt="agent-browser documentation icon" width="64" height="64" loading="lazy" decoding="async" referrerPolicy="no-referrer" style={{ display: "block", width: "64px", height: "64px", margin: "0 0 1rem" }} />
+    </a>
+    <figcaption><strong><a href="https://github.com/vercel-labs/agent-browser">agent-browser</a></strong></figcaption>
+    <p>Vercel's browser automation CLI for AI agents. Agents can inspect pages, interact with elements and capture screenshots. I want the tools acting inside a browser to be inspectable too.</p>
+  </figure>
+  <figure style={{ margin: 0 }}>
+    <a href="https://github.com/Beingpax/VoiceInk">
+      <img src="https://raw.githubusercontent.com/Beingpax/VoiceInk/main/VoiceInk/Assets.xcassets/AppIcon.appiconset/256-mac.png" alt="VoiceInk macOS app icon" width="64" height="64" loading="lazy" decoding="async" referrerPolicy="no-referrer" style={{ display: "block", width: "64px", height: "64px", margin: "0 0 1rem" }} />
+    </a>
+    <figcaption><strong><a href="https://github.com/Beingpax/VoiceInk">VoiceInk</a></strong></figcaption>
+    <p>Voice-to-text for macOS with local transcription. Its source is available under GPLv3. <a href="https://tryvoiceink.com/">Optional cloud enhancement sends transcribed text to a provider</a>—an important distinction when discussing privacy.</p>
+  </figure>
+  <figure style={{ margin: 0 }}>
+    <a href="https://github.com/anomalyco/opencode">
+      <img src="https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/console/app/src/asset/logo-ornate-light.svg" alt="OpenCode project wordmark" width="240" height="64" loading="lazy" decoding="async" referrerPolicy="no-referrer" style={{ display: "block", width: "240px", maxWidth: "100%", height: "64px", objectFit: "contain", background: "white", borderRadius: "8px", padding: "8px", margin: "0 0 1rem" }} />
+    </a>
+    <figcaption><strong><a href="https://github.com/anomalyco/opencode">OpenCode</a></strong></figcaption>
+    <p>An open-source coding agent that supports different model providers. That separation matters: I want to choose my coding environment independently of the company supplying the model.</p>
+  </figure>
+  <figure style={{ margin: 0 }}>
+    <a href="https://github.com/tw93/Mole">
+      <img src="https://raw.githubusercontent.com/tw93/Mole/main/docs/img/big-mole.png" alt="Mole project image showing Mac cleanup results" width="240" height="120" loading="lazy" decoding="async" referrerPolicy="no-referrer" style={{ display: "block", width: "100%", height: "120px", objectFit: "contain", objectPosition: "left center", margin: "0 0 1rem" }} />
+    </a>
+    <figcaption><strong><a href="https://github.com/tw93/Mole">Mole</a></strong></figcaption>
+    <p>Mac cleanup, disk analysis and system monitoring. I mean the open-source CLI here, not the separate paid Mac app. Source visibility matters especially when software can delete files.</p>
+  </figure>
+</div>
+
+<small>Images: the respective projects' repositories, linked above. Images load from GitHub; no affiliation or endorsement is implied.</small>
+
+## Open-source software is not the same as open weights
+
+An open-source coding app can still use a closed model. **Open weights** means access to a model's learned parameters; those numbers are not a readable explanation of its decisions.
+
+The [Open Source Initiative's AI definition](https://opensource.org/ai/open-source-ai-definition) goes further: appropriate freedoms, model parameters, complete training and inference code, and sufficient information about the training data. Downloadable weights alone do not establish that.
+
+Open weights still matter. They make independent evaluation, adaptation and self-hosting possible within the release's license. But we should say what is actually available.
+
+## The models I care about
+
+### GLM: especially GLM-5.3-Flash
+
+Z.ai's [GLM-5.3-Flash](https://huggingface.co/zai-org/GLM-5.3-Flash) is one of my favorites. Its [documented design](https://huggingface.co/docs/transformers/main/en/model_doc/glm5_next) combines text and vision, 320 billion total parameters, 18 billion active parameters, and sparse plus linear attention to improve long-context efficiency.
+
+The important part for me is that developers can work with published weights and implementations—not just call a remote API. We can test the model against our own code and investigate its failures.
+
+### DeepSeek V4.1
+
+Another favorite is [DeepSeek-V4.1-Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash), the published V4.1 release. It provides MIT-licensed weights, inference code and evaluation instructions. Its cache-compression work addresses memory costs in long agent sessions. Publishing the implementation makes those engineering choices available for others to examine and build on.
+
+### Qwen
+
+[Qwen3.5-9B](https://huggingface.co/Qwen/Qwen3.5-9B) is a concrete example: downloadable text-and-vision weights under Apache 2.0, in a smaller model than the large GLM and DeepSeek releases above. That gives developers another option for local experiments and task-specific evaluation. Check the exact checkpoint, not just the family name.
+
+### Kimi
+
+Moonshot's [Kimi K2.5](https://huggingface.co/moonshotai/Kimi-K2.5) publishes weights and code for multimodal, tool-using workflows. Its [Modified MIT license](https://huggingface.co/moonshotai/Kimi-K2.5/blob/main/LICENSE) adds a condition: commercial products exceeding 100 million monthly active users or US$20 million in monthly revenue must prominently display “Kimi K2.5” in their interface. Calling that simply “MIT” would hide a real difference.
+
+Open weights still need suitable hardware. “18 billion active” does not mean an 18-billion-parameter download. Access and affordability are separate questions.
+
+## Free code does not mean free labor
+
+I support charging for hosting, support and convenient builds. I also support paying maintainers. The freedom to inspect and improve software should survive the purchase.
+
+We learn from each other. I want the next person to be able to learn from my code, not just use the result.
+
+*Model and project details checked on September 21, 2026. The named checkpoints are examples, not a claim that every release in each family has identical terms.*

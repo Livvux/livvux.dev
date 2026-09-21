@@ -1,0 +1,91 @@
+---
+title: "Code muss frei sein: Warum Open Source wichtig ist"
+publishedAt: "2026-09-21"
+author: "Livvux"
+summary: "Warum ich transparente Software, geteiltes Wissen und offene KI will: meine liebsten Entwicklertools, GLM, DeepSeek, Qwen und Kimi."
+---
+
+**Code muss frei sein.**
+
+Frei zum Prüfen, Nutzen, Ändern und Teilen. Das heißt nicht, dass Entwickler unbezahlt arbeiten sollen. Nutzer müssen nachvollziehen können, was sie bekommen. Eine schicke Oberfläche reicht nicht.
+
+## Wir lernen voneinander
+
+Entwicklung sollte nicht bedeuten, dieselben Probleme getrennt voneinander zu lösen. Eine Implementierung zu lesen, einen Fehlerbericht zu verfolgen und eine Korrektur zu verstehen, vermittelt Dinge, die keine Produktdemo zeigt.
+
+Open Source macht dieses Wissen wiederverwendbar. Ein Beitrag kann das ursprüngliche Projekt verbessern. Ein Fork kann eine andere Richtung einschlagen. Der nächste Entwickler muss nicht bei null anfangen.
+
+Transparenz bedeutet für mich: lesbarer Quellcode, eine klare Lizenz und eine Bauanleitung. Öffentlich sichtbarer Code allein reicht nicht: [Open Source erlaubt auch Änderungen und Weitergabe](https://opensource.org/osd). Das garantiert keine Sicherheit. Es ermöglicht unabhängige Prüfung.
+
+## Vier meiner Lieblingsprojekte
+
+<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: "1.5rem", margin: "1.5rem 0" }}>
+  <figure style={{ margin: 0 }}>
+    <a href="https://github.com/vercel-labs/agent-browser">
+      <img src="https://raw.githubusercontent.com/vercel-labs/agent-browser/main/docs/src/app/favicon.ico" alt="Symbol der agent-browser-Dokumentation" width="64" height="64" loading="lazy" decoding="async" referrerPolicy="no-referrer" style={{ display: "block", width: "64px", height: "64px", margin: "0 0 1rem" }} />
+    </a>
+    <figcaption><strong><a href="https://github.com/vercel-labs/agent-browser">agent-browser</a></strong></figcaption>
+    <p>Vercels Kommandozeilenwerkzeug zur Browser-Automatisierung für KI-Agenten. Agenten können Seiten prüfen, Elemente bedienen und Screenshots erstellen. Auch die Werkzeuge, die in einem Browser handeln, müssen für mich überprüfbar sein.</p>
+  </figure>
+  <figure style={{ margin: 0 }}>
+    <a href="https://github.com/Beingpax/VoiceInk">
+      <img src="https://raw.githubusercontent.com/Beingpax/VoiceInk/main/VoiceInk/Assets.xcassets/AppIcon.appiconset/256-mac.png" alt="App-Symbol von VoiceInk für macOS" width="64" height="64" loading="lazy" decoding="async" referrerPolicy="no-referrer" style={{ display: "block", width: "64px", height: "64px", margin: "0 0 1rem" }} />
+    </a>
+    <figcaption><strong><a href="https://github.com/Beingpax/VoiceInk">VoiceInk</a></strong></figcaption>
+    <p>Spracheingabe für macOS mit lokaler Transkription. Der Quellcode steht unter GPLv3. <a href="https://tryvoiceink.com/">Die optionale Cloud-Nachbearbeitung sendet transkribierten Text an einen Anbieter</a> – ein wichtiger Unterschied beim Thema Datenschutz.</p>
+  </figure>
+  <figure style={{ margin: 0 }}>
+    <a href="https://github.com/anomalyco/opencode">
+      <img src="https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/console/app/src/asset/logo-ornate-light.svg" alt="Schriftzug des OpenCode-Projekts" width="240" height="64" loading="lazy" decoding="async" referrerPolicy="no-referrer" style={{ display: "block", width: "240px", maxWidth: "100%", height: "64px", objectFit: "contain", background: "white", borderRadius: "8px", padding: "8px", margin: "0 0 1rem" }} />
+    </a>
+    <figcaption><strong><a href="https://github.com/anomalyco/opencode">OpenCode</a></strong></figcaption>
+    <p>Ein Open-Source-Coding-Agent, der verschiedene Modellanbieter unterstützt. Diese Trennung ist wichtig: Ich will meine Entwicklungsumgebung unabhängig von dem Unternehmen wählen, das das Modell bereitstellt.</p>
+  </figure>
+  <figure style={{ margin: 0 }}>
+    <a href="https://github.com/tw93/Mole">
+      <img src="https://raw.githubusercontent.com/tw93/Mole/main/docs/img/big-mole.png" alt="Projektbild von Mole mit Ergebnissen einer Mac-Bereinigung" width="240" height="120" loading="lazy" decoding="async" referrerPolicy="no-referrer" style={{ display: "block", width: "100%", height: "120px", objectFit: "contain", objectPosition: "left center", margin: "0 0 1rem" }} />
+    </a>
+    <figcaption><strong><a href="https://github.com/tw93/Mole">Mole</a></strong></figcaption>
+    <p>Mac-Bereinigung, Speicheranalyse und Systemüberwachung. Gemeint ist hier das offene Kommandozeilenwerkzeug, nicht die separate kostenpflichtige Mac-App. Gerade bei Software, die Dateien löschen kann, will ich den Quellcode einsehen können.</p>
+  </figure>
+</div>
+
+<small>Bilder: die oben verlinkten Projekt-Repositories. Die Bilder werden von GitHub geladen; es besteht keine Verbindung zu den Projekten und keine Empfehlung durch sie.</small>
+
+## Open-Source-Software ist nicht dasselbe wie offene Gewichte
+
+Eine offene Coding-App kann trotzdem ein geschlossenes Modell nutzen. **Offene Gewichte** bedeuten Zugang zu den erlernten Modellparametern. Diese Zahlen erklären aber nicht lesbar, warum das Modell eine Entscheidung trifft.
+
+Die [KI-Definition der Open Source Initiative](https://opensource.org/ai/open-source-ai-definition) geht weiter: entsprechende Nutzungsfreiheiten, Modellparameter, vollständiger Trainings- und Inferenzcode sowie ausreichende Informationen über die Trainingsdaten. Herunterladbare Gewichte allein erfüllen das nicht automatisch.
+
+Offene Gewichte sind trotzdem wichtig. Sie ermöglichen unabhängige Tests, Anpassungen und eigenen Betrieb im Rahmen der jeweiligen Lizenz. Wir sollten aber klar sagen, was tatsächlich verfügbar ist.
+
+## Die Modelle, die mir wichtig sind
+
+### GLM: besonders GLM-5.3-Flash
+
+[GLM-5.3-Flash](https://huggingface.co/zai-org/GLM-5.3-Flash) von Z.ai gehört zu meinen Favoriten. Die [dokumentierte Architektur](https://huggingface.co/docs/transformers/main/en/model_doc/glm5_next) verbindet Text- und Bildverarbeitung, insgesamt 320 Milliarden Parameter, 18 Milliarden aktive Parameter sowie Sparse und Linear Attention für effizientere Verarbeitung langer Kontexte.
+
+Entscheidend ist für mich, dass Entwickler mit veröffentlichten Gewichten und Implementierungen arbeiten können – statt nur eine entfernte API aufzurufen. Wir können das Modell an unserem eigenen Code testen und seine Fehler untersuchen.
+
+### DeepSeek V4.1
+
+Ein weiterer Favorit ist [DeepSeek-V4.1-Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash), die veröffentlichte V4.1-Version. Sie bietet MIT-lizenzierte Gewichte, Inferenzcode und Anleitungen zur Evaluation. Ihre Cache-Kompression reduziert den Speicherbedarf bei langen Agenten-Sitzungen. Die veröffentlichte Implementierung macht diese technischen Entscheidungen für andere prüfbar und nutzbar.
+
+### Qwen
+
+[Qwen3.5-9B](https://huggingface.co/Qwen/Qwen3.5-9B) ist ein konkretes Beispiel: herunterladbare Gewichte für Text- und Bildverarbeitung unter Apache 2.0, in einem kleineren Modell als die oben genannten GLM- und DeepSeek-Versionen. Das schafft eine weitere Option für lokale Experimente und aufgabenspezifische Tests. Entscheidend ist die konkrete Modellversion, nicht nur der Familienname.
+
+### Kimi
+
+Moonshots [Kimi K2.5](https://huggingface.co/moonshotai/Kimi-K2.5) veröffentlicht Gewichte und Code für multimodale Abläufe mit Werkzeugnutzung. Die [Modified-MIT-Lizenz](https://huggingface.co/moonshotai/Kimi-K2.5/blob/main/LICENSE) enthält eine Zusatzbedingung: Kommerzielle Produkte mit mehr als 100 Millionen monatlich aktiven Nutzern oder mehr als 20 Millionen US-Dollar Monatsumsatz müssen „Kimi K2.5“ deutlich in ihrer Oberfläche anzeigen. Einfach nur „MIT“ zu schreiben, würde diesen Unterschied verschweigen.
+
+Auch offene Gewichte brauchen passende Hardware. „18 Milliarden aktiv“ bedeutet keinen Download mit nur 18 Milliarden Parametern. Zugang und Bezahlbarkeit sind unterschiedliche Fragen.
+
+## Freier Code bedeutet nicht unbezahlte Arbeit
+
+Ich unterstütze es, für Hosting, Support und bequem installierbare Versionen Geld zu verlangen. Ebenso unterstütze ich die Bezahlung von Maintainern. Die Freiheit, Software zu prüfen und zu verbessern, sollte auch nach dem Kauf bestehen bleiben.
+
+Wir lernen voneinander. Ich will, dass der nächste Mensch aus meinem Code lernen kann – statt nur das Ergebnis zu benutzen.
+
+*Modell- und Projektdetails geprüft am 21. September 2026. Die genannten Modellversionen sind Beispiele; nicht jede Veröffentlichung einer Modellfamilie hat dieselben Bedingungen.*
