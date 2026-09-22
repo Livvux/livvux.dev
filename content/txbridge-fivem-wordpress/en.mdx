@@ -1,0 +1,139 @@
+---
+title: "txBridge: Connect FiveM to WordPress and Other Apps"
+publishedAt: "2026-09-22"
+updatedAt: "2026-09-22"
+author: "Livvux"
+summary: "Connect FiveM to WordPress and other apps with txBridge: server status, restart events, controlled actions and custom Lua events. Open source under MIT."
+---
+
+A FiveM server and its website should not feel like two separate projects. Players want to see how busy the server is. Staff need useful restart notices. Developers want server events in their own applications without building a different connection for every feature.
+
+That is what **txBridge** is designed for: connecting a running FiveM server to WordPress and other backends through an authenticated API and signed webhooks.
+
+The project is open source under the MIT license. Its Lua resource runs server-side and does not depend on a particular roleplay framework.
+
+**Repository: [Livvux/txBridge on GitHub](https://github.com/Livvux/txBridge)**
+
+## One connection, two directions
+
+The repository includes a FiveM resource, an installable WordPress plugin, a reference Python HTTP client, and API and deployment documentation.
+
+The connection works in two directions:
+
+```text
+FiveM → txBridge → signed webhooks → WordPress / your backend
+Your backend → authenticated requests → txBridge → FiveM
+```
+
+Webhooks tell another application that something happened. API requests let an authorized application read current information or perform a specifically permitted action.
+
+That distinction matters: receiving a notification that someone was banned does not give a website permission to ban players.
+
+Sources: [Project overview](https://github.com/Livvux/txBridge/blob/main/README.md), [API reference](https://github.com/Livvux/txBridge/blob/main/docs/API.md).
+
+## Example 1: Show server status on your WordPress website
+
+The simplest use case is a player-count widget on a homepage or community page.
+
+After installing and configuring the plugin, explicitly enable `public_status` for the relevant server and add:
+
+```text
+[txbridge_status server="main"]
+```
+
+The supplied widget reads a limited public status projection from WordPress. API secrets remain on the server; visitors do not receive administrative access.
+
+This is periodically refreshed information, not a second-by-second live feed. Status snapshots default to a 30-second interval, and the shortcode polls WordPress every 30 seconds. Once a snapshot becomes stale, the widget displays “Status unavailable” rather than presenting an old player count as current.
+
+A stale snapshot does not necessarily mean the game server is offline. A network problem or delayed delivery can also cause it.
+
+Sources: [WordPress integration](https://github.com/Livvux/txBridge/blob/main/docs/WORDPRESS.md), [Event delivery](https://github.com/Livvux/txBridge/blob/main/docs/EVENTS.md).
+
+## Example 2: Turn restart events into useful notifications
+
+A restart should not surprise people who are about to join.
+
+txBridge captures the 17 documented txAdmin events listed in its current event reference. One of them reaches external applications as `txadmin.scheduledRestart`, with a `secondsRemaining` field.
+
+A custom consumer could use that event to update a website banner or notify a staff tool. WordPress developers can subscribe through the plugin’s `txbridge_event` action hook.
+
+The event transport and hook are included. A finished countdown banner, email workflow, or notification bot is not.
+
+Because delivery can be delayed or arrive out of order, a countdown should account for the event’s `emittedAt` timestamp, and state updates should compare source sequences. Starting a fresh 60-second timer when an old notification arrives would be misleading.
+
+Sources: [Event reference](https://github.com/Livvux/txBridge/blob/main/docs/EVENTS.md), [WordPress consumer example](https://github.com/Livvux/txBridge/blob/main/examples/wordpress-consumer.php).
+
+## Example 3: Build a focused staff tool
+
+An internal tool could read server status, connected players, and resource states through `/v1/status`, `/v1/players`, and `/v1/resources`.
+
+With the relevant permissions and configuration enabled, it could also send an announcement, message a player, kick a connected player, or restart an explicitly allowlisted resource. Announcements and direct messages require a running `chat` resource.
+
+These actions are disabled until explicitly granted. Player-targeted actions also require the current `sessionId`, not just a numeric player ID that might later belong to someone else.
+
+The native actions are not txAdmin database operations. A native kick does not create a txAdmin ban, warning, or admin-history record. There is also no arbitrary-command or RCON endpoint in the native API.
+
+**The API is provided; a complete moderation dashboard is something you would build on top.**
+
+Source: [API reference](https://github.com/Livvux/txBridge/blob/main/docs/API.md).
+
+## Example 4: Publish events from your own Lua resources
+
+The bridge is not limited to txAdmin notifications. Approved server resources can publish custom events.
+
+For example, a queue resource could send its waiting-player count to a website. First, allow the calling resource in txBridge’s configuration:
+
+```lua
+Config.Events.allowedPublishers['my_queue'] = true
+```
+
+Then publish from the server-side code of `my_queue`, after txBridge has started:
+
+```lua
+local ok, eventId, err = pcall(function()
+    return exports.txbridge:PublishEvent('queue.updated', {
+        waiting = 12,
+        estimatedWaitSeconds = 90,
+    })
+end)
+
+if not ok then
+    print('txBridge error: ' .. tostring(eventId))
+elseif not eventId then
+    print('txBridge rejected event: ' .. tostring(err))
+end
+```
+
+The numbers are examples; your resource supplies the actual queue data. The external event type becomes `custom.queue.updated`. Delivery also requires a configured webhook destination whose event filter permits that type.
+
+A website or custom automation can then consume it. For n8n or another workflow system, implement the documented signature verification and deduplication in a trusted receiver; this is not a bundled one-click connector.
+
+Source: [Exports and application integration](https://github.com/Livvux/txBridge/blob/main/docs/FUNCTIONS.md).
+
+## Security and delivery are part of the design
+
+txBridge uses HMAC signatures and permission scopes. Secrets stay in trusted server-side configuration, and sensitive event fields such as names and message text are redacted by default.
+
+For delivery, it provides a persistent, bounded outgoing queue, retries, and storage for failed deliveries. The WordPress plugin stores accepted events and deduplicates repeated deliveries.
+
+These mechanisms are not an unlimited-delivery or exactly-once guarantee. Important workflows still need durable processing, recovery logic, and protection against repeating the same operation. Receiving a webhook is not the same as successfully completing every action triggered by it.
+
+Sources: [API authentication requirements](https://github.com/Livvux/txBridge/blob/main/docs/API.md), [Event delivery](https://github.com/Livvux/txBridge/blob/main/docs/EVENTS.md), [WordPress inbox](https://github.com/Livvux/txBridge/blob/main/docs/WORDPRESS.md).
+
+## What version 0.1.0 does not promise
+
+The repository describes version 0.1.0 as an **implementation and integration-test candidate**. Its local tests use mocked components; they are not evidence of a fully validated production deployment. Staging acceptance remains necessary.
+
+txBridge is an independent integration, not an official Cfx.re, txAdmin, or WordPress product. It cannot reconstruct the complete txAdmin database from events, recover every event missed during downtime, or start FXServer after the process has stopped.
+
+An optional adapter for internal txAdmin routes exists, but it is experimental, version-dependent, and disabled by default. It should not be confused with a supported universal management API.
+
+Source: [Project status and limitations](https://github.com/Livvux/txBridge/blob/main/README.md).
+
+## Start with one useful connection
+
+A sensible first integration is a read-only server-status widget. From there, add restart notices, a private operational view, or a custom event that solves a real problem for your community.
+
+The goal does not have to be putting every administrative function into a website. Often, the useful improvement is smaller: making the information your community needs available in the place where people already look for it.
+
+Explore the code on **[GitHub](https://github.com/Livvux/txBridge)** and follow the **[installation guide](https://github.com/Livvux/txBridge/blob/main/docs/INSTALLATION.md)** before exposing an endpoint.
