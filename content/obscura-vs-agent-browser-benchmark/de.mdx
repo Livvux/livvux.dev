@@ -1,0 +1,169 @@
+---
+title: "Obscura vs. agent-browser: Browser-Automation im Speedtest"
+publishedAt: "2026-09-22"
+author: "Livvux"
+summary: "Mein macOS-Benchmark vergleicht Obscura und agent-browser bei Kaltstarts, Batches, Stealth und Interaktionen – mit Rohdaten und klaren Grenzen der Ergebnisse."
+---
+
+**Obscura war in den meisten gemessenen Abläufen schneller. agent-browser gewann bei wiederholter Navigation auf entfernten Seiten mit einer warmen Sitzung.** Das ist die nützliche Kernaussage meines Benchmarks vom 22. September – nicht, dass ein Tool das andere überall ersetzen sollte.
+
+Das auffälligste Interaktionsergebnis: **78,0 ms über Obscuras CDP-Server gegenüber 766,3 ms über die agent-browser-CLI** für fünf Runden aus Eingeben → Klicken → Auslesen. Der CLI-Weg benötigte damit etwa **9,8-mal so viel Zeit**. Verglichen werden allerdings unterschiedliche Schnittstellen. Das beweist nicht, dass die Chrome-Engine zehnmal langsamer ist.
+
+Für einzelne Abrufe und Batches würde ich mit Obscura anfangen. Für einen Agenten, der Snapshots, Elementreferenzen und Login-Abläufe benötigt, bleibt agent-browser sinnvoll. Hier steht, was ich gemessen habe, wie sich die Abläufe unterscheiden und wo die Aussagekraft endet.
+
+Alle Leistungswerte stammen aus meinem [ursprünglichen Benchmark-Bericht](/benchmarks/browser-speed-2026-09-22/browser-speed-report.md), der [JSON-Datei mit Einzelläufen](/benchmarks/browser-speed-2026-09-22/browser-speed-report.json) und der [CSV-Datei](/benchmarks/browser-speed-2026-09-22/browser-speed-report.csv). Es handelt sich um die bereitgestellten Messungen, nicht um einen neuen Benchmark-Durchlauf für diesen Artikel.
+
+## Was wurde getestet?
+
+Der Bericht dokumentiert **Obscura 0.2.3** und **agent-browser 0.38.1** auf **macOS mit Apple Silicon**, gemessen am **22. September 2026**. Das genaue Chipmodell, die RAM-Ausstattung und die Chrome-Buildnummer sind nicht angegeben.
+
+Gemessen wurde die verstrichene Zeit mit Pythons `time.perf_counter()`: ein Aufwärmdurchlauf, danach **4–7 gemessene Durchläufe je Ergebniszeile**. Die Tabellen zeigen Mediane in Millisekunden. Niedriger ist schneller. Bei mehreren Seiten oder Interaktionsrunden gilt die Zeit für das gesamte Szenario, nicht für eine einzelne Seite oder Aktion.
+
+Die lokalen Tests verwendeten statische Testseiten auf `127.0.0.1:8765`: einen DOM mit 500 Zeilen und eine separate Formularseite. Obscura lief mit `--allow-private-network`. Die entfernten Ziele waren `example.com`, `example.org` und `iana.org`. Das sind unkomplizierte Seiten, kein Test zum Überwinden von Bot-Schutz.
+
+Der Bericht beschreibt Obscura als Rust-Tool mit eingebettetem V8 und eigener DOM- und Rendering-Pipeline, ohne Chromium zu starten. In der getesteten agent-browser-Konfiguration spricht eine CLI mit einem dauerhaft laufenden Chrome-Daemon. Das sind die Architekturbeschreibungen aus dem Bericht, keine unabhängige Prüfung der Engines.
+
+### „Kalt“ und „warm“ bedeuten nicht dasselbe
+
+| Modus | Obscura-Ablauf | agent-browser-Ablauf |
+|---|---|---|
+| Kalt | Neuer `fetch`-Prozess, der nach der Aufgabe endet | `close` → `open` → `get title` → `close` |
+| Warm, nacheinander | Weiterhin ein neuer Prozess für jeden `fetch` | Bereits laufenden Chrome-Daemon wiederverwenden |
+| Batch | Mehrere URLs in einem `scrape`-Prozess | Wiederholte CLI-Befehlsketten |
+| Interaktiv | Warme `serve`-Instanz, direkt über CDP gesteuert | Warmes Chrome, über einzelne CLI-Befehle gesteuert |
+
+Dieser Unterschied ist wichtig. Ein sequenzielles Ergebnis für „warmes Obscura“ misst hier **keine dauerhaft offene Obscura-Sitzung**. Der kalte agent-browser-Ablauf enthält Navigation, Auslesen und Beenden – nicht nur den Browserstart.
+
+## Navigation, Auslesen und Screenshots
+
+| Szenario | Obscura, ms | agent-browser, ms | Läufe je Tool | Kürzerer Ablauf |
+|---|---:|---:|---:|---|
+| Kalt, eine lokale Seite | 21,0 | 970,7 | 7 | Obscura; Zeitverhältnis 46,2× |
+| Kalt, eine entfernte Seite | 71,1 | 1027,6 | 5 | Obscura; 14,5× |
+| Warm, fünf lokale Seiten nacheinander | 109,2 | 595,4 | 5 | Obscura; 5,5× |
+| Batch, fünf lokale Seiten | 26,1 | 595,4 | 5 | Obscura; 22,8× |
+| Warm, drei entfernte Seiten nacheinander | 886,9 | 448,2 | 4 | agent-browser; 2,0× |
+| Warmer lokaler Screenshot | 45,5 | 133,0 | 5 | Obscura; 2,9× |
+
+Quelle: [aufgezeichnete Ergebnisse](/benchmarks/browser-speed-2026-09-22/browser-speed-report.json). Die Verhältnisse teilen den größeren Median durch den kleineren. Sie messen weder den reinen Engine-Durchsatz noch eine identische Darstellungsqualität.
+
+Der Kaltstart-Ablauf zeigt den deutlichsten Abstand. Den Titel der lokalen Testseite auszulesen dauerte über Obscura 21,0 ms, über agent-browser 970,7 ms. Ein Skript, das für jede kleine Aufgabe neu startet, setzt dabei sehr unterschiedlich viel Technik in Gang.
+
+Batching verändert das Ergebnis erneut. Fünf lokale Seiten benötigten als getrennte Obscura-Abrufe 109,2 ms, innerhalb eines einzigen `scrape`-Prozesses aber 26,1 ms. Wiederholtes Einrichten zu vermeiden lohnt sich auch dann, wenn jeder einzelne Prozess günstig ist.
+
+**Die agent-browser-Batch-Zeile verwendet dieselben Daten wie der warme sequenzielle Vergleich.** Alle fünf Einzellaufzeiten sind im Export identisch. Das ist keine separate Batch-Implementierung und kein zusätzliches unabhängiges Experiment.
+
+Auch die Screenshot-Zeile zeigt ausschließlich die Dauer. Bildvergleichswerte oder Prüfungen der Darstellung über mehrere Browser hinweg sind in den hochgeladenen Nachweisen nicht enthalten.
+
+### Warum agent-browser bei warmen Remote-Aufrufen gewinnt
+
+Bei drei nacheinander aufgerufenen entfernten Seiten dreht sich die Reihenfolge um: **448,2 ms für agent-browser gegenüber 886,9 ms für Obscura**.
+
+Der Bericht erklärt das damit, dass warmes Chrome Verbindungen, TLS-Sitzungen und HTTP-Cache wiederverwenden kann, während Obscura bei jedem `fetch` einen neuen Prozess startet. Diese Erklärung passt zum unterschiedlichen Sitzungsmodell. Der Export enthält jedoch keine Netzwerk-Traces, mit denen sich der Beitrag jedes einzelnen Mechanismus bestimmen ließe.
+
+Die praktische Erkenntnis ist enger als „Chrome ist im Internet besser“: **Eine bestehende Sitzung kann wichtiger sein als ein günstiger neuer Prozess.** Wie eine dauerhaft offene Obscura-CDP-Sitzung dieselbe Folge aus drei Seiten bewältigen würde, wurde nicht aufgezeichnet.
+
+## Stealth: ungefähr 10 ms zusätzlich, kein Nachweis für Tarnung
+
+| Obscura-Szenario | Normal, ms | `--stealth`, ms | Beobachteter Unterschied |
+|---|---:|---:|---|
+| Kalt, entfernt | 71,1 | 81,2 | +10,1 ms; etwa +14,2 % |
+| Kalt, lokal | 21,0 | 21,9 | +0,9 ms; etwa +4,3 % |
+| Drei entfernte Seiten nacheinander | 886,9 | 802,1 | −84,8 ms |
+| Drei entfernte Seiten in einem Batch | Nicht gemessen | 183,8 | Kein normaler Batch zum Vergleich |
+
+Für den kalten lokalen Stealth-Test gab es fünf Läufe, gegenüber sieben ohne Stealth. Die kalten Remote-Tests nutzten jeweils fünf; die Stealth-Tests mit mehreren Seiten jeweils vier. Alle Stichprobengrößen und Spannweiten stehen in der [CSV-Datei](/benchmarks/browser-speed-2026-09-22/browser-speed-report.csv).
+
+Der Bericht beschreibt Stealth als Anpassungen des Fingerprints und Blockieren von Trackern. Dieser Benchmark misst dessen **Zeitaufwand**, nicht die Erkennung oder Blockierung durch eine Website. Ein entsprechendes agent-browser-Stealth-Ergebnis enthält der Datensatz nicht.
+
+Auf localhost lag der beobachtete Unterschied unter einer Millisekunde. Beim kalten Remote-Abruf waren es etwa 10 ms. Das ist in diesem Test ein kleiner absoluter Aufpreis – aber nicht buchstäblich kostenlos.
+
+Der schnellere sequenzielle Stealth-Lauf beweist nicht, dass Stealth die Navigation beschleunigt. Bei vier Durchläufen sind Netzwerkschwankungen eine plausible Erklärung, wie auch der Bericht festhält. Ebenso isolieren **183,8 ms für den Stealth-Batch nicht den Einfluss von Stealth**: Batching und Parallelität unterscheiden sich ebenfalls. Der Bericht nennt für diesen Ablauf eine standardmäßige Parallelität von 10.
+
+„Stealth kostet hier wenig Zeit“ wird durch die Daten gestützt. „Stealth macht das Tool unerkennbar“ nicht.
+
+## Interaktive Schleifen: drei unterschiedliche Arbeitsweisen
+
+Jede gemessene interaktive Aufgabe bestand aus **fünf Runden** mit jeweils drei Aktionen: `#name` ausfüllen, `#submit` klicken und `#count` auslesen. Das sind nicht fünf einzelne Befehle. Der agent-browser-Weg verwendete **15 CLI-Befehle**.
+
+| Interaktiver Ablauf | Median, ms | Läufe | Was gemessen wurde |
+|---|---:|---:|---|
+| Obscura, ein `fetch` mit einer JavaScript-Auswertung | 18,9 | 5 | Ein neuer Prozess führt alle fünf Runden als einen Batch aus |
+| Obscura `serve`, direktes CDP | 78,0 | 5 | Warmer Server, Navigation und mehrstufige Interaktion über einen WebSocket |
+| agent-browser, CLI gegen warmes Chrome | 766,3 | 5 | Einzelne Aufrufe für `fill`, `click` und `get text` |
+
+Quelle: [interaktive Ergebniszeilen](/benchmarks/browser-speed-2026-09-22/browser-speed-report.json).
+
+**78,0 gegenüber 766,3 ms** ist ein nützlicher Vergleich für die Wahl einer Schnittstelle für eng getaktete programmatische Schleifen. Er misst die tatsächlich aufgerufenen Abläufe einschließlich ihres Zusatzaufwands.
+
+Es ist kein kontrollierter Engine-Vergleich, bei dem beide Seiten direktes CDP verwenden. Ein Weg hält eine WebSocket-Verbindung offen; der andere startet wiederholt CLI-Befehle. Der Bericht erwähnt außerdem zusätzliche Validierung und Referenzverarbeitung bei agent-browser. Prozessstarts, Protokollverarbeitung, Validierung und Engine-Ausführung wurden nicht getrennt vermessen.
+
+Die **18,9 ms** beantworten eine andere Frage: Wie schnell lässt sich bekannte DOM-Arbeit erledigen, wenn alles in eine JavaScript-Auswertung passt? Dazwischen trifft kein Agent Entscheidungen. Das ist keine 40-fache Beschleunigung eines vollständigen KI-Agenten-Ablaufs.
+
+Modellantworten, eine Snapshot-basierte Entscheidungsschleife oder erfolgreiche Logins wurden nicht gemessen. Der [dokumentierte Snapshot-Referenz-Aktion-Ablauf von agent-browser](https://agent-browser.dev/quick-start) erklärt den Nutzen: Ein Agent kann die Seite untersuchen und anschließend Elemente wie `@e1` ansprechen. Diese Dokumentation liefert Produktkontext, nicht die Leistungswerte dieses Artikels.
+
+## Ein dauerhafter Obscura-Server startet in ungefähr 61 ms
+
+Für den Start von `obscura serve` sind **60,7 ms** dokumentiert. Die fünf Durchläufe lagen zwischen **58,5 und 62,0 ms**.
+
+Der Endpunkt der Messung ist klar definiert: `/json/version` antwortet, anschließend wird der Prozess beendet. Gemessen wurde die Bereitschaft des Servers, nicht eine abgeschlossene Seiteninteraktion.
+
+Die 970,7 ms des kalten agent-browser-Ablaufs durch 60,7 ms zu teilen und daraus einen gleichwertigen Browserstart-Vergleich abzuleiten wäre irreführend. Beide Messungen enden an unterschiedlichen Stellen. Die nützliche Aussage lautet: Der Bericht misst einen geringen Einrichtungsaufwand für Obscura als dauerhaft verfügbaren CDP-Dienst.
+
+## Welches Tool würde ich einsetzen?
+
+| Aufgabe | Meine erste Wahl | Einschränkung |
+|---|---|---|
+| Einzelner Titel- oder Seitenabruf | Obscura | Starke Kaltstart-Ergebnisse auf diesen Testseiten |
+| Kleine Batches bekannter Seiten | Obscura `scrape` | Arbeit in einem Prozess halten; großer Durchsatz wurde nicht getestet |
+| Schnelle Interaktionen mit bekannten Selektoren | Obscura `serve` | Direktes CDP vermeidet wiederholte CLI-Aufrufe |
+| Agenten mit Snapshots, Referenzen und Login-Abläufen | agent-browser | Eine Workflow-Entscheidung, kein gemessener Geschwindigkeitsvorteil beim Login |
+| Wiederholte Remote-Navigation in einer warmen Sitzung | agent-browser in der getesteten Konfiguration | Gewann diese Folge aus drei Seiten |
+| Screenshots mit hohen Ansprüchen an Browser-Treue | Gegen den benötigten Browser prüfen | Eine kurze Aufnahmezeit beweist keine korrekte Darstellung |
+
+Ich würde agent-browser nicht aussortieren, weil eine kleine Formularschleife über direktes CDP schneller ist. Genauso wenig würde ich jeden einfachen Abruf durch eine vollständige Agentenschnittstelle schicken, wenn ein einzelner kleiner Aufruf reicht.
+
+## Grenzen, die neben die Überschrift gehören
+
+Dies ist ein kleiner Benchmark auf einem einzelnen Rechner mit 4–7 Läufen je Ergebniszeile. Er beweist weder eine allgemeingültige Rangfolge noch statistische Signifikanz für winzige Unterschiede oder die Leistung auf jeder Website. Aufwendige SPAs, Video, PDFs, Service Worker, Electron und angemeldete produktive Abläufe wurden nicht getestet.
+
+Auch Wartebedingungen sind relevant. Der Bericht verwendete `--wait 0`, wenn der Titel bereits verfügbar war, beziehungsweise adaptives Warten bei entfernten Seiten. Seiten mit später ausgeführtem JavaScript können andere Wartezeiten benötigen. Für beliebige Seiten ist damit weder ein identischer Bereitschaftszustand noch identische Browser-Treue nachgewiesen.
+
+**Einordnung der Daten:** Die Exporte enthalten 20 Ergebniszeilen, nicht 20 unabhängige direkte Vergleiche. Die Gesamtwertung „8 von 10“ aus dem Originalbericht wird hier nicht übernommen, weil die exportierten Zeilen wiederverwendete Vergleichswerte, reine Stealth-Abläufe und unterschiedliche Messgrenzen enthalten. Stattdessen zeigt der Artikel die einzelnen Vergleiche.
+
+**Rundung:** Die exportierten Mediane bleiben unverändert. Berechnet man die beiden sequenziellen Obscura-Mediane mit vier Läufen aus den gerundeten Einzelwerten neu, weichen sie um 0,05 ms von den exportierten Medianen ab. Auf dieser Genauigkeit lässt sich keine sinnvolle Geschwindigkeitsaussage aufbauen.
+
+**Reproduzierbarkeit:** Der hochgeladene Bericht nennt `run.py`, `run_ext.py` und `cdp_interactive.py`. Die ursprünglichen Skripte und Testseiten waren aber nicht enthalten. Die Rohzeiten sind verfügbar; das vollständige Experiment lässt sich aus dem Archiv allein nicht rekonstruieren. Ein neu geschriebenes Testskript wird hier nicht als Original ausgegeben.
+
+## Befehle zur Einordnung des Aufbaus
+
+Diese Beispiele sind aus dem Bericht übernommen und angepasst, kein vollständiges Paket zur Reproduktion. Die lokalen Befehle setzen den ursprünglichen Testserver und dessen Dateien voraus. Die benannte agent-browser-Sitzung wird exportiert, damit jeder Befehl dieselbe Sitzung nutzt.
+
+```bash
+# Die ursprüngliche lokale Testseite muss bereits auf Port 8765 laufen.
+obscura fetch http://127.0.0.1:8765/fixture.html \
+  --allow-private-network --eval 'document.title' --wait 0
+
+export AGENT_BROWSER_SESSION=bench-speed
+agent-browser open http://127.0.0.1:8765/fixture.html
+agent-browser get title
+agent-browser close
+```
+
+```bash
+# Kalter Remote-Abruf mit Stealth aus dem Bericht.
+obscura fetch https://example.com --stealth --eval 'document.title'
+
+# Server für den direkten CDP-Ablauf starten.
+obscura serve --port 9223 --allow-private-network
+```
+
+Das interaktive Testskript verwendete anschließend `Target.createTarget`, das Anhängen an das Ziel, `Page.navigate` und `Runtime.evaluate`. Der Bericht nennt einen WebSocket-Handshake ohne Origin (`suppress_origin=True`). Ohne das fehlende Testskript beschreiben diese Angaben den Aufbau; sie stellen die veröffentlichten Laufzeiten nicht nach.
+
+## Fazit
+
+**Obscura ist mein Ausgangspunkt für schnelle Abrufe, kleine Batches und CDP-Schleifen mit bekannten Selektoren. agent-browser bleibt sinnvoll für Snapshot-basierte Agentenabläufe und die hier gemessene warme Remote-Navigation.**
+
+Die wichtigste Entscheidung betrifft den Ausführungsweg, nicht nur den Toolnamen. Kalt oder warm, ein Prozess oder fünfzehn CLI-Aufrufe, gebündeltes JavaScript oder Entscheidungen eines Agenten: Diese Unterschiede können das Ergebnis stark verändern.
+
+Deshalb veröffentliche ich auch die [Einzelläufe](/benchmarks/browser-speed-2026-09-22/browser-speed-report.json). Wie bei [meiner Haltung zu Open Source](/blog/code-must-be-free/de) ist mir Transparenz wichtiger als eine bequeme Überschrift.
