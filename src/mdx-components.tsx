@@ -2,6 +2,7 @@ import { CodeBlock } from "@/components/mdx/code-block";
 import { MediaContainer } from "@/components/mdx/media-container";
 import { MarketShareChart } from "@/components/mdx/market-share-chart";
 import { SyncComparison } from "@/components/mdx/sync-comparison";
+import { TweetEmbed } from "@/components/mdx/tweet-embed";
 import type { ComponentProps } from "react";
 
 type CodeProps = ComponentProps<"code"> & { "data-language"?: string };
@@ -10,6 +11,7 @@ export const mdxComponents = {
   MediaContainer,
   MarketShareChart,
   SyncComparison,
+  TweetEmbed,
   pre: (props: ComponentProps<"pre">) => <CodeBlock {...props} />,
   hr: (props: ComponentProps<"hr">) => (
     <div className="my-10 flex w-full items-center" {...props}>
