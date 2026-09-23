@@ -8,3 +8,5 @@ build/
 .env*
 !.env.example
 .playwright-cli/
+test-results/
+*.tsbuildinfo
