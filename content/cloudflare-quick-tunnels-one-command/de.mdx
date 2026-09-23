@@ -1,0 +1,143 @@
+---
+title: "Cloudflare Quick Tunnels: Mit einem Befehl live"
+publishedAt: "2026-09-23"
+author: "Livvux"
+summary: "Mit einem cloudflared-Befehl wird localhost zur öffentlichen HTTPS-Vorschau. Mit echtem WhatsApp-Beispiel, Anleitung und den wichtigsten Grenzen."
+---
+
+**Die Website läuft auf deinem Rechner. Jemand anderes soll sie ansehen. Dafür sollte nicht erst ein komplettes Deployment nötig sein.**
+
+Genau das gefällt mir an [Cloudflare Quick Tunnels](https://try.cloudflare.com/). Sobald `cloudflared` installiert ist und deine Anwendung auf Port 3000 läuft, macht dieser Befehl sie über das Internet erreichbar:
+
+```bash
+cloudflared tunnel --url http://localhost:3000
+```
+
+Du bekommst kostenlos einen öffentlichen HTTPS-Link. Für diese vorübergehende Vorschau brauchst du weder einen Cloudflare-Account noch eine gekaufte Domain oder eigene DNS-Einträge. Genau das macht [Quick Tunnels](https://try.cloudflare.com/) interessant: die Anwendung teilen, ohne vorher einen Hosting-Account einzurichten.
+
+Wichtig ist die Unterscheidung: **Deine Anwendung wird öffentlich erreichbar, läuft aber weiterhin auf deinem Rechner.** Das ist ein Tunnel, kein Upload auf ein dauerhaftes Hosting.
+
+## Von der lokalen Website zum WhatsApp-Link
+
+Der Anlass für diesen Artikel ist eine Website-Vorschau für die **Eichhörnchen Auffangstation Berger**, geteilt in WhatsApp. Der Link erschien mit dem Titel und der Beschreibung der Website. Meine Reaktion im Chat: „1 command“.
+
+<figure>
+  <img src="/images/blog/cloudflare-quick-tunnels/whatsapp-preview.webp" alt="Echte WhatsApp-Linkvorschau der Eichhörnchen Auffangstation Berger mit Website-Titel, Beschreibung und gekürztem temporärem Tunnel-Hostnamen" width="800" height="405" loading="lazy" decoding="async" style={{ width: "100%", height: "auto", borderRadius: "12px" }} />
+  <figcaption>Ausschnitt aus meinem echten WhatsApp-Screenshot mit der geteilten Website-Vorschau. Der übrige Chat ist weggelassen.</figcaption>
+</figure>
+
+Dieser kleine Moment erklärt den Nutzen besser als eine Funktionsliste. Aus einem lokalen Projekt wird etwas, das du einer anderen Person schicken kannst. Sie öffnet die Seite selbst, statt sie anhand eines Screenshots oder einer Bildschirmübertragung beurteilen zu müssen.
+
+Bei einer solchen Website sind die wichtigen Fragen konkret. Wird sofort klar, worum es geht? Ist der Text auf dem Handy lesbar? Findet man die Kontaktmöglichkeit ohne langes Suchen? Ich möchte darüber sprechen, solange sich Änderungen noch einfach umsetzen lassen.
+
+Deshalb interessiert mich auch, [wie Technik die Arbeit im Tierschutz erleichtern kann](/blog/technology-animal-welfare/de). Der Nutzen liegt nicht in einem weiteren komplizierten System. Sondern darin, ein kleines Hindernis zwischen sinnvoller Arbeit und den Menschen zu beseitigen, die sie beurteilen sollen.
+
+## Was passiert hinter dem Befehl?
+
+Die [Tunnel-Architektur von Cloudflare](https://developers.cloudflare.com/tunnel/) verwendet einen kleinen Connector namens `cloudflared`. Er baut von deinem Rechner aus eine Verbindung zu Cloudflare auf. Besucher erreichen Cloudflare; ihre Anfragen werden über diese Verbindung an deinen lokalen Webserver weitergeleitet.
+
+Der Weg einer Anfrage sieht so aus:
+
+```text
+Browser des Besuchers → Cloudflare → cloudflared → localhost:3000
+```
+
+Du musst am Router keinen eingehenden Port weiterleiten und Besuchern nicht die IP-Adresse deines Anschlusses geben. Dein Netzwerk muss die ausgehenden Verbindungen des Connectors trotzdem erlauben. „Keine Portweiterleitung“ bedeutet nicht, dass ein Tunnel Netzwerksperren ignorieren kann.
+
+Die öffentliche Adresse verwendet HTTPS. Im Beispiel läuft der letzte Abschnitt vom Connector zur Anwendung über lokales HTTP. Cloudflare liegt im Datenverkehr, ist aber kein Hosting-Ziel, das deine Anwendung nach dem Abschalten deines Rechners weiterbetreibt. So beschreibt Cloudflare das [Connector-Modell](https://developers.cloudflare.com/tunnel/).
+
+## So startest du – mit klaren Voraussetzungen
+
+„Ein Befehl“ beschreibt den Start des Tunnels. Zwei Dinge müssen vorher bereitstehen: der Connector und eine laufende Webanwendung.
+
+### cloudflared einmal installieren
+
+Unter macOS mit installiertem Homebrew:
+
+```bash
+brew install cloudflared
+```
+
+Auf der [offiziellen Download-Seite](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/downloads/) bietet Cloudflare außerdem Windows-Installer, Linux-Pakete und einzelne Programmdateien an. Wähle die passende Variante für dein Betriebssystem und halte den Connector aktuell.
+
+### Deine bestehende Anwendung starten
+
+Bei einem Projekt mit einem `dev`-Script, das pnpm verwendet:
+
+```bash
+pnpm dev
+```
+
+Öffne die lokale Adresse, die dein Entwicklungsserver ausgibt. Prüfe zuerst, ob die Seite funktioniert. In diesem Artikel verwenden wir Port `3000`; bei deiner Anwendung kann es ein anderer sein.
+
+Gib nur einen Dienst frei, den du öffentlich zeigen möchtest. Verwende nicht dein gesamtes Benutzerverzeichnis als Basis eines Dateiservers und keine Datenbank-Verwaltung als praktische Testseite.
+
+### In einem zweiten Terminal die Vorschau freigeben
+
+Die Anwendung läuft im ersten Terminal weiter. Im zweiten führst du aus:
+
+```bash
+cloudflared tunnel --url http://localhost:3000
+```
+
+Der Connector gibt eine zufällig zugewiesene Adresse unter `*.trycloudflare.com` aus. Kopiere genau diese HTTPS-URL und öffne sie vor dem Teilen auf deinem Handy, möglichst über mobile Daten. Cloudflare beschreibt diesen [Weg von localhost zur öffentlichen URL](https://developers.cloudflare.com/tunnel/get-started/) auch in seiner Anleitung.
+
+Lass beide Prozesse während der Besprechung laufen. Der Rechner muss wach und mit dem Internet verbunden bleiben. Anschließend beendest du den Tunnel mit `Ctrl+C` im entsprechenden Terminal. Cloudflares [ursprüngliche Erklärung zu Quick Tunnels](https://blog.cloudflare.com/quick-tunnels-anytime-anywhere/) beschreibt, wie getrennte Tunnel aufgeräumt werden. Ein neuer Quick Tunnel bekommt eine neue zufällige Adresse, kein dauerhaftes Lesezeichen. Das Beenden zieht bereits empfangene Inhalte nicht zurück: Eine Linkvorschau im Chat kann etwa weiterhin sichtbar bleiben.
+
+## Der eigentliche Gewinn: schneller konkretes Feedback
+
+Ein Kunde muss weder dein Repository noch dein Terminal oder deine Deployment-Plattform verstehen, um eine Seite zu beurteilen. „Öffne den Link und probiere die Navigation aus“ ist deutlich hilfreicher als „Stell dir vor, wie dieser Screenshot funktioniert“.
+
+Dasselbe gilt für einen Kollegen, der ein Formular prüft, oder jemanden mit einem anderen Smartphone. Cloudflare nennt das [Teilen über Netzwerkgrenzen und Tests in verschiedenen Browsern](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/) ausdrücklich als Einsatzzwecke.
+
+Für mich ist eine gute Rückmeldung konkret: Seite öffnen, eine Aufgabe erledigen und beschreiben, wo etwas unklar wurde. Mit einer funktionierenden Vorschau ist das schon früh möglich. Sie macht Feedback nicht automatisch gut, gibt den Beteiligten aber etwas Greifbares.
+
+Das passt auch zur Entwicklung mit KI-Unterstützung. Ein Agent kann beim Bauen einer Oberfläche helfen. Benutzen und beurteilen muss sie trotzdem ein Mensch. Mein bevorzugter Ablauf: lokal prüfen, die vorübergehende öffentliche Freigabe ausdrücklich erlauben, Vorschau teilen, Änderungen machen und den Tunnel beenden.
+
+## Öffentliches HTTPS ist kein privater Zugang
+
+Eine zufällige URL ist kein Passwort. Der einfache Befehl erstellt weder eine Anmeldeseite noch begrenzt er den Zugang auf die Menschen, denen du den Link schickst.
+
+Für einen öffentlich vorzeigbaren Entwurf mit Beispieldaten kann das genau richtig sein. Für ein internes Dashboard oder Inhalte mit Kundendaten reicht es nicht. Nutze eine Anmeldung in der Anwendung oder einen verwalteten Tunnel mit einer passend eingerichteten [Cloudflare-Access-Regel](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/self-hosted-public-app/). Access ist eine zusätzliche Authentifizierungsschicht. Der Einzeiler aktiviert sie nicht automatisch.
+
+Ich würde auch einem Agenten keine pauschale Erlaubnis geben, beliebige lokale Ports öffentlich freizugeben. Prüfe, welcher Dienst geteilt wird und was seine Routen preisgeben. Eine Vorschau soll die Arbeit zeigen, die du präsentieren möchtest – nicht den Rest deiner Entwicklungsumgebung.
+
+## Die Grenzen sind klar – und wichtig
+
+Die [Dokumentation zu Quick Tunnels](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/#limitations) nennt drei wesentliche Einschränkungen:
+
+| Grenze | Bedeutung |
+| --- | --- |
+| 200 gleichzeitig laufende Anfragen | Gemeint sind parallele Anfragen, nicht 200 Besucher oder Anfragen pro Tag. Weitere Anfragen erhalten HTTP `429`. |
+| Keine Server-Sent Events (SSE) | Verlasse dich nicht darauf, dass eine SSE-basierte Streaming-Oberfläche über einen Quick Tunnel funktioniert. |
+| Keine garantierte Verfügbarkeit oder SLA | Gedacht für Tests und Entwicklung, nicht als Verfügbarkeitsversprechen für den Produktivbetrieb. |
+
+Die SSE-Grenze ist relevant, wenn du eine Chat-Oberfläche mit gestreamten Antworten vorführen möchtest. Dass eine normale Seite lädt, beweist noch nicht, dass jede Streaming-Funktion funktioniert. Teste die tatsächliche Bedienung oder wähle einen geeigneten verwalteten Aufbau.
+
+Diese Grenzen machen das Werkzeug für seinen Zweck nicht weniger nützlich. Sie machen klarer, wo dieser Zweck endet: **Eine vorübergehende Vorschau teilen, keine produktive Abhängigkeit schaffen.**
+
+## Wenn es beim ersten Versuch nicht klappt
+
+**Ein `502`-Fehler:** Prüfe, ob die Anwendung noch läuft und ob URL, Port und Protokoll stimmen. Cloudflares [Anleitung zur Fehlersuche am Ursprungsserver](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/troubleshoot-tunnels/common-errors/) erklärt, dass ein verbundener Tunnel allein noch keine erreichbare Anwendung beweist. Teste zuerst die lokale Adresse.
+
+**Das Framework lehnt Hostname oder Origin ab:** Lies die Einstellungen des Entwicklungsservers. Vite verwendet [`server.allowedHosts`](https://vite.dev/config/server-options#server-allowedhosts), Next.js bietet [`allowedDevOrigins`](https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins). Erlaube bei Bedarf nur den genau zugewiesenen Hostnamen deiner Vorschau. Schalte die Schutzmechanismen nicht allgemein ab und gib nicht sämtliche `*.trycloudflare.com`-Hosts frei.
+
+**Eine bestehende cloudflared-Konfiguration stört:** Cloudflare dokumentiert einen [Konflikt mit `.cloudflared/config.yaml`](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/). Prüfe, ob diese Datei vorhanden ist. Lösche keine funktionierende Konfiguration; bewahre sie auf und unterbrich keinen anderen Tunnel.
+
+**Der Connector bekommt keine Verbindung:** Prüfe in einem eingeschränkten Netzwerk Cloudflares [Anforderungen an ausgehende Verbindungen](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/tunnel-with-firewall/). Der Tunnelverkehr verwendet Port `7844`: UDP für QUIC oder TCP für HTTP/2. Kläre die Freigabe mit dem Netzwerkadministrator, statt die Firewall abzuschalten.
+
+Prüfe außerdem die Anwendung selbst: Wenn dein Frontend dem Browser eines Besuchers sagt, er solle `localhost` aufrufen, meint das dessen Gerät. Der Tunnel schreibt fest hinterlegte API-Adressen oder Callback-URLs für Anmeldungen nicht automatisch um.
+
+## Wenn aus der Vorschau ein echter Dienst wird
+
+Sobald andere Menschen eine verlässliche Adresse brauchen, ist ein bewusst eingerichtetes Deployment sinnvoll. Cloudflares [Anleitung für verwaltete Tunnel](https://developers.cloudflare.com/tunnel/get-started/) beschreibt einen Tunnel in deinem Account mit einem Hostnamen unter deiner Domain. Soll der Dienst privat sein, richtest du Access zusätzlich ein.
+
+Auch ein verwalteter Tunnel braucht einen Ursprungsserver, der online bleibt. Anwendungssicherheit, Backups und zuverlässiges Hosting werden dadurch nicht überflüssig. Der Unterschied: Aus einem kurzlebigen Link für Rückmeldungen wird Infrastruktur, die du gezielt betreibst.
+
+Für den Schritt davor möchte ich aus „Kannst du dir das kurz ansehen?“ aber kein Infrastrukturprojekt machen.
+
+**Lokal bauen. Einen Befehl ausführen. Eine echte Vorschau schicken. Konkretes Feedback bekommen.**
+
+Deshalb gehört [Quick Tunnels](https://try.cloudflare.com/) für mich in den Werkzeugkasten für die Entwicklung.
+
+*Technische Angaben am 23. September 2026 anhand der verlinkten offiziellen Dokumentation geprüft. Das Bild ist ein Ausschnitt aus einem echten Screenshot; die Befehle sind dokumentierte Beispiele, kein zeitlich gemessener Deployment-Test.*
