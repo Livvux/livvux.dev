@@ -8,12 +8,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { DATA } from "@/data/resume";
+import { Link2 } from "lucide-react";
 
 export default function Navbar() {
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-4 z-30">
-      <Dock className="z-50 pointer-events-auto relative h-14 p-2 w-fit mx-auto flex gap-2 border bg-card/90 backdrop-blur-3xl shadow-[0_0_10px_3px] shadow-primary/5">
-        {DATA.navbar.map((item) => {
+      <Dock className="z-50 pointer-events-auto relative h-14 p-2 w-fit max-w-[calc(100vw-2rem)] mx-auto flex justify-start gap-1 overflow-x-auto sm:justify-center sm:gap-2 sm:overflow-visible border bg-card/90 backdrop-blur-3xl shadow-[0_0_10px_3px] shadow-primary/5">
+        {[...DATA.navbar, { href: "/tools", label: "Tools", icon: Link2 }].map((item) => {
           const isExternal = item.href.startsWith("http");
           return (
             <Tooltip key={item.href}>
@@ -22,6 +23,7 @@ export default function Navbar() {
                   href={item.href}
                   target={isExternal ? "_blank" : undefined}
                   rel={isExternal ? "noopener noreferrer" : undefined}
+                  aria-label={item.label}
                 >
                   <DockIcon className="rounded-3xl cursor-pointer size-full bg-background p-0 text-muted-foreground hover:text-foreground hover:bg-muted backdrop-blur-3xl border border-border transition-colors">
                     <item.icon className="size-full rounded-sm overflow-hidden object-contain" />

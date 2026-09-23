@@ -1,0 +1,12 @@
+import type { AuditEvent, Report } from './types';
+export const PAGE_TYPES: Record<string, string>;
+export const INTENTS: Record<string, string>;
+export const ROLES: Record<string, string>;
+export const STAGES: string[];
+export const STAGE_LABELS: string[];
+export function label(value: unknown): string;
+export function isGenericAnchor(value: string): boolean;
+export function csvCell(value: unknown): string;
+export function toCsv(rows: Record<string, unknown>[], columns: string[]): string;
+export function reportCsv(report: Report): string;
+export function readEvents(response: Response, onEvent: (event: AuditEvent) => void): Promise<void>;
