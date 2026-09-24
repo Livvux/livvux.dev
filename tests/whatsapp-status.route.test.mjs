@@ -16,7 +16,7 @@ async function freePort() {
   return port;
 }
 
-test("blog bridge sends the OG image as a JPEG status with German caption once", { timeout: 60_000 }, async () => {
+test("blog bridge sends the German URL as a preview-enabled text status once", { timeout: 60_000 }, async () => {
   const calls = [];
   const mock = createServer(async (request, response) => {
     response.setHeader("Content-Type", "application/json");
@@ -81,10 +81,11 @@ test("blog bridge sends the OG image as a JPEG status with German caption once",
     assert.equal(second.status, 200);
     assert.equal((await second.json()).result, "already_sent");
     assert.equal(calls.length, 1);
-    assert.equal(calls[0].path, "/api/18pro/status/image");
-    assert.equal(calls[0].body.file.mimetype, "image/jpeg");
-    assert.equal(Buffer.from(calls[0].body.file.data, "base64").subarray(0, 3).toString("hex"), "ffd8ff");
-    assert.match(calls[0].body.caption, /https:\/\/livvux\.dev\/blog\/macos-finder-webp-converter-2026\/de$/);
+    assert.equal(calls[0].path, "/api/18pro/status/text");
+    assert.equal(calls[0].body.text, "https://livvux.dev/blog/macos-finder-webp-converter-2026/de");
+    assert.equal(calls[0].body.linkPreview, true);
+    assert.equal(calls[0].body.linkPreviewHighQuality, true);
+    assert.equal(calls[0].body.file, undefined);
   } finally {
     if (app.exitCode === null) {
       app.kill("SIGTERM");
