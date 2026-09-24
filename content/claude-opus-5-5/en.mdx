@@ -1,0 +1,104 @@
+---
+title: "Claude Opus 5.5: Better Results, Not Just Cheaper Tokens"
+publishedAt: "2026-09-24"
+author: "Livvux"
+summary: "Claude Opus 5.5 through a developer's lens: original Artificial Analysis charts, effort settings, API pricing, and why cheaper tokens do not always mean cheaper tasks."
+---
+
+**A model upgrade matters to me when it helps finish real work. Not when it produces a more impressive screenshot of a leaderboard.**
+
+Anthropic [released Claude Opus 5.5 on September 22, 2026](https://www.anthropic.com/claude-opus-5-5), positioning it around stronger coding, clearer communication and lower running costs. The interesting question is what that combination could change for someone building websites, maintaining applications and reviewing code.
+
+This is a source-based analysis, not a hands-on benchmark. Prices and dashboard values were checked on **September 24, 2026**. My evaluation ideas below are proposals, not results from running Opus 5.5 on my projects.
+
+## What changed for developers?
+
+The [official model overview](https://platform.claude.com/docs/en/models/opus-5-5/overview) lists a one-million-token context window, text and image input, and text output. Its Claude API identifier is `claude-opus-5-5`. Adaptive thinking is always on, with `medium` as the default effort level.
+
+My interest is less about filling that context window and more about keeping a task coherent: understanding a bug, finding the relevant files, making a focused change and checking that the original behavior still works.
+
+For a small project, a model that needs less supervision could be more valuable than one that generates a longer answer. But I would want evidence from the actual application before drawing that conclusion.
+
+## The independent benchmark picture
+
+The [Artificial Analysis release dashboard](https://artificialanalysis.ai/models/releases/claude-opus-5-5) compares five effort configurations with default fallback enabled. These are settings of the same release, not five separate model families.
+
+The two original charts in this article are publisher-hosted images from [Artificial Analysis's accompanying launch analysis](https://artificialanalysis.ai/articles/claude-opus-5-5). They are not recreated graphics or live embeds of the interactive dashboard. Open an image at full size to inspect its labels; use the release dashboard for current filters and measurements.
+
+<figure>
+  <a href="https://cdn.sanity.io/images/6vfeftx9/articles/7fd5f0b59acb7f47a13db71f4e07a06763d9186a-2008x2005.png" target="_blank" rel="noopener noreferrer" aria-label="Open Artificial Analysis's original benchmark overview at full size">
+    <img src="https://cdn.sanity.io/images/6vfeftx9/articles/7fd5f0b59acb7f47a13db71f4e07a06763d9186a-2008x2005.png?auto=format&w=1200" alt="Original Artificial Analysis benchmark overview published with its Claude Opus 5.5 launch analysis; the effort-level values are also provided in the table below." width="2008" height="2005" loading="lazy" decoding="async" referrerPolicy="no-referrer" style={{ width: "100%", height: "auto", borderRadius: "12px" }} />
+  </a>
+  <figcaption>Original chart: <a href="https://artificialanalysis.ai/articles/claude-opus-5-5">Artificial Analysis, September 22, 2026</a>. Publisher-hosted, with the original labels and branding retained.</figcaption>
+</figure>
+
+Here is the dashboard snapshot in text. Costs are **USD per Intelligence Index task**, not prices per million tokens.
+
+| Effort, with default fallback | Intelligence Index | Cost per task (USD) |
+| --- | ---: | ---: |
+| low | 42 | $0.55 |
+| medium | 51 | $1.34 |
+| high | 54 | $1.82 |
+| xhigh | 56 | $3.46 |
+| max | 58 | $5.98 |
+
+Source: [Artificial Analysis release dashboard](https://artificialanalysis.ai/models/releases/claude-opus-5-5), September 24, 2026. These are benchmark-specific weighted costs, not a quote for your application.
+
+My reading: I would not make `max` the default just because it tops this table. I would start an evaluation at `medium`, then test whether extra effort improves the work enough to justify the cost. A difficult architectural problem and a straightforward content edit do not need the same evaluation criteria.
+
+## The more useful graph: quality against cost
+
+A ranking answers one question: which tested configuration scored higher? A quality-versus-cost comparison asks another: what are we paying for the improvement?
+
+<figure>
+  <a href="https://cdn.sanity.io/images/6vfeftx9/articles/77c818c26ed8d618c0cdd3cd54b8a12194cbf883-2008x1176.png" target="_blank" rel="noopener noreferrer" aria-label="Open Artificial Analysis's original intelligence and cost comparison at full size">
+    <img src="https://cdn.sanity.io/images/6vfeftx9/articles/77c818c26ed8d618c0cdd3cd54b8a12194cbf883-2008x1176.png?auto=format&w=1200" alt="Original Artificial Analysis chart accompanying its comparison of Claude Opus 5.5 effort levels on intelligence and cost per task." width="2008" height="1176" loading="lazy" decoding="async" referrerPolicy="no-referrer" style={{ width: "100%", height: "auto", borderRadius: "12px" }} />
+  </a>
+  <figcaption>Original comparison: <a href="https://artificialanalysis.ai/articles/claude-opus-5-5">Artificial Analysis launch analysis</a>. For interactive comparisons, open the <a href="https://artificialanalysis.ai/models/releases/claude-opus-5-5">release dashboard</a>.</figcaption>
+</figure>
+
+For my own work, I would add a third dimension: the time I spend checking and correcting the result. A cheap answer that requires a rewrite is not necessarily a cheap solution. Equally, paying more for reasoning that does not improve the accepted result is not automatically worthwhile.
+
+That suggests a practical target: **cost per accepted change**, rather than cost per response. I would count failed attempts and review time, not just the run that eventually worked.
+
+## Cheaper tokens do not guarantee cheaper tasks
+
+These are the standard Claude API rates in [Anthropic's pricing documentation](https://platform.claude.com/docs/en/about-claude/pricing), in USD per million tokens:
+
+| Token category | Opus 5 | Opus 5.5 |
+| --- | ---: | ---: |
+| Uncached input | $5.00 | $4.00 |
+| Output | $25.00 | $20.00 |
+| Cache reads | $0.50 | $0.20 |
+
+The ordinary input and output rates fall by 20%; cache reads fall by 60%. That is not a blanket 40% reduction in the price of every token.
+
+Anthropic's [40% lower running-cost claim](https://www.anthropic.com/claude-opus-5-5) concerns its tests of typical workloads at default settings. That is not a guaranteed saving for every workload or effort level.
+
+In contrast, [Artificial Analysis reports](https://artificialanalysis.ai/articles/claude-opus-5-5) approximately **119,000 output tokens per task at max effort**, versus roughly **73,000 for Opus 5 at max**. Its measured cost per task was approximately level despite the cheaper token rates.
+
+These results address different setups. My conclusion is not that either comparison should be ignored. It is that the workload, effort setting and total usage belong next to any savings claim.
+
+## What these charts cannot tell us
+
+The [Intelligence Index methodology](https://artificialanalysis.ai/methodology/intelligence-benchmarking) describes a weighted collection of evaluations. Version 4.3.2 combines ten tests; its focus is primarily English and text-based work. An index score is not a universal percentage of tasks solved correctly, nor a direct assessment of German writing quality.
+
+The fallback qualification also matters. Anthropic's [release notes](https://www.anthropic.com/claude-opus-5-5) explain that safeguards can route certain tasks to other models. I would not describe a fallback-enabled result as an unrestricted, single-model measurement.
+
+None of that makes the benchmark useless. It makes it a shortlist, not an acceptance test for my software. I would still want the model to explain uncertainty, leave unrelated files alone and admit when it could not verify a change.
+
+## An API migration is not just a model-name swap
+
+Check the [official migration guide](https://platform.claude.com/docs/en/models/opus-5-5/migration-guide) before changing an integration. Disabled thinking and forced tool selection are not supported. Thinking blocks must be preserved as documented in tool conversations. Reasoning counts toward output usage and the `max_tokens` budget, so visible answer length alone does not describe consumption.
+
+I would test the existing tool loop before expanding access. My starting boundary would be a working branch with reviewable diffs, explicit permissions and no automatic production deployment. Those are engineering choices, not promises made by a model score.
+
+## How I would decide whether to switch
+
+I would choose a small set of real tasks before looking at the answers: a bug with a known reproduction, a refactor with behavior that must remain unchanged, and a feature with written acceptance criteria.
+
+Each configuration would get the same starting commit, instructions, tools and limits. I would run more than one attempt, record unsuccessful runs and compare the changes against the same tests. My review would ask whether the result is correct, whether the diff stays within scope and how much intervention it needed.
+
+The most useful result would not be a dramatic demo. It would be a repeatable improvement I can explain: fewer corrections, a cleaner patch or a lower total cost for the same accepted outcome.
+
+**Opus 5.5 belongs on that evaluation list. The decision to make it a default should come from the work, not the launch headline.**
