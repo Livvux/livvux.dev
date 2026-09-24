@@ -3,6 +3,7 @@ import { compileMDX } from "@content-collections/mdx";
 import remarkGfm from "remark-gfm";
 import { z } from "zod";
 import { remarkCodeMeta } from "./src/lib/remark-code-meta";
+import { remarkContentLinks } from "./src/lib/remark-content-links";
 
 const posts = defineCollection({
     name: "posts",
@@ -19,7 +20,7 @@ const posts = defineCollection({
     }),
     transform: async (document, context) => {
         const mdx = await compileMDX(context, document, {
-            remarkPlugins: [remarkGfm, remarkCodeMeta],
+            remarkPlugins: [remarkGfm, remarkCodeMeta, remarkContentLinks],
         });
         return {
         ...document,

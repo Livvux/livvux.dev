@@ -1,3 +1,4 @@
+import { ContentLink } from "@/components/content-link";
 import { CodeBlock } from "@/components/mdx/code-block";
 import { MediaContainer } from "@/components/mdx/media-container";
 import { MarketShareChart } from "@/components/mdx/market-share-chart";
@@ -8,6 +9,8 @@ import type { ComponentProps } from "react";
 type CodeProps = ComponentProps<"code"> & { "data-language"?: string };
 
 export const mdxComponents = {
+  ContentLink,
+  a: ContentLink,
   MediaContainer,
   MarketShareChart,
   SyncComparison,
