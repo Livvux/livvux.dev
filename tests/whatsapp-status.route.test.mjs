@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import { spawn } from "node:child_process";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { createServer } from "node:http";
 import { createServer as createTcpServer } from "node:net";
 import { tmpdir } from "node:os";
@@ -16,7 +16,7 @@ async function freePort() {
   return port;
 }
 
-test("blog bridge sends the German URL as a preview-enabled text status once", { timeout: 60_000 }, async () => {
+test("blog bridge sends the OG image followed by the German link once", { timeout: 60_000 }, async () => {
   const calls = [];
   const mock = createServer(async (request, response) => {
     response.setHeader("Content-Type", "application/json");
@@ -28,7 +28,7 @@ test("blog bridge sends the German URL as a preview-enabled text status once", {
       const chunks = [];
       for await (const chunk of request) chunks.push(chunk);
       calls.push({ path: request.url, body: JSON.parse(Buffer.concat(chunks).toString()) });
-      response.end(JSON.stringify({ key: { id: "mock-status" } }));
+      response.end(JSON.stringify({ id: `mock-status-${calls.length}` }));
       return;
     }
     response.statusCode = 404;
@@ -80,12 +80,20 @@ test("blog bridge sends the German URL as a preview-enabled text status once", {
     const second = await send();
     assert.equal(second.status, 200);
     assert.equal((await second.json()).result, "already_sent");
-    assert.equal(calls.length, 1);
-    assert.equal(calls[0].path, "/api/18pro/status/text");
-    assert.equal(calls[0].body.text, "https://livvux.dev/blog/macos-finder-webp-converter-2026/de");
-    assert.equal(calls[0].body.linkPreview, true);
-    assert.equal(calls[0].body.linkPreviewHighQuality, true);
-    assert.equal(calls[0].body.file, undefined);
+    const url = "https://livvux.dev/blog/macos-finder-webp-converter-2026/de";
+    assert.equal(calls.length, 2);
+    assert.equal(calls[0].path, "/api/18pro/status/image");
+    assert.equal(calls[0].body.file.mimetype, "image/jpeg");
+    assert.ok(Buffer.from(calls[0].body.file.data, "base64").subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff])));
+    assert.equal(calls[0].body.caption, url);
+    assert.equal(calls[1].path, "/api/18pro/status/text");
+    assert.equal(calls[1].body.text, url);
+    assert.equal(calls[1].body.linkPreview, true);
+    assert.equal(calls[1].body.linkPreviewHighQuality, true);
+    const marker = JSON.parse(await readFile(join(stateDir, "macos-finder-webp-converter-2026.json"), "utf8"));
+    assert.equal(marker.state, "sent");
+    assert.equal(marker.imageMessageId, "mock-status-1");
+    assert.equal(marker.messageId, "mock-status-2");
   } finally {
     if (app.exitCode === null) {
       app.kill("SIGTERM");
