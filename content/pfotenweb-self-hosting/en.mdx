@@ -1,0 +1,373 @@
+---
+title: "Pfotenweb for Free: Install Your Animal Rescue Website, Step by Step"
+publishedAt: "2026-09-24"
+author: "Livvux"
+summary: "A beginner-friendly guide to free Pfotenweb: set up a server with Docker and HTTPS, add your first animals, manage enquiries and keep your website backed up."
+---
+
+**Your rescue needs a website. You should not have to build one from scratch just to introduce your animals, publish news and receive enquiries.**
+
+[Pfotenweb is my own project](https://github.com/Livvux/pfotenweb). Its free, self-hosted edition provides a website for **one organisation per installation**, including animal profiles, photos, news, contact enquiries and separate team accounts. There is no software subscription, animal limit or requirement to connect a Pfotenweb account. The source code is available under the MIT licence.[^edition]
+
+This guide takes you from an empty server to your first animal profile. You do not need to program anything. You will need to copy some commands and take responsibility for keeping the server updated.
+
+**Free software does not mean free hosting.** Your server, domain and backup storage can still cost money. And the free edition is its own product: do not assume that every feature of the hosted service is included.
+
+Already know you do not want to manage a server? You can [sign up through pfotenweb.de](https://pfotenweb.de/) instead. That is the separately hosted option, not a prerequisite or an extra step in this guide.
+
+## The route we are taking
+
+We will use **Docker Compose**, which starts Pfotenweb and its supporting services together. Think of it as following the installation recipe already included in the project, rather than assembling all the pieces yourself.
+
+The included setup contains the website, a database that stores your records, an initial setup task and **Caddy**, which handles the encrypted HTTPS connection.[^compose]
+
+```text
+Your domain → Caddy / HTTPS → Pfotenweb
+                                ↕
+                      Database and photos
+```
+
+There is no ready-made Pfotenweb one-click deployment template in the release reviewed for this guide. Docker is the supported route, but preparing your domain and entering your settings still takes a few steps. A provider's “Docker” server image is not a complete Pfotenweb installation.
+
+**Version used: v1.0.1**, the latest published release when checked on **24 September 2026**. We deliberately select that version instead of `main`, the changing development branch. Before installing later, check the [release page](https://github.com/Livvux/pfotenweb/releases) for newer releases and their instructions.[^release]
+
+## 1. Get a suitable server
+
+A server is simply a computer that stays online. For this walkthrough, use a **new Linux VPS or cloud server with Ubuntu 24.04 LTS, 64-bit**, and administrator access. A normal webspace package intended only for PHP or WordPress is not the setup described here.
+
+In your hosting provider's control panel, choose **Create server**, select Ubuntu 24.04 LTS and save the server's IP address and login instructions. The exact button names vary by provider. Prefer SSH-key login where the provider offers it.
+
+As a practical starting point, I would choose **2 virtual CPUs, 4 GB of memory and 40 GB of storage**, with room to grow. These are my planning suggestions, **not published Pfotenweb minimum requirements or a tested capacity guarantee**. Building the application also needs memory, and photos and backups consume storage.
+
+Use a fresh server for this guide. A server already running websites, Coolify, Dokploy or another web-management system needs a different networking setup; do not overwrite or stop its existing services.
+
+In the provider's firewall settings, allow incoming **TCP 80 and 443** for the website. Keep SSH access, usually **TCP 22**, available to your own IP address. Do not open database port **5432** or application port **3000** to the Internet. An additional firewall on the server must also permit the required connections. Docker-published ports can bypass ordinary UFW rules, so do not rely on those alone.[^docker]
+
+## 2. Point a domain at the server
+
+Your domain is the website address people will type. The examples use `tierheim.example.org`; replace it with an address you control.
+
+In the control panel where you manage your domain, open **DNS settings**. For a subdomain such as `tierheim.your-domain.org`, create this record:
+
+| Field | Enter |
+| --- | --- |
+| Type | `A` |
+| Name / host | `tierheim` |
+| Value / destination | Your server's public IPv4 address |
+| TTL | Leave the provider's default |
+
+For the main domain instead, the name is often `@` or an empty field; follow your provider's guidance. Do not replace an existing website's records accidentally. Leave email records such as MX unchanged.
+
+Only add an **AAAA** record when your server has working public IPv6. An old AAAA record pointing elsewhere can break access and certificate setup. Where the provider offers a proxy option, start with **DNS only** for this direct-to-server walkthrough.
+
+Caddy needs the chosen domain to resolve to this server and ports 80/443 to be reachable before it can set up public HTTPS.[^https] DNS changes are not always visible immediately. Use your domain provider's DNS checker to confirm the destination before continuing.
+
+## 3. Connect to the server
+
+On a Mac, open **Terminal**. On Windows, open **PowerShell**. Use the username and IP address from your server provider:
+
+```bash
+ssh SERVER_USER@SERVER_IP
+```
+
+Replace both capitalised placeholders. A provider's browser-based server console is another option. On the first SSH connection, check the server fingerprint against the provider's information before accepting it. Password entry may show no characters; that is normal.
+
+**From here on, commands run on the server**, not on your own computer, unless a step explicitly says otherwise. The examples assume your server account can use `sudo`, which grants administrator rights for a command. Stop and read any error before moving on.
+
+## 4. Install Docker once
+
+First check whether the server already has Docker and Compose:
+
+```bash
+sudo docker --version
+sudo docker compose version
+```
+
+If both show version numbers, skip the installation commands below. If Docker is present but Compose is missing, use the [official Ubuntu installation guide](https://docs.docker.com/engine/install/ubuntu/) rather than mixing different Docker packages.
+
+For a **fresh Ubuntu 24.04 server without Docker**, install it from Docker's official package repository.[^docker] Copy one block at a time. These commands are for Ubuntu, not for your Mac or Windows computer.
+
+First install the small tools used in this guide:
+
+```bash
+sudo apt update
+sudo apt install -y ca-certificates curl git nano openssl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+```
+
+Then add Docker's package source. Copy the **whole block**, including the last `EOF` line:
+
+```bash
+sudo tee /etc/apt/sources.list.d/docker.sources > /dev/null <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: noble
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+```
+
+Install and verify:
+
+```bash
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl enable --now docker
+sudo docker run --rm hello-world
+sudo docker compose version
+```
+
+**Success looks like:** a “Hello from Docker!” message and a Compose version number. You do not need to install Node.js or a database separately for this Docker route.[^compose]
+
+On an Ubuntu server where you skipped Docker installation because it was already present, install the remaining helper tools:
+
+```bash
+sudo apt update && sudo apt install -y git nano openssl
+```
+
+## 5. Download Pfotenweb
+
+Run these commands on the server:
+
+```bash
+cd ~
+git clone https://github.com/Livvux/pfotenweb.git
+cd pfotenweb
+git checkout v1.0.1
+cp .env.example .env
+chmod 600 .env
+```
+
+`git clone` downloads the project. `git checkout v1.0.1` selects the release used here. A message about a **detached HEAD** is normal when selecting a release; it is not an installation failure.
+
+The `.env` file is your private settings sheet. `chmod 600` limits access to its owner. Do not upload this file to GitHub or paste it into support requests.
+
+If a `pfotenweb` folder already exists, stop and check what it contains rather than deleting it. After reconnecting to the server later, return to this folder with `cd ~/pfotenweb` before running Compose commands.
+
+## 6. Enter your website details and passwords
+
+Generate two different random values, one command at a time:
+
+```bash
+openssl rand -hex 32
+openssl rand -hex 32
+```
+
+Save the first as your **database password** and the second as your **website administrator password** in a password manager. Do not reuse your server login password. The generated values avoid special-character problems in the database address and exceed the initial administrator's 16-character minimum.[^setup]
+
+Open the settings file:
+
+```bash
+nano .env
+```
+
+Replace the corresponding lines with your own values. **The capitalised values below are placeholders, not usable passwords.** Replace `tierheim.example.org` and the example email address too.
+
+```dotenv
+POSTGRES_PASSWORD=PASTE_FIRST_RANDOM_VALUE
+SITE_URL=https://tierheim.example.org
+DOMAIN=tierheim.example.org
+ACME_EMAIL=you@example.org
+INITIAL_ORG_NAME="My Animal Rescue"
+INITIAL_ADMIN_USERNAME=vorstand
+INITIAL_ADMIN_PASSWORD=PASTE_SECOND_RANDOM_VALUE
+```
+
+`SITE_URL` is the full website address, including `https://`. `DOMAIN` is the same hostname **without** `https://` or a path. `ACME_EMAIL` should be a real email address you monitor for certificate-related contact. Use your organisation's name and keep the quotation marks around it.
+
+`vorstand` is just the example username in the supplied settings, not a universal Pfotenweb login. You may choose another username with 3–50 characters. Keep the organisation name within 2–60 characters.[^setup]
+
+Leave the existing `DATABASE_URL` line alone for this route: Docker Compose supplies the correct internal connection automatically. Leave the `SMTP_*` email settings as supplied for now; sending email is optional.[^compose]
+
+In Nano, press **Ctrl+O**, then **Enter** to save. Press **Ctrl+X** to exit. On a Mac, this is the Control key, not Command.
+
+Check that Compose can read the settings:
+
+```bash
+sudo docker compose --profile https config --quiet
+```
+
+No output and no error means the configuration parsed successfully. It does **not** prove that the domain or every password is correct. Keep `--quiet`: the full configuration output can contain secrets.
+
+## 7. Start the website
+
+Still inside `~/pfotenweb`, run:
+
+```bash
+sudo docker compose --profile https up -d --build
+```
+
+This builds the application, starts the database, creates the initial organisation and administrator, and starts the website with Caddy. Let it finish; the first build is not instantaneous. The `-d` option lets the services continue running after you disconnect.[^compose]
+
+Check the result:
+
+```bash
+sudo docker compose --profile https ps -a
+```
+
+Look for a running database, app and Caddy. The one-time `setup` service finishing with **Exited (0)** is expected. A non-zero exit code or a repeatedly restarting app needs investigation, not another empty installation.
+
+For diagnostic messages:
+
+```bash
+sudo docker compose --profile https logs --tail=80 setup app caddy
+```
+
+These messages are for your review. Remove passwords, tokens and personal information before sharing any logs publicly.
+
+## 8. Open your site and sign in
+
+In your browser, open your actual domain, followed by `/admin`:
+
+```text
+https://tierheim.example.org/admin
+```
+
+Sign in using `INITIAL_ADMIN_USERNAME` and the **second generated password**. This is a username login, not a Pfotenweb cloud account or an email registration.
+
+Open the main domain in another tab too. **Success looks like:** a website over HTTPS without a certificate warning, and an administrator area you can enter. A new installation has no demo animals or news; an empty animal list is normal.[^setup]
+
+Once login works and your credentials are safely stored, remove the `INITIAL_ADMIN_USERNAME` and `INITIAL_ADMIN_PASSWORD` lines from `.env`, then run the same `up -d --build` command again to recreate services with the cleaned environment. Existing accounts are not recreated or changed on subsequent setup runs.[^setup]
+
+**Do not change `POSTGRES_PASSWORD` afterwards as a casual settings edit.** Changing `.env` alone does not change the password inside an already-created PostgreSQL database. Likewise, editing an `INITIAL_ADMIN_*` value is not a password reset.
+
+## Make it your rescue's website
+
+The reviewed release's interface is in **German**. The labels below are deliberately the ones you will see, with English explanations alongside them.
+
+Open **Verein** at `/admin/verein`. The sections are **Verein**, **Kontakt**, **Startseite**, **Über uns**, **Impressum** and **Erscheinungsbild**.[^screens]
+
+Start with your organisation's details and contact information. Then write a short homepage introduction, explain your work under “Über uns”, and adjust your visual identity. Save each section before moving to the next; the sections are separate forms.
+
+Review the public site after each change. Before sharing it widely, check your legal notice and privacy information for your actual organisation and hosting arrangement. A populated template is not a guarantee that your legal obligations are covered.
+
+For ideas on what to include, see my article about [useful, current animal rescue websites](/blog/animal-rescue-websites).
+
+## Add your first animal
+
+Open **Tiere**, then the new-animal form at `/admin/tiere/neu`.
+
+Enter the animal's name, species (**Art**) and sex (**Geschlecht**). Add the birth year, size and breed when known. Write a useful **Beschreibung**: personality, needs and the home you are looking for. The description requires at least 20 characters.[^animals]
+
+Upload your photos using **Fotos hochladen**. Start with a few clear pictures you have permission to publish. Select **Vermittelbar** for an animal seeking a home, **Reserviert** for a reservation or **Vermittelt** after adoption. Select **Auf der Startseite zeigen** only when you want the profile featured on the homepage.
+
+Press **Tier anlegen**. Treat this as publishing the animal, not saving a private draft: the animal form does not offer the news section's draft checkbox. Check the result on the public `/tiere` page in a private browser window. To change the profile later, open it under **Tiere** and save with **Änderungen speichern**.[^animals]
+
+Use real information rather than leaving a fictional test animal on the live website.
+
+## Publish news and read enquiries
+
+For a news item, open **Aktuelles** and go to `/admin/aktuelles/neu`. Fill in **Titel** and **Beitrag**. Leave **Veröffentlicht (öffentlich sichtbar)** unchecked to keep a draft; check it when the text is ready, then press **Beitrag anlegen**. Confirm published news appears on `/aktuelles`.[^posts]
+
+For messages, open **Anfragen** at `/admin/anfragen`. Reply using the sender's email address in your normal email application, then use **Als erledigt markieren** when finished. This is not a promise of an in-app conversation thread.[^screens]
+
+Send a test message through your public contact page and confirm it arrives here. **Enquiries are stored even without SMTP email delivery.** Until notifications are configured and tested, someone needs to check this page regularly.[^edition]
+
+## Give helpers their own access
+
+Under **Team** at `/admin/team`, create a separate username and strong password for each helper, choose the role and press **Zugang anlegen**. Send credentials privately, not in a public group.[^team]
+
+**Redaktion** can maintain animals, news and enquiries. **Verantwortlich** can also change organisation settings and manage accounts. Give people only the access they need, rather than sharing the main administrator password.[^roles]
+
+Your own password can also be changed in this area. The initial-password settings file is not the place to manage existing accounts.
+
+## Optional: receive email notifications
+
+SMTP means the settings Pfotenweb uses to send mail through an email provider. It does not create a mailbox.
+
+Ask your mail provider for its server name, port, encryption setting, username, password and permitted sender address. Enter those values in the existing `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS` and `SMTP_FROM` fields in `.env`, then run the same Compose start command again.[^edition]
+
+Use the provider's exact combination of port and encryption; do not guess. Send another contact-form test and check both **Anfragen** and the receiving mailbox. Until delivery works, keep checking the administrator area.
+
+## Keep a backup before you need one
+
+Your animals and messages live in the database; their photos live in a separate upload area. **You need both.** A GitHub copy of the application is not a backup of your rescue's content.[^compose]
+
+The following manual backup briefly stops the app so its database and photos stay consistent. It uses a timestamped folder and arranges for the app to start again when the block exits. Run it on the server, inside `~/pfotenweb`:
+
+```bash
+(
+  set -eu
+  umask 077
+  backup_dir="backup/$(date +%Y%m%d-%H%M%S)"
+  mkdir -p "$backup_dir"
+  sudo -v
+  trap 'sudo docker compose start app' EXIT
+  sudo docker compose stop app
+  sudo docker compose exec -T db pg_dump -U pfotenweb -d pfotenweb -Fc > "$backup_dir/database.dump"
+  sudo docker compose run -T --rm --no-deps --entrypoint tar app -czf - -C /data/uploads . > "$backup_dir/uploads.tar.gz"
+  cp .env compose.yaml Caddyfile "$backup_dir/"
+  git describe --tags --always > "$backup_dir/version.txt"
+  test -s "$backup_dir/database.dump"
+  gzip -t "$backup_dir/uploads.tar.gz"
+  printf 'Backup: %s\n' "$backup_dir"
+)
+```
+
+Check that it finished without errors and your website is back. The checks above are basic file checks, **not a restore test**. A failed backup must not be treated as usable.
+
+Copy the backup off the server. In a **new terminal on your own computer**, this copies the backup folder, including its hidden settings file:
+
+```bash
+scp -r SERVER_USER@SERVER_IP:~/pfotenweb/backup ./pfotenweb-backups
+```
+
+Replace the login details again. Protect your computer and keep the backup in encrypted storage: it contains personal enquiries and your `.env` secrets. A second folder on the same server does not protect against losing that server.
+
+Arrange daily backups with the person maintaining your server; the manual command does not set up a schedule. Test recovery on a separate, empty installation using the [release's restore instructions](https://github.com/Livvux/pfotenweb/blob/v1.0.1/README.md). Do not experiment with destructive restore commands on your only live copy.
+
+**Never use `docker compose down -v` as a troubleshooting shortcut.** The `-v` option removes the named storage volumes that hold your data.
+
+## Update deliberately, not by accident
+
+Before an update, make and check a backup, read the [release notes](https://github.com/Livvux/pfotenweb/releases), and keep any source-code customisations safe. Fetch the available version labels:
+
+```bash
+git fetch --tags
+git tag --list --sort=-version:refname
+```
+
+Only after choosing an actual published release, replace `RELEASE_TAG` below with its version label. It is a placeholder, not a command to run unchanged:
+
+```bash
+git checkout RELEASE_TAG && sudo docker compose --profile https up -d --build
+```
+
+Check the public site, administrator login, photos and contact form again. Updates can change the database structure. Returning to an older application version may require restoring the matching backup, not just selecting an older version label.[^edition]
+
+There is a separate caution for moving existing data: **v1.0.1 only imports archive format 1**. Newer development code supports additional formats, but that does not make those capabilities part of this release. Check the [current compatibility notes](https://github.com/Livvux/pfotenweb#import-aus-neueren-exporten) before a migration. Import requires a fresh, otherwise empty installation; keep the original export protected.[^compatibility]
+
+## When something does not work
+
+| What you see | What to check first |
+| --- | --- |
+| Domain does not open | Check its A/AAAA records, server address and provider firewall. |
+| HTTPS warning | Check `DOMAIN`, DNS and ports 80/443; inspect Caddy logs. Do not bypass the warning to send your password. |
+| Port already in use | Another service is using 80, 443 or 3000. Do not stop unrelated websites; use a fresh server or get help adapting the setup. |
+| `no configuration file provided` | Run `cd ~/pfotenweb` before the Compose command. |
+| `setup` failed | Check the `INITIAL_*` settings and password length; inspect `setup` logs. `Exited (0)` means success, not failure. |
+| Login fails | Use your chosen username and administrator password, not the database password. Editing `.env` does not reset an existing account. |
+| No notification email | Check **Anfragen** first. SMTP is optional and must be configured separately. |
+| Photos disappear after moving servers | Check that the upload storage was backed up and restored along with the database. |
+
+The [project's issue tracker](https://github.com/Livvux/pfotenweb/issues) is available for bug reports. Include the release version and a sanitised error message, never your settings file or personal enquiries.
+
+The goal is not to become a server specialist. It is to get a useful website online, keep animal information current and make sure a real person receives and handles enquiries.
+
+*Checked against the linked v1.0.1 files and official Docker/Caddy documentation on 24 September 2026. This is a source-reviewed walkthrough, not a claim that a new production deployment was performed for this article.*
+
+[^edition]: [Pfotenweb v1.0.1: installation, scope and maintenance](https://github.com/Livvux/pfotenweb/blob/v1.0.1/README.md).
+[^compose]: [The release's Compose file](https://github.com/Livvux/pfotenweb/blob/v1.0.1/compose.yaml) and [Dockerfile](https://github.com/Livvux/pfotenweb/blob/v1.0.1/Dockerfile).
+[^release]: [Published release v1.0.1](https://github.com/Livvux/pfotenweb/releases/tag/v1.0.1).
+[^docker]: [Docker Engine installation on Ubuntu, including firewall limitations](https://docs.docker.com/engine/install/ubuntu/).
+[^https]: [Caddy: requirements for automatic HTTPS](https://caddyserver.com/docs/automatic-https).
+[^setup]: [Initial setup validation](https://github.com/Livvux/pfotenweb/blob/v1.0.1/scripts/setup.ts) and [the supplied settings template](https://github.com/Livvux/pfotenweb/blob/v1.0.1/.env.example).
+[^screens]: [Administrator pages in the reviewed release](https://github.com/Livvux/pfotenweb/tree/v1.0.1/src/app/admin).
+[^animals]: [Animal form: fields, status and save actions](https://github.com/Livvux/pfotenweb/blob/v1.0.1/src/components/admin/animal-form.tsx).
+[^posts]: [News form: explicit draft/publication control](https://github.com/Livvux/pfotenweb/blob/v1.0.1/src/components/admin/post-form.tsx).
+[^team]: [Team access and password forms](https://github.com/Livvux/pfotenweb/blob/v1.0.1/src/components/admin/team-forms.tsx).
+[^roles]: [Role names and permissions](https://github.com/Livvux/pfotenweb/blob/v1.0.1/src/lib/roles.ts).
+[^compatibility]: [Current README: release versus development import compatibility](https://github.com/Livvux/pfotenweb/blob/main/README.md).
