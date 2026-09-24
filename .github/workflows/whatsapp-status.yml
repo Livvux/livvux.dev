@@ -9,6 +9,7 @@ on:
       - "src/app/api/internal/blog-status/**"
       - "scripts/whatsapp-status.mjs"
       - "tests/whatsapp-status.test.mjs"
+      - "tests/whatsapp-status.route.test.mjs"
       - ".github/workflows/whatsapp-status.yml"
 
 jobs:
@@ -24,6 +25,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - run: node --test tests/whatsapp-status.route.test.mjs
       - run: pnpm exec tsc --noEmit
       - run: pnpm lint
   publish:
