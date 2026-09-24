@@ -1,0 +1,53 @@
+name: Claude Opus 5.5 article
+
+on:
+  pull_request:
+    paths:
+      - 'content/claude-opus-5-5/**'
+      - 'docs/claude-opus-5-5-article-sources.md'
+      - 'tests/claude-opus-5-5-article.test.mjs'
+      - '.github/workflows/claude-opus-5-5-article.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: opus-5-5-article-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify bilingual content, sources and chart references
+        run: node --test tests/claude-opus-5-5-article.test.mjs
+      - uses: pnpm/action-setup@v4
+      - name: Install existing dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build the site and compile both MDX articles
+        run: pnpm build
+      - name: Check both production routes and publisher chart availability
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm start > /tmp/opus-5-5-article-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          ready=false
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:3000/blog/claude-opus-5-5 >/dev/null; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" != true ]; then
+            cat /tmp/opus-5-5-article-next.log
+            exit 1
+          fi
+          ARTICLE_BASE_URL=http://localhost:3000 ARTICLE_CHECK_REMOTE_IMAGES=1 node --test tests/claude-opus-5-5-article.test.mjs
