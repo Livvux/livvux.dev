@@ -1,0 +1,171 @@
+---
+title: "Does Your Piano Need Tuning? A Browser Tool Built with AI"
+publishedAt: "2026-09-24"
+author: "Livvux"
+summary: "How I helped build a browser-based piano tuning check for Hans Milde, with AI-assisted development, local audio analysis and clear limits."
+---
+
+You sit down at your piano. Something sounds less settled than you remember. Is it time to have it tuned, or are you simply listening more closely today?
+
+For my client and friend **Hans Milde**, I helped build a tool around that question: a **piano tuning check that runs directly in your browser**. You play six notes, the microphone captures them, and the website gives you a cautious first assessment. It is free to use and does not upload your audio.[^live]
+
+I used AI as part of the development. But the interesting part is not an AI confidently declaring whether your piano is in tune. In fact, that is not how the tool works at all.
+
+It uses local signal processing, checks whether its measurements are usable, and leaves room for an honest answer: **we cannot tell from this sample**.[^engine]
+
+## Built with AI does not mean measured by AI
+
+There are two separate ideas here: using AI to help build software, and putting an AI model inside the finished product.
+
+This project uses the first approach. The audio analysis itself is implemented in TypeScript and JavaScript. There is no language model judging a recording, no external model download, and no cloud inference service in the measurement pipeline.[^engine]
+
+That is a useful distinction. AI-assisted development does not have to result in another chatbot. It can help create a focused tool whose decisions remain inspectable: which frequency was detected, which measurements were accepted, and which rules produced the result.
+
+The point is not to make the software sound intelligent. It is to make the next step clearer for the person using it.
+
+## Six notes, not an entire piano
+
+The check asks you to play **C4, D4, E4, G4, A4 and C5**, starting with middle C. Each note is played separately, without the sustain pedal. The interface provides keyboard hints, microphone-level feedback and progress towards a stable measurement.[^interface]
+
+This is deliberately a sample of the middle register—not a full inspection of every key and string. A reassuring result applies only to the tested notes.[^limits]
+
+After the audio measurements, the tool asks when the piano was last professionally tuned and whether you hear wavering notes, unsettled chords or other audible problems. Those answers provide context that a microphone alone cannot supply.[^assessment]
+
+That makes the tool a first check before a conversation with Hans, rather than an invitation to replace him.
+
+## From a piano key to a number
+
+The main audio path looks like this:
+
+```text
+Piano key → microphone → AudioWorklet → analysis worker
+          → measurement quality checks → assessment
+```
+
+Microphone access starts after the user clicks the start button. The browser requests permission, and the application asks for audio without echo cancellation, noise suppression or automatic gain control. When the browser cannot confirm those settings, the tool records that uncertainty and will not give an automatic reassuring result.[^capture]
+
+An **AudioWorklet** collects the audio on the browser’s audio-processing thread. A separate worker performs the heavier analysis, keeping that work away from the page’s main interface thread.[^capture][^worklet]
+
+An important detail is that the worklet captures **non-overlapping blocks with timestamps from the audio clock**. Repeatedly reading an audio snapshot whenever the screen refreshes could otherwise count overlapping sound as separate evidence. The implementation also limits work in flight: under load, it drops blocks rather than building an endless queue of old audio.[^timing]
+
+At a sample rate of 48,000 samples per second, a block of 4,096 samples contains about **85 milliseconds** of sound. Several blocks—not one fleeting reading—are needed for an accepted measurement.[^timing]
+
+## Finding the note behind the overtones
+
+A piano note is not a pure sine wave. Its sound contains multiple frequency components. Finding a strong frequency is therefore not necessarily the same as finding the intended note.
+
+The detector combines two related ways of looking for repetition in the waveform: **YIN** and a **normalized square difference function, or NSDF**. An FFT makes the calculations efficient. A separate spectral check, using a Hann window, checks and refines the first partial—the frequency component used for the final pitch estimate.[^pitch]
+
+In simpler terms: the software looks for a repeating pattern, checks that two estimates agree, and then checks the frequency content rather than trusting that agreement alone.
+
+Consider a simplified sound with a weak component at **220 Hz** and a much stronger one at **440 Hz**. A detector could lock onto the stronger overtone and report a note an octave too high. This implementation includes an extra check for lower-frequency evidence and can reject such an ambiguous signal instead.[^pitch]
+
+It also searches broadly before comparing the detected pitch with the requested key. When the interface asks for A4 and you play A5, it does not simply halve the frequency to make your answer fit.[^pitch][^quality]
+
+These are safeguards against misleading readings, not a promise that every complex piano sound can be resolved correctly.
+
+## Why the tool waits before accepting a note
+
+The first part of the sound is not immediately counted. The measurement logic skips the first **200 milliseconds after a clear onset** and then looks for a stable section.[^quality]
+
+Acceptance requires **eight consecutive usable windows**, spanning at least **550 milliseconds** between the first and last accepted timestamp. The middle half of the pitch readings may spread by no more than **4 cents**, and the full set by no more than **8 cents**. A cent is one hundredth of a semitone.[^quality][^assessment]
+
+Silence, clipping, a wrong note, insufficient confidence or a significant timing gap interrupts the evidence. A momentary correct-looking reading is not enough.[^quality]
+
+The internal confidence threshold is **0.9**, but that does **not** mean “a 90% chance the piano is correctly tuned.” It is a signal-quality criterion, not a probability about the instrument’s condition.[^quality][^limits]
+
+That distinction matters. A stable measurement of one note is still only a measurement of one note.
+
+## Why 440 Hz is a reference—not a verdict
+
+One of my favourite details is how the assessment separates a shared pitch offset from uneven differences between notes.
+
+The interface lets you select a known reference of **432, 440, 442 or 443 Hz**. The default is **unknown**. The software should not assume it knows the pitch the piano was intended to have.[^reference]
+
+Pitch differences are expressed in cents:
+
+```text
+cents = 1200 × log2(measured frequency / reference frequency)
+```
+
+For example, 442 Hz is approximately **7.85 cents above** 440 Hz. And 432 Hz is approximately **31.77 cents below** it. Those are frequency comparisons, not diagnoses.[^assessment]
+
+Now imagine two simplified sets of six notes. In one, every note has the same offset from a 440 Hz-based reference. In the other, the median offset is identical, but E4 is a further 18 cents lower and A4 is 18 cents higher.
+
+<figure>
+  <img src="/images/blog/hans-milde-piano-tuning/pitch-pattern-en.svg" alt="Constructed example: a uniform shift to a 432 Hz reference versus uneven note-to-note deviations with the same median." width="960" height="580" loading="lazy" decoding="async" style={{ width: "100%", height: "auto", borderRadius: "12px" }} />
+  <figcaption>Illustrative calculation, not recordings or validation data. The examples deliberately omit the individual stretch of a real piano.</figcaption>
+</figure>
+
+The same example in numbers, rounded to two decimal places:
+
+| Note | Uniform shift (cents) | Uneven pattern (cents) |
+| --- | ---: | ---: |
+| C4 | -31.77 | -31.77 |
+| D4 | -31.77 | -31.77 |
+| E4 | -31.77 | -49.77 |
+| G4 | -31.77 | -31.77 |
+| A4 | -31.77 | -13.77 |
+| C5 | -31.77 | -31.77 |
+
+
+The first pattern could reflect an intentionally different reference pitch, but uniform drift is also possible. Without knowing the intended pitch, that difference alone does not settle the question. The second pattern contains uneven deviations that a single average would hide.
+
+The implementation calculates the **median offset** and then each note’s difference from it. Its assessment rules examine both the overall pitch and the remaining unevenness. Tests explicitly distinguish a known 432 Hz reference from an unknown reference.[^assessment][^tests]
+
+These thresholds are product rules for a cautious screening tool—not universally validated boundaries between a well-tuned and badly tuned piano.[^limits]
+
+## An unclear result is a useful result
+
+The tool can report an unremarkable sample, recommend professional attention, or say that the result is unclear. A reassuring outcome requires **all six distinct notes**, sufficient measurement quality and suitable answers to the follow-up questions.[^assessment]
+
+A recommendation can also come from the owner’s answers. For example, reporting audible problems or a last tuning more than two years ago triggers a recommendation independently of the audio. The explanation must preserve that distinction: a maintenance recommendation is not proof that the microphone detected a fault.[^assessment]
+
+Once measurements finish or the session is cancelled, the microphone resources are released. Optional WhatsApp sharing is separate: clicking the link prepares a result summary and measured values, and the user sends the message themselves. No audio recording is attached.[^capture][^interface][^live]
+
+The aim is to help someone start a better-informed conversation with Hans, not pressure them with a supposedly scientific verdict.
+
+## What makes this project special
+
+Pitch detection is not new. YIN was published in 2002, and browser-based chromatic tuners already exist.[^yin][^tuner]
+
+For me, the distinctive part is the combination: **a guided piano-specific workflow, local processing, explicit uncertainty and a direct connection to a real craft professional**. It turns a website from a description of a service into something a visitor can actually use.
+
+The result is not just “437 Hz.” It is an explanation of what the sample suggests, what remains unknown, and why professional attention may—or may not—be the next sensible step.[^assessment]
+
+That is the kind of application of AI-assisted development I find worthwhile: useful software around a specific human need, without pretending the software replaces the person with the expertise.
+
+## What the tests establish—and what they do not
+
+The regression suite contains **486 synthetic accuracy cases**: six notes, nine pitch offsets, three signal models and three sample rates. Each case must produce a detection with less than one cent of error; simply rejecting a difficult accuracy fixture does not count as passing.[^tests]
+
+Other tests exercise wrong octaves, strong overtones, noise, clipping, interrupted measurements and resource cleanup. The browser tests use a synthetic microphone source with the real audio-processing components.[^limits]
+
+These tests check software behaviour under defined test conditions. **It is not a guarantee of one-cent accuracy on real pianos or phone microphones.** The project documentation still calls for validation against real instruments, physical devices and an independent professional assessment.[^limits]
+
+There are also things this short check does not establish: whether all strings belonging to a key agree, whether the whole instrument has the right individual stretch, how its tone and action feel, or whether it holds its tuning over time. Specialist piano-tuning software itself accounts for the instrument’s inharmonicity and stretch; a six-note screening cannot substitute for that broader work.[^limits][^pianometer]
+
+For me, that is the value of the project: **a small, private first check that helps people understand when to ask an expert**.
+
+AI helped build the tool. The browser does the calculation. Hans remains the person who can assess and work on the instrument.
+
+**[Try the piano tuning check on Hans Milde’s website.](https://klavierbau-milde.de/klavier-stimmung-test)**
+
+
+*Implementation links below refer to the reviewed source snapshot from PR #19. Access to the client repository may be required. The public tool is linked separately; synthetic tests are not real-instrument validation.*
+
+[^live]: [Live piano tuning check](https://klavierbau-milde.de/klavier-stimmung-test), Public tool; implementation details below refer to the reviewed PR #19 source snapshot.
+[^engine]: [Audio engine documentation and implementation in PR #19](https://github.com/Livvux/hansmilde-piano-2/pull/19); [analysis worker](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/analysis.worker.ts).
+[^interface]: [Interface controller](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/controller.ts) and [target notes](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/assessment.ts).
+[^capture]: [Microphone capture and cleanup](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/audio.ts); [assessment logic](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/assessment.ts).
+[^worklet]: [MDN: AudioWorklet](https://developer.mozilla.org/en-US/docs/Web/API/AudioWorklet).
+[^timing]: [Capture architecture and measurement contract](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/docs/TUNING-TEST.md); [AudioWorklet capture](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/public/audio/tuning-capture-v2.js).
+[^pitch]: [Pitch detector implementation](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/pitch.ts).
+[^quality]: [Measurement acceptance logic](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/measurement.ts).
+[^assessment]: [Assessment and cents calculation](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/assessment.ts). Numeric examples in this article are calculated illustrations, not collected measurements.
+[^reference]: [Reference-pitch options and documented defaults](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/docs/TUNING-TEST.md); [controller](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/controller.ts).
+[^tests]: [Synthetic regression corpus and alternative-reference tests](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/tests/tuning-regression.test.ts).
+[^limits]: [Project documentation: limitations, tests and outstanding real-instrument validation](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/docs/TUNING-TEST.md).
+[^yin]: de Cheveigné, A.; Kawahara, H. (2002). [YIN, a fundamental frequency estimator for speech and music](https://pubs.aip.org/asa/jasa/article/111/4/1917/547221/YIN-a-fundamental-frequency-estimator-for-speech). DOI: 10.1121/1.1458024.
+[^tuner]: [muted.io: browser-based chromatic tuner and cents explanation](https://muted.io/chromatic-tuner/).
+[^pianometer]: [PianoMeter: tuning curves and inharmonicity](https://pianometer.com/support/).

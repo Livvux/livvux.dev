@@ -1,0 +1,54 @@
+name: Hans Milde piano article
+
+on:
+  pull_request:
+    paths:
+      - 'content/hans-milde-piano-tuning-check/**'
+      - 'public/images/blog/hans-milde-piano-tuning/**'
+      - 'docs/hans-milde-piano-article-sources.md'
+      - 'tests/hans-milde-piano-article.test.mjs'
+      - '.github/workflows/hans-milde-piano-article.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: piano-article-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Article, source and chart regression checks
+        run: node --test tests/hans-milde-piano-article.test.mjs
+      - uses: pnpm/action-setup@v4
+      - name: Install existing dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build the site and compile both MDX articles
+        run: pnpm build
+      - name: Check both production article routes and local SVG assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm start > /tmp/piano-article-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          ready=false
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:3000/blog/hans-milde-piano-tuning-check >/dev/null; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" != true ]; then
+            cat /tmp/piano-article-next.log
+            exit 1
+          fi
+          ARTICLE_BASE_URL=http://localhost:3000 node --test tests/hans-milde-piano-article.test.mjs

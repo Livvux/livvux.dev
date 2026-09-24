@@ -1,0 +1,171 @@
+---
+title: "Muss dein Klavier gestimmt werden? Ein Browser-Tool mit KI gebaut"
+publishedAt: "2026-09-24"
+author: "Livvux"
+summary: "Wie ich für Hans Milde einen Klavier-Stimmungstest mitentwickelt habe: mit KI-Unterstützung, lokaler Audioanalyse und klaren Grenzen."
+---
+
+Du setzt dich ans Klavier. Irgendetwas klingt nicht mehr so ruhig wie früher. Wird es Zeit für eine Stimmung – oder hörst du heute einfach genauer hin?
+
+Für meinen Kunden und Freund **Hans Milde** habe ich ein Tool mitentwickelt, das genau bei dieser Frage hilft: einen **Klavier-Stimmungstest direkt im Browser**. Du spielst sechs Töne, das Mikrofon erfasst sie und die Website gibt dir eine vorsichtige erste Einschätzung. Der Test ist kostenlos und lädt keine Audiodaten hoch.[^live]
+
+Bei der Entwicklung habe ich KI eingesetzt. Das Interessante daran ist aber nicht eine KI, die selbstbewusst behauptet, dein Klavier sei verstimmt. So funktioniert das Tool nämlich gar nicht.
+
+Es nutzt lokale Signalverarbeitung, prüft die Verwertbarkeit seiner Messungen und lässt eine ehrliche Antwort zu: **Mit dieser Stichprobe lässt sich das nicht eindeutig beurteilen.**[^engine]
+
+## Mit KI entwickelt heißt nicht: von KI gemessen
+
+Hier muss man zwei Dinge auseinanderhalten: KI beim Programmieren einzusetzen und ein KI-Modell in das fertige Produkt einzubauen.
+
+Dieses Projekt nutzt den ersten Ansatz. Die eigentliche Audioanalyse ist in TypeScript und JavaScript umgesetzt. Kein Sprachmodell beurteilt eine Aufnahme. Es werden keine fremden KI-Modelle nachgeladen, und für die Messung wird kein KI-Dienst in der Cloud angesprochen.[^engine]
+
+Das finde ich wichtig. KI-gestützte Entwicklung muss nicht beim nächsten Chatbot enden. Sie kann ein klar abgegrenztes Werkzeug ermöglichen, dessen Entscheidungen nachvollziehbar bleiben: Welche Frequenz wurde erkannt? Welche Messungen wurden angenommen? Welche Regeln haben zum Ergebnis geführt?
+
+Das Ziel ist nicht, die Software möglichst intelligent wirken zu lassen. Sie soll dem Menschen davor helfen, den nächsten Schritt besser einzuschätzen.
+
+## Sechs Töne statt einer vollständigen Klavierprüfung
+
+Der Test führt durch **C4, D4, E4, G4, A4 und C5**, beginnend beim mittleren C. Du spielst jeden Ton einzeln und ohne Haltepedal. Hinweise zur Tastatur, eine Mikrofonpegel-Anzeige und der Fortschritt der stabilen Messung helfen dabei.[^interface]
+
+Das ist bewusst eine Stichprobe in der mittleren Lage – keine vollständige Prüfung aller Tasten und Saiten. Ein unauffälliges Ergebnis bezieht sich nur auf die getesteten Töne.[^limits]
+
+Nach den Tonmessungen fragt das Tool, wann das Klavier zuletzt professionell gestimmt wurde und ob du Schwebungen, unruhige Akkorde oder andere Auffälligkeiten hörst. Diese Angaben ergänzen die Messung um Informationen, die ein Mikrofon allein nicht liefern kann.[^assessment]
+
+Damit ist das Tool eine erste Orientierung vor dem Gespräch mit Hans. Kein Versuch, ihn zu ersetzen.
+
+## Von der Klaviertaste zum Messwert
+
+Der wichtigste Datenweg sieht so aus:
+
+```text
+Klaviertaste → Mikrofon → AudioWorklet → Analyse-Worker
+             → Qualitätsprüfung → Einschätzung
+```
+
+Der Mikrofonzugriff startet erst nach einem Klick. Der Browser fragt nach der Freigabe, und die Anwendung fordert Audio ohne Echounterdrückung, Rauschunterdrückung und automatische Lautstärkeanpassung an. Bestätigt der Browser diese Einstellungen nicht, berücksichtigt das Tool diese Unsicherheit und gibt keine automatische Entwarnung.[^capture]
+
+Ein **AudioWorklet** sammelt die Audiodaten auf dem Audio-Thread des Browsers. Ein separater Worker übernimmt die aufwendigere Analyse, statt diese Arbeit auf dem Hauptthread der Benutzeroberfläche auszuführen.[^capture][^worklet]
+
+Ein wichtiges Detail: Das Worklet erfasst **nicht überlappende Audioblöcke mit Zeitstempeln aus dem Audiotakt**. Würde man einfach bei jeder Bildschirmaktualisierung einen Audioschnappschuss auslesen, könnten überlappende Ausschnitte mehrfach als neue Messgrundlage gezählt werden. Außerdem begrenzt die Implementierung die gleichzeitig laufende Analyse. Bei Überlast werden Blöcke verworfen, statt immer mehr alte Audiodaten aufzustauen.[^timing]
+
+Bei 48.000 Samples pro Sekunde umfasst ein Block aus 4.096 Samples etwa **85 Millisekunden**. Für eine angenommene Messung braucht es mehrere solcher Blöcke – nicht nur einen kurzen, passend aussehenden Wert.[^timing]
+
+## Den eigentlichen Ton zwischen den Obertönen finden
+
+Ein Klavierton ist keine reine Sinuswelle. Er enthält mehrere Frequenzanteile. Eine starke Frequenz zu finden heißt deshalb noch nicht automatisch, den richtigen Grundton erkannt zu haben.
+
+Der Detektor kombiniert zwei verwandte Verfahren, die nach Wiederholungen in der Wellenform suchen: **YIN** und eine **normalisierte quadratische Differenzfunktion, kurz NSDF**. Eine FFT beschleunigt die Berechnungen. Eine zusätzliche Spektralprüfung mit einem Hann-Fenster überprüft und verfeinert den ersten Teilton, dessen Frequenz für den endgültigen Messwert verwendet wird.[^pitch]
+
+Einfacher gesagt: Die Software sucht ein wiederkehrendes Muster, prüft die Übereinstimmung zweier Schätzungen und kontrolliert zusätzlich die enthaltenen Frequenzen. Die Übereinstimmung allein reicht ihr nicht.
+
+Stell dir ein vereinfachtes Signal mit einem schwachen Anteil bei **220 Hz** und einem viel stärkeren Anteil bei **440 Hz** vor. Ein Detektor könnte sich am stärkeren Oberton orientieren und eine Oktave zu hoch anzeigen. Die Implementierung prüft deshalb zusätzlich auf passende tiefere Frequenzanteile und kann einen solchen uneindeutigen Fall verwerfen.[^pitch]
+
+Sie sucht außerdem zunächst in einem breiten Frequenzbereich und vergleicht das Ergebnis erst danach mit der geforderten Taste. Wenn A4 verlangt wird und du A5 spielst, wird die Frequenz nicht einfach halbiert, damit das Ergebnis passt.[^pitch][^quality]
+
+Das sind Schutzmaßnahmen gegen irreführende Messwerte. Keine Garantie, dass sich jeder komplexe Klavierklang eindeutig auflösen lässt.
+
+## Warum das Tool nicht sofort ein Ergebnis akzeptiert
+
+Der Anfang des Tons wird nicht direkt gewertet. Die Messlogik überspringt zunächst **200 Millisekunden nach einem klar erkannten Tonbeginn** und sucht anschließend einen stabilen Abschnitt.[^quality]
+
+Für die Annahme sind **acht aufeinanderfolgende verwertbare Messfenster** nötig. Zwischen dem ersten und letzten akzeptierten Zeitstempel müssen mindestens **550 Millisekunden** liegen. Die mittlere Hälfte der Tonhöhenwerte darf höchstens **4 Cent** auseinanderliegen, die gesamte Gruppe höchstens **8 Cent**. Ein Cent ist ein Hundertstel eines Halbtons.[^quality][^assessment]
+
+Stille, Übersteuerung, eine falsche Taste, zu geringe Konfidenz oder eine größere Zeitlücke unterbrechen die Messgrundlage. Ein kurzzeitig richtig aussehender Wert genügt nicht.[^quality]
+
+Die interne Konfidenzgrenze liegt bei **0,9**. Das bedeutet aber **nicht**, dass das Klavier mit 90 Prozent Wahrscheinlichkeit richtig gestimmt ist. Es ist ein Kriterium für das Messsignal – keine Wahrscheinlichkeit für den Zustand des Instruments.[^quality][^limits]
+
+Diese Unterscheidung ist wichtig: Auch eine stabile Messung eines Tons bleibt zunächst nur die Messung eines Tons.
+
+## Warum 440 Hz ein Vergleichswert sind – kein Urteil
+
+Besonders gefällt mir, wie die Auswertung zwischen einer gemeinsamen Tonhöhenverschiebung und ungleichmäßigen Abweichungen einzelner Töne unterscheidet.
+
+Du kannst einen bekannten Kammerton von **432, 440, 442 oder 443 Hz** auswählen. Standardmäßig steht die Auswahl auf **unbekannt**. Die Software soll nicht so tun, als wüsste sie, auf welche Tonhöhe das Instrument gestimmt werden sollte.[^reference]
+
+Die Tonhöhenunterschiede werden in Cent berechnet:
+
+```text
+Cent = 1200 × log2(gemessene Frequenz / Vergleichsfrequenz)
+```
+
+442 Hz liegen beispielsweise ungefähr **7,85 Cent über** 440 Hz. Und 432 Hz liegen ungefähr **31,77 Cent darunter**. Das sind zunächst Frequenzvergleiche, keine Diagnosen.[^assessment]
+
+Stell dir jetzt zwei vereinfachte Gruppen aus jeweils sechs Tönen vor. In der ersten haben alle Töne denselben Abstand zu einer Referenz auf Basis von 440 Hz. In der zweiten ist der Median der Abweichungen identisch – aber E4 liegt zusätzlich 18 Cent tiefer und A4 18 Cent höher.
+
+<figure>
+  <img src="/images/blog/hans-milde-piano-tuning/pitch-pattern-de.svg" alt="Konstruiertes Beispiel: gleichmäßige Verschiebung zu einer 432-Hz-Referenz und ungleichmäßige Abweichungen bei gleichem Median." width="960" height="580" loading="lazy" decoding="async" style={{ width: "100%", height: "auto", borderRadius: "12px" }} />
+  <figcaption>Veranschaulichendes Rechenbeispiel, keine Aufnahmen oder Validierungsdaten. Die individuelle Spreizung eines echten Klaviers bleibt in diesen Beispielen bewusst unberücksichtigt.</figcaption>
+</figure>
+
+Dasselbe Beispiel als Zahlen, auf zwei Nachkommastellen gerundet:
+
+| Ton | Gleichmäßige Verschiebung (Cent) | Ungleichmäßiges Muster (Cent) |
+| --- | ---: | ---: |
+| C4 | -31,77 | -31,77 |
+| D4 | -31,77 | -31,77 |
+| E4 | -31,77 | -49,77 |
+| G4 | -31,77 | -31,77 |
+| A4 | -31,77 | -13,77 |
+| C5 | -31,77 | -31,77 |
+
+
+Das erste Muster könnte zu einer absichtlich anderen Kammertonhöhe passen. Es könnte aber auch durch ein gleichmäßiges Absinken entstanden sein. Ohne die beabsichtigte Stimmung zu kennen, beantwortet diese Verschiebung allein die Frage nicht. Das zweite Muster enthält ungleichmäßige Abweichungen, die ein einzelner Mittelwert verdecken würde.
+
+Die Implementierung berechnet deshalb den **Median der Abweichungen** und danach den Abstand jedes Tons zu diesem gemeinsamen Wert. Ihre Regeln berücksichtigen sowohl die Gesamtlage als auch die verbleibenden Unterschiede. Die Tests unterscheiden ausdrücklich zwischen einer bekannten 432-Hz-Referenz und einer unbekannten Referenz.[^assessment][^tests]
+
+Die Grenzwerte sind dabei Produktentscheidungen für eine vorsichtige Ersteinschätzung – keine allgemein validierten Grenzen zwischen einem gut und schlecht gestimmten Klavier.[^limits]
+
+## Auch ein unklares Ergebnis hilft
+
+Das Tool kann eine unauffällige Stichprobe melden, professionelle Hilfe empfehlen oder das Ergebnis als unklar einstufen. Für ein beruhigendes Ergebnis braucht es **alle sechs unterschiedlichen Töne**, ausreichende Messqualität und passende Antworten auf die Zusatzfragen.[^assessment]
+
+Eine Empfehlung kann auch aus deinen Angaben entstehen. Wer bereits hörbare Probleme meldet oder dessen letzte Stimmung mehr als zwei Jahre zurückliegt, erhält unabhängig von der Audioanalyse einen entsprechenden Hinweis. Diese Trennung muss erkennbar bleiben: Eine Wartungsempfehlung ist kein Beweis dafür, dass das Mikrofon einen Fehler festgestellt hat.[^assessment]
+
+Nach den Messungen oder beim Abbruch werden die Mikrofonressourcen freigegeben. Das optionale Teilen über WhatsApp ist ein eigener Schritt: Ein Klick bereitet einen Ergebnistext mit Messwerten vor; die Nachricht verschickst du dort selbst. Eine Audioaufnahme wird nicht angehängt.[^capture][^interface][^live]
+
+Es geht darum, das Gespräch mit Hans besser vorzubereiten – nicht darum, mit einem vermeintlich wissenschaftlichen Urteil Druck aufzubauen.
+
+## Was dieses Projekt besonders macht
+
+Tonerkennung ist keine neue Erfindung. YIN wurde 2002 veröffentlicht, und chromatische Stimmgeräte im Browser gibt es bereits.[^yin][^tuner]
+
+Das Besondere ist für mich die Verbindung: **ein geführter Ablauf für Klavierbesitzer, lokale Verarbeitung, ausdrücklich zugelassene Unsicherheit und der direkte Bezug zu einem echten Fachbetrieb**. Aus einer Website, die eine Leistung beschreibt, wird etwas, das Besucher unmittelbar nutzen können.
+
+Das Ergebnis lautet nicht einfach „437 Hz“. Es erklärt, worauf die Stichprobe hindeutet, was offenbleibt und warum eine fachliche Prüfung der nächste sinnvolle Schritt sein könnte.[^assessment]
+
+Genau solche Anwendungen finde ich an KI-gestützter Entwicklung spannend: nützliche Software für ein konkretes menschliches Bedürfnis, ohne so zu tun, als würde sie den Menschen mit der eigentlichen Fachkenntnis ersetzen.
+
+## Was die Tests zeigen – und was nicht
+
+Die Regressionstests enthalten **486 synthetische Genauigkeitsfälle**: sechs Töne, neun Tonhöhenabweichungen, drei Signalmodelle und drei Abtastraten. Jeder Fall muss erkannt werden und weniger als einen Cent Fehler aufweisen. Ein schwieriges Genauigkeitsbeispiel einfach zurückzuweisen zählt nicht als bestandener Test.[^tests]
+
+Weitere Tests behandeln falsche Oktaven, starke Obertöne, Rauschen, Übersteuerung, unterbrochene Messungen und das Freigeben der Ressourcen. Die Browsertests verwenden eine synthetische Mikrofonquelle zusammen mit den echten Komponenten der Audioverarbeitung.[^limits]
+
+Diese Tests prüfen Softwareverhalten unter festgelegten Testbedingungen. **Es ist keine Garantie für eine Genauigkeit von einem Cent an echten Klavieren oder Smartphone-Mikrofonen.** Die Projektdokumentation verlangt weiterhin eine Validierung mit echten Instrumenten, physischen Geräten und einer unabhängigen fachlichen Beurteilung.[^limits]
+
+Auch inhaltlich bleiben Grenzen: Der kurze Check beurteilt nicht vollständig, ob die Saiten einer Taste sauber zusammenklingen, ob die individuelle Spreizung des gesamten Instruments passt, wie sich Klang und Mechanik anfühlen oder wie gut das Klavier seine Stimmung hält. Spezialisierte Klavier-Stimmsoftware berücksichtigt selbst die Inharmonizität und Spreizung des Instruments. Eine Stichprobe aus sechs Tönen ersetzt diese umfassendere Arbeit nicht.[^limits][^pianometer]
+
+Für mich liegt genau darin der Wert des Projekts: **ein kleiner, privater erster Check, der Menschen hilft, den Bedarf an fachlichem Rat besser einzuschätzen**.
+
+KI hat bei der Entwicklung geholfen. Der Browser übernimmt die Berechnung. Hans bleibt derjenige, der das Instrument fachlich beurteilen und daran arbeiten kann.
+
+**[Den Klavier-Stimmungstest auf der Website von Hans Milde ausprobieren.](https://klavierbau-milde.de/klavier-stimmung-test)**
+
+
+*Die Implementierungslinks beziehen sich auf den geprüften Quellstand aus PR #19. Für das Kunden-Repository kann eine Zugriffsberechtigung nötig sein. Das öffentliche Tool ist separat verlinkt; synthetische Tests ersetzen keine Praxiserprobung.*
+
+[^live]: [Live-Klavier-Stimmungstest](https://klavierbau-milde.de/klavier-stimmung-test), Öffentliches Tool; technische Angaben beziehen sich auf den geprüften Quellstand aus PR #19.
+[^engine]: [Dokumentation und Implementierung der Audio-Engine in PR #19](https://github.com/Livvux/hansmilde-piano-2/pull/19); [Analyse-Worker](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/analysis.worker.ts).
+[^interface]: [Bedienungs-Controller](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/controller.ts) und [Zieltöne](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/assessment.ts).
+[^capture]: [Mikrofonaufnahme und Ressourcenfreigabe](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/audio.ts); [Bewertungslogik](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/assessment.ts).
+[^worklet]: [MDN: AudioWorklet](https://developer.mozilla.org/en-US/docs/Web/API/AudioWorklet).
+[^timing]: [Aufnahmearchitektur und Messvertrag](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/docs/TUNING-TEST.md); [AudioWorklet-Aufnahme](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/public/audio/tuning-capture-v2.js).
+[^pitch]: [Implementierung des Tonhöhendetektors](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/pitch.ts).
+[^quality]: [Annahmeregeln für Messungen](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/measurement.ts).
+[^assessment]: [Bewertung und Cent-Berechnung](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/assessment.ts). Zahlenbeispiele im Artikel sind berechnete Veranschaulichungen, keine erhobenen Messdaten.
+[^reference]: [Kammertonoptionen und dokumentierte Voreinstellungen](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/docs/TUNING-TEST.md); [Controller](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/src/components/tuning-test/controller.ts).
+[^tests]: [Synthetische Regressionstests und Tests alternativer Referenztöne](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/tests/tuning-regression.test.ts).
+[^limits]: [Projektdokumentation: Grenzen, Tests und noch erforderliche Praxiserprobung](https://github.com/Livvux/hansmilde-piano-2/blob/2acf421b49c87a0b9a0e1bf5f9ba5278d6260260/docs/TUNING-TEST.md).
+[^yin]: de Cheveigné, A.; Kawahara, H. (2002). [YIN, a fundamental frequency estimator for speech and music](https://pubs.aip.org/asa/jasa/article/111/4/1917/547221/YIN-a-fundamental-frequency-estimator-for-speech). DOI: 10.1121/1.1458024.
+[^tuner]: [muted.io: chromatisches Browser-Stimmgerät und Erklärung der Cent-Einheit](https://muted.io/chromatic-tuner/).
+[^pianometer]: [PianoMeter: Stimmkurven und Inharmonizität](https://pianometer.com/support/).
