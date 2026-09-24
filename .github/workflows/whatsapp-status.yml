@@ -1,0 +1,42 @@
+name: WhatsApp status for new blog posts
+
+on:
+  push:
+    branches: [main]
+    paths: ["content/**"]
+  pull_request:
+    paths:
+      - "src/app/api/internal/blog-status/**"
+      - "scripts/whatsapp-status.mjs"
+      - "tests/whatsapp-status.test.mjs"
+      - ".github/workflows/whatsapp-status.yml"
+
+jobs:
+  verify:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --test tests/whatsapp-status.test.mjs
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm exec tsc --noEmit
+      - run: pnpm lint
+  publish:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Notify deployed blog
+        env:
+          BLOG_STATUS_WEBHOOK_SECRET: ${{ secrets.BLOG_STATUS_WEBHOOK_SECRET }}
+        run: node scripts/whatsapp-status.mjs "${{ github.event.before }}" "${{ github.sha }}"
