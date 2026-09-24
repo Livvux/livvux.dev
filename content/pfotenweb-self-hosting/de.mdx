@@ -1,0 +1,377 @@
+---
+title: "Pfotenweb kostenlos nutzen: Ihre Tierschutz-Website Schritt für Schritt installieren"
+publishedAt: "2026-09-24"
+author: "Livvux"
+summary: "Pfotenweb einfach selbst installieren: vom eigenen Server mit Docker und HTTPS bis zum ersten Tierprofil, zu Kontaktanfragen und sicheren Backups. Eine Anleitung für Einsteiger."
+---
+
+**Ihr Verein braucht eine Website. Dafür sollten Sie nicht erst selbst eine programmieren müssen, nur um Tiere vorzustellen, Neuigkeiten zu veröffentlichen und Anfragen zu erhalten.**
+
+[Pfotenweb ist mein eigenes Projekt](https://github.com/Livvux/pfotenweb). Die kostenlose Version zum Selbstinstallieren bietet eine Website für **einen Verein pro Installation**: mit Tierprofilen, Fotos, Neuigkeiten, Kontaktanfragen und eigenen Teamzugängen. Es gibt kein Software-Abo, kein Tierlimit und keine Pflicht, ein Pfotenweb-Konto zu verbinden. Der Quellcode steht unter der MIT-Lizenz zur Verfügung.[^edition]
+
+Diese Anleitung führt Sie vom leeren Server bis zum ersten Tierprofil. Sie müssen nichts programmieren. Einige Befehle müssen Sie aber kopieren und ausführen. Außerdem braucht der Server jemanden, der sich um Updates kümmert.
+
+**Kostenlose Software bedeutet nicht kostenloses Hosting.** Für Server, Domain und Speicherplatz für Sicherungen können Kosten entstehen. Die kostenlose Ausgabe ist zudem eigenständig: Nicht jede Funktion des gehosteten Angebots gehört automatisch dazu.
+
+Sie wissen bereits, dass Sie keinen Server verwalten möchten? Dann können Sie sich stattdessen [direkt über pfotenweb.de anmelden](https://pfotenweb.de/). Das ist das separat gehostete Angebot, keine Voraussetzung und kein zusätzlicher Schritt dieser Anleitung.
+
+## Welchen Weg wir nehmen
+
+Wir verwenden **Docker Compose**. Damit starten Pfotenweb und die benötigten Hilfsprogramme gemeinsam. Stellen Sie sich das wie ein fertiges Installationsrezept vor, das dem Projekt bereits beiliegt. Sie müssen die Einzelteile nicht selbst zusammensuchen.
+
+Die mitgelieferte Einrichtung enthält die Website, eine Datenbank für Ihre Einträge, einen einmaligen Einrichtungsschritt und **Caddy**. Caddy kümmert sich um die verschlüsselte HTTPS-Verbindung.[^compose]
+
+```text
+Ihre Domain → Caddy / HTTPS → Pfotenweb
+                                ↕
+                      Datenbank und Fotos
+```
+
+Ihre Domain führt also über die sichere Verbindung zur Website. Datenbank und Fotos bleiben auf Ihrem Server.
+
+Eine fertige Pfotenweb-Vorlage für eine Ein-Klick-Installation ist im hier geprüften Release nicht enthalten. Docker ist der vorgesehene Weg, aber Domain und Einstellungen brauchen trotzdem einige Schritte. Ein Server-Angebot mit vorinstalliertem „Docker“ ist noch keine vollständige Pfotenweb-Installation.
+
+**Verwendete Version: v1.0.1**, das bei der Prüfung am **24. September 2026** neueste veröffentlichte Release. Wir wählen ausdrücklich diese Version und nicht `main`, den laufenden Entwicklungsstand. Prüfen Sie bei einer späteren Installation auf der [Release-Seite](https://github.com/Livvux/pfotenweb/releases), ob eine neue Version mit eigenen Hinweisen veröffentlicht wurde.[^release]
+
+## 1. Einen passenden Server bereitstellen
+
+Ein Server ist einfach ein Computer, der dauerhaft online bleibt. Für diese Anleitung verwenden Sie einen **neuen Linux-VPS oder Cloud-Server mit Ubuntu 24.04 LTS, 64-Bit**, auf dem Sie Administratorrechte haben. Ein gewöhnliches Webspace-Paket nur für PHP oder WordPress ist nicht die hier beschriebene Umgebung.
+
+Wählen Sie im Kundenbereich Ihres Hosting-Anbieters **Server erstellen**, dann Ubuntu 24.04 LTS. Bewahren Sie die IP-Adresse und die Anmeldehinweise auf. Die genauen Schaltflächen unterscheiden sich je nach Anbieter. Bevorzugen Sie die Anmeldung mit einem SSH-Schlüssel, wenn Ihr Anbieter sie anbietet.
+
+Als Ausgangspunkt würde ich **2 virtuelle Prozessorkerne, 4 GB Arbeitsspeicher und 40 GB Speicherplatz** mit Erweiterungsmöglichkeit wählen. Das ist meine Planungsempfehlung, **keine veröffentlichte Pfotenweb-Mindestanforderung und keine gemessene Kapazitätsgarantie**. Auch das Erstellen der Anwendung braucht Arbeitsspeicher; Fotos und Backups belegen zusätzlichen Platz.
+
+Verwenden Sie für diese Anleitung einen frischen Server. Auf einem Server mit bestehenden Websites, Coolify, Dokploy oder einer anderen Verwaltungsoberfläche muss die Verbindung anders eingerichtet werden. Überschreiben oder stoppen Sie dort keine vorhandenen Dienste.
+
+Erlauben Sie in der Firewall des Anbieters eingehende Verbindungen über **TCP 80 und 443** für die Website. Lassen Sie den SSH-Zugang, normalerweise **TCP 22**, für Ihre eigene IP-Adresse offen. Öffnen Sie **5432** für die Datenbank und **3000** für die Anwendung nicht ins Internet. Eine zusätzliche Firewall auf dem Server muss die nötigen Verbindungen ebenfalls erlauben. Von Docker veröffentlichte Ports können gewöhnliche UFW-Regeln umgehen; verlassen Sie sich nicht allein auf diese Regeln.[^docker]
+
+## 2. Die Domain mit dem Server verbinden
+
+Die Domain ist die Adresse Ihrer Website. Wir verwenden als Beispiel `tierheim.example.org`. Ersetzen Sie diese durch eine Adresse, die Ihnen gehört.
+
+Öffnen Sie bei Ihrem Domain-Anbieter die **DNS-Einstellungen**. Für eine Unteradresse wie `tierheim.ihre-domain.de` legen Sie folgenden Eintrag an:
+
+| Feld | Eintrag |
+| --- | --- |
+| Typ | `A` |
+| Name / Host | `tierheim` |
+| Wert / Ziel | Öffentliche IPv4-Adresse Ihres Servers |
+| TTL | Voreinstellung des Anbieters beibehalten |
+
+Für die Hauptdomain steht im Namensfeld häufig `@` oder gar nichts. Beachten Sie dazu die Anleitung Ihres Anbieters. Ersetzen Sie nicht versehentlich die Einträge einer bestehenden Website. E-Mail-Einträge wie MX bleiben unverändert.
+
+Legen Sie nur dann einen **AAAA-Eintrag** an, wenn Ihr Server eine funktionierende öffentliche IPv6-Adresse hat. Ein alter AAAA-Eintrag zu einem anderen Server kann die Erreichbarkeit und die Zertifikatseinrichtung stören. Bietet Ihr Domain-Anbieter eine Proxy-Funktion an, wählen Sie für diesen direkten Weg zunächst **Nur DNS / DNS only**.
+
+Damit Caddy öffentliches HTTPS einrichten kann, muss die gewählte Domain auf diesen Server zeigen. Außerdem müssen die Ports 80 und 443 erreichbar sein.[^https] DNS-Änderungen sind nicht immer sofort überall sichtbar. Prüfen Sie das Ziel mit der DNS-Prüfung Ihres Anbieters, bevor Sie weitermachen.
+
+## 3. Am Server anmelden
+
+Öffnen Sie auf dem Mac das **Terminal**, unter Windows die **PowerShell**. Verwenden Sie den Benutzernamen und die IP-Adresse aus den Zugangsdaten Ihres Server-Anbieters:
+
+```bash
+ssh SERVER_USER@SERVER_IP
+```
+
+Ersetzen Sie beide großgeschriebenen Platzhalter. Alternativ können Sie die Server-Konsole im Browser Ihres Anbieters verwenden. Vergleichen Sie bei der ersten SSH-Verbindung den angezeigten Server-Fingerabdruck mit den Angaben des Anbieters, bevor Sie die Verbindung bestätigen. Bei der Passworteingabe erscheinen möglicherweise keine Zeichen. Das ist normal.
+
+**Ab hier laufen die Befehle auf dem Server**, nicht auf Ihrem eigenen Computer, sofern ein Schritt nichts anderes sagt. Die Beispiele setzen einen Server-Zugang voraus, der `sudo` verwenden darf. Damit erhält ein Befehl Administratorrechte. Lesen Sie eine Fehlermeldung, bevor Sie mit dem nächsten Schritt fortfahren.
+
+## 4. Docker einmalig installieren
+
+Prüfen Sie zuerst, ob Docker und Compose bereits vorhanden sind:
+
+```bash
+sudo docker --version
+sudo docker compose version
+```
+
+Zeigen beide Befehle Versionsnummern an, überspringen Sie die folgenden Installationsbefehle. Ist Docker vorhanden, aber Compose fehlt, nutzen Sie die [offizielle Ubuntu-Installationsanleitung](https://docs.docker.com/engine/install/ubuntu/), statt unterschiedliche Docker-Pakete zu vermischen.
+
+Auf einem **frischen Ubuntu-24.04-Server ohne Docker** installieren Sie Docker aus dessen offizieller Paketquelle.[^docker] Kopieren Sie immer einen vollständigen Block. Diese Befehle sind für Ubuntu gedacht, nicht für Ihren Mac oder Windows-PC.
+
+Installieren Sie zuerst die kleinen Hilfsprogramme, die wir in dieser Anleitung benötigen:
+
+```bash
+sudo apt update
+sudo apt install -y ca-certificates curl git nano openssl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+```
+
+Fügen Sie anschließend die Docker-Paketquelle hinzu. Kopieren Sie den **gesamten Block einschließlich der letzten Zeile `EOF`**:
+
+```bash
+sudo tee /etc/apt/sources.list.d/docker.sources > /dev/null <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: noble
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+```
+
+Installieren und prüfen Sie Docker:
+
+```bash
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl enable --now docker
+sudo docker run --rm hello-world
+sudo docker compose version
+```
+
+**So erkennen Sie den Erfolg:** Es erscheinen „Hello from Docker!“ und eine Compose-Versionsnummer. Node.js oder eine Datenbank müssen Sie für diesen Docker-Weg nicht separat installieren.[^compose]
+
+Haben Sie die Docker-Installation auf Ihrem Ubuntu-Server übersprungen, weil Docker bereits vorhanden war, installieren Sie noch die übrigen Hilfsprogramme:
+
+```bash
+sudo apt update && sudo apt install -y git nano openssl
+```
+
+## 5. Pfotenweb herunterladen
+
+Führen Sie diese Befehle auf dem Server aus:
+
+```bash
+cd ~
+git clone https://github.com/Livvux/pfotenweb.git
+cd pfotenweb
+git checkout v1.0.1
+cp .env.example .env
+chmod 600 .env
+```
+
+`git clone` lädt das Projekt herunter. `git checkout v1.0.1` wählt die hier verwendete Version aus. Eine Meldung über **detached HEAD** ist bei der Auswahl eines Releases normal und kein Installationsfehler.
+
+Die Datei `.env` ist Ihr privates Einstellungsblatt. `chmod 600` beschränkt den Zugriff auf den Eigentümer. Laden Sie diese Datei nicht auf GitHub hoch und kopieren Sie sie nicht in Support-Anfragen.
+
+Existiert bereits ein Ordner namens `pfotenweb`, prüfen Sie zuerst seinen Inhalt, statt ihn zu löschen. Wenn Sie sich später erneut am Server anmelden, wechseln Sie vor Compose-Befehlen mit `cd ~/pfotenweb` wieder in diesen Ordner.
+
+## 6. Website-Daten und Passwörter eintragen
+
+Erzeugen Sie zwei unterschiedliche Zufallswerte. Führen Sie die Befehle nacheinander aus:
+
+```bash
+openssl rand -hex 32
+openssl rand -hex 32
+```
+
+Speichern Sie den ersten Wert als **Datenbankpasswort**, den zweiten als **Administratorpasswort Ihrer Website** in einem Passwortmanager. Verwenden Sie nicht Ihr Server-Passwort erneut. Die erzeugten Werte vermeiden Probleme mit Sonderzeichen in der Datenbankadresse und sind länger als die für die Ersteinrichtung erforderlichen 16 Zeichen.[^setup]
+
+Öffnen Sie die Einstellungsdatei:
+
+```bash
+nano .env
+```
+
+Ersetzen Sie die entsprechenden Zeilen durch Ihre eigenen Angaben. **Die großgeschriebenen Werte sind Platzhalter und keine verwendbaren Passwörter.** Ersetzen Sie auch `tierheim.example.org` und die Beispiel-E-Mail-Adresse.
+
+```dotenv
+POSTGRES_PASSWORD=PASTE_FIRST_RANDOM_VALUE
+SITE_URL=https://tierheim.example.org
+DOMAIN=tierheim.example.org
+ACME_EMAIL=you@example.org
+INITIAL_ORG_NAME="My Animal Rescue"
+INITIAL_ADMIN_USERNAME=vorstand
+INITIAL_ADMIN_PASSWORD=PASTE_SECOND_RANDOM_VALUE
+```
+
+Bei `PASTE_FIRST_RANDOM_VALUE` kommt der erste erzeugte Wert hinein, bei `PASTE_SECOND_RANDOM_VALUE` der zweite. Tragen Sie statt „My Animal Rescue“ Ihren Vereinsnamen ein und lassen Sie die Anführungszeichen stehen.
+
+`SITE_URL` enthält die vollständige Website-Adresse einschließlich `https://`. `DOMAIN` enthält denselben Domainnamen **ohne** `https://` und ohne einen Seitenpfad. Verwenden Sie bei `ACME_EMAIL` eine echte, regelmäßig gelesene E-Mail-Adresse als Kontakt für das Zertifikat.
+
+`vorstand` ist nur der Beispiel-Benutzername der mitgelieferten Einstellungen, kein allgemeiner Pfotenweb-Zugang. Sie dürfen einen anderen Namen mit 3–50 Zeichen wählen. Der Vereinsname muss 2–60 Zeichen lang sein.[^setup]
+
+Lassen Sie die vorhandene Zeile `DATABASE_URL` für diesen Weg unverändert. Docker Compose setzt die richtige interne Datenbankverbindung automatisch. Lassen Sie auch die `SMTP_*`-Einstellungen zunächst wie in der Vorlage; der E-Mail-Versand ist optional.[^compose]
+
+Speichern Sie in Nano mit **Strg+O**, dann **Enter**. Beenden Sie den Editor mit **Strg+X**. Auf dem Mac ist damit die Control-Taste gemeint, nicht Command.
+
+Prüfen Sie, ob Compose die Einstellungen lesen kann:
+
+```bash
+sudo docker compose --profile https config --quiet
+```
+
+Keine Ausgabe und keine Fehlermeldung bedeuten, dass die Konfiguration eingelesen werden konnte. Das prüft **nicht**, ob Ihre Domain oder jedes Passwort richtig ist. Lassen Sie `--quiet` stehen: Die vollständige Konfigurationsausgabe kann Geheimnisse enthalten.
+
+## 7. Die Website starten
+
+Führen Sie im Ordner `~/pfotenweb` diesen Befehl aus:
+
+```bash
+sudo docker compose --profile https up -d --build
+```
+
+Damit wird die Anwendung erstellt, die Datenbank gestartet, der erste Verein samt Administrator angelegt und die Website mit Caddy gestartet. Lassen Sie den Vorgang fertiglaufen; der erste Build ist nicht sofort abgeschlossen. Dank `-d` laufen die Dienste auch weiter, wenn Sie die Verbindung zum Server schließen.[^compose]
+
+Prüfen Sie den Zustand:
+
+```bash
+sudo docker compose --profile https ps -a
+```
+
+Datenbank, App und Caddy sollten laufen. Dass der einmalige Dienst `setup` mit **Exited (0)** endet, ist richtig. Ein anderer Exit-Code oder eine ständig neu startende App braucht eine Fehlerprüfung, keine erneute leere Installation.
+
+Die letzten Meldungen sehen Sie mit:
+
+```bash
+sudo docker compose --profile https logs --tail=80 setup app caddy
+```
+
+Diese Meldungen sind zunächst für Ihre eigene Prüfung gedacht. Entfernen Sie Passwörter, Zugangsschlüssel und persönliche Daten, bevor Sie Ausgaben öffentlich teilen.
+
+## 8. Website öffnen und anmelden
+
+Öffnen Sie im Browser Ihre tatsächliche Domain mit dem Zusatz `/admin`:
+
+```text
+https://tierheim.example.org/admin
+```
+
+Melden Sie sich mit `INITIAL_ADMIN_USERNAME` und dem **zweiten erzeugten Passwort** an. Hier wird ein Benutzername verwendet, kein Pfotenweb-Cloud-Konto und keine Registrierung per E-Mail.
+
+Öffnen Sie die Hauptdomain zusätzlich in einem zweiten Tab. **So erkennen Sie den Erfolg:** Ihre Website ist über HTTPS ohne Zertifikatswarnung erreichbar und Sie können den Verwaltungsbereich betreten. Eine neue Installation enthält keine Beispieltiere oder Neuigkeiten. Eine leere Tierliste ist normal.[^setup]
+
+Sobald die Anmeldung funktioniert und Ihre Zugangsdaten sicher gespeichert sind, entfernen Sie `INITIAL_ADMIN_USERNAME` und `INITIAL_ADMIN_PASSWORD` aus `.env`. Führen Sie anschließend denselben Befehl mit `up -d --build` erneut aus, damit die Dienste ohne diese Einrichtungsdaten neu erstellt werden. Vorhandene Konten werden bei späteren Einrichtungsläufen nicht neu angelegt oder geändert.[^setup]
+
+**Ändern Sie `POSTGRES_PASSWORD` danach nicht einfach wie eine gewöhnliche Einstellung.** Eine Änderung in `.env` allein ändert nicht das Passwort einer bereits angelegten PostgreSQL-Datenbank. Auch das Bearbeiten von `INITIAL_ADMIN_*` setzt kein bestehendes Passwort zurück.
+
+## Die Website für Ihren Verein einrichten
+
+Die Oberfläche des geprüften Releases ist **auf Deutsch**. Die folgenden Bezeichnungen entsprechen den tatsächlichen Menüs.
+
+Öffnen Sie **Verein** unter `/admin/verein`. Dort finden Sie die Bereiche **Verein**, **Kontakt**, **Startseite**, **Über uns**, **Impressum** und **Erscheinungsbild**.[^screens]
+
+Beginnen Sie mit Vereinsdaten und Kontaktinformationen. Schreiben Sie anschließend eine kurze Begrüßung für die Startseite, stellen Sie Ihre Arbeit unter „Über uns“ vor und passen Sie die Gestaltung an. Speichern Sie jeden Bereich, bevor Sie zum nächsten wechseln. Die Bereiche sind eigenständige Formulare.
+
+Prüfen Sie nach jeder Änderung die öffentliche Website. Kontrollieren Sie vor der Veröffentlichung, ob Impressum und Datenschutzinformationen zu Ihrem tatsächlichen Verein und Ihrer Hosting-Lösung passen. Eine ausgefüllte Vorlage garantiert nicht, dass alle rechtlichen Anforderungen abgedeckt sind.
+
+Anregungen für die Inhalte finden Sie in meinem Artikel über [hilfreiche und aktuelle Websites für Tierschutzvereine](/blog/animal-rescue-websites/de).
+
+## Das erste Tier anlegen
+
+Öffnen Sie **Tiere** und dann das Formular für ein neues Tier unter `/admin/tiere/neu`.
+
+Tragen Sie Name, **Art** und **Geschlecht** ein. Ergänzen Sie Geburtsjahr, Größe und Rasse, soweit bekannt. Beschreiben Sie unter **Beschreibung** den Charakter, die Bedürfnisse und das gesuchte Zuhause. Der Text muss mindestens 20 Zeichen enthalten.[^animals]
+
+Fügen Sie über **Fotos hochladen** einige aussagekräftige Bilder hinzu, die Sie veröffentlichen dürfen. Wählen Sie **Vermittelbar**, wenn das Tier ein Zuhause sucht, **Reserviert** bei einer Reservierung oder **Vermittelt** nach der Vermittlung. Setzen Sie **Auf der Startseite zeigen** nur, wenn das Profil dort hervorgehoben erscheinen soll.
+
+Klicken Sie auf **Tier anlegen**. Behandeln Sie das als Veröffentlichung, nicht als privaten Entwurf: Anders als bei Neuigkeiten gibt es im Tierformular kein entsprechendes Entwurfs-Kästchen. Prüfen Sie das Ergebnis auf der öffentlichen Seite `/tiere` in einem privaten Browserfenster. Später öffnen Sie das Profil erneut unter **Tiere** und sichern Anpassungen mit **Änderungen speichern**.[^animals]
+
+Verwenden Sie echte Angaben, statt ein erfundenes Testtier auf der öffentlichen Website stehenzulassen.
+
+## Neuigkeiten veröffentlichen und Anfragen lesen
+
+Öffnen Sie für eine Neuigkeit **Aktuelles** und das Formular unter `/admin/aktuelles/neu`. Füllen Sie **Titel** und **Beitrag** aus. Ohne Häkchen bei **Veröffentlicht (öffentlich sichtbar)** bleibt der Beitrag ein Entwurf. Ist der Text fertig, setzen Sie das Häkchen und klicken auf **Beitrag anlegen**. Prüfen Sie anschließend die öffentliche Seite `/aktuelles`.[^posts]
+
+Nachrichten finden Sie unter **Anfragen** auf `/admin/anfragen`. Antworten Sie über die angezeigte E-Mail-Adresse in Ihrem gewöhnlichen E-Mail-Programm. Klicken Sie danach auf **Als erledigt markieren**. Damit ist kein vollständiger Antwortverlauf innerhalb der Anwendung gemeint.[^screens]
+
+Senden Sie selbst eine Testnachricht über die öffentliche Kontaktseite und prüfen Sie, ob sie hier ankommt. **Anfragen werden auch ohne eingerichteten SMTP-Versand gespeichert.** Solange Benachrichtigungen nicht eingerichtet und getestet sind, muss jemand diesen Bereich regelmäßig öffnen.[^edition]
+
+## Helfern eigene Zugänge geben
+
+Legen Sie unter **Team** auf `/admin/team` für jede mitarbeitende Person einen eigenen Benutzernamen und ein starkes Passwort an. Wählen Sie die Rolle und klicken Sie auf **Zugang anlegen**. Übermitteln Sie die Zugangsdaten privat, nicht in einer öffentlichen Gruppe.[^team]
+
+**Redaktion** darf Tiere, Neuigkeiten und Anfragen pflegen. **Verantwortlich** darf zusätzlich Vereinsdaten ändern und Zugänge verwalten. Geben Sie jeder Person nur die benötigten Rechte, statt das Hauptpasswort gemeinsam zu verwenden.[^roles]
+
+Auch Ihr eigenes Passwort können Sie in diesem Bereich ändern. Die Einrichtungsdatei ist nicht zur Verwaltung bestehender Konten gedacht.
+
+## Optional: Benachrichtigungen per E-Mail erhalten
+
+SMTP bezeichnet die Einstellungen, mit denen Pfotenweb über einen E-Mail-Anbieter Nachrichten verschickt. Dadurch wird kein eigenes Postfach angelegt.
+
+Fragen Sie Ihren E-Mail-Anbieter nach Servername, Port, Verschlüsselung, Benutzername, Passwort und erlaubter Absenderadresse. Tragen Sie diese Werte in `.env` bei `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS` und `SMTP_FROM` ein. Führen Sie danach den bisherigen Compose-Startbefehl erneut aus.[^edition]
+
+Übernehmen Sie die genaue Kombination aus Port und Verschlüsselung des Anbieters. Raten Sie nicht. Senden Sie anschließend eine weitere Testanfrage und prüfen Sie sowohl **Anfragen** als auch das Empfängerpostfach. Bis der Versand funktioniert, bleibt der Verwaltungsbereich die verlässliche Anlaufstelle.
+
+## Eine Sicherung anlegen, bevor Sie sie brauchen
+
+Tiere und Nachrichten liegen in der Datenbank, Fotos in einem getrennten Upload-Bereich. **Sie brauchen beides.** Eine Kopie des Programmcodes von GitHub ist keine Sicherung Ihrer Vereinsinhalte.[^compose]
+
+Die folgende manuelle Sicherung stoppt die App kurz, damit Datenbank und Bilder zusammenpassen. Sie erstellt einen Ordner mit Zeitstempel unter `~/pfotenweb-backups`, **außerhalb des Projektordners**. So gelangen private Sicherungen nicht versehentlich in einen späteren Docker-Build. Beim Verlassen des Blocks wird die App wieder gestartet. Führen Sie den Block auf dem Server im Ordner `~/pfotenweb` aus:
+
+```bash
+(
+  set -eu
+  umask 077
+  backup_dir="$HOME/pfotenweb-backups/$(date +%Y%m%d-%H%M%S)"
+  mkdir -p "$backup_dir"
+  sudo -v
+  trap 'sudo docker compose start app' EXIT
+  sudo docker compose stop app
+  sudo docker compose exec -T db pg_dump -U pfotenweb -d pfotenweb -Fc > "$backup_dir/database.dump"
+  sudo docker compose run -T --rm --no-deps --entrypoint tar app -czf - -C /data/uploads . > "$backup_dir/uploads.tar.gz"
+  cp .env compose.yaml Caddyfile "$backup_dir/"
+  git describe --tags --always > "$backup_dir/version.txt"
+  test -s "$backup_dir/database.dump"
+  gzip -t "$backup_dir/uploads.tar.gz"
+  printf 'Backup: %s\n' "$backup_dir"
+)
+```
+
+Prüfen Sie, ob der Vorgang ohne Fehler beendet wurde und Ihre Website wieder erreichbar ist. Die enthaltenen Prüfungen kontrollieren nur grundlegende Dateieigenschaften, **nicht die tatsächliche Wiederherstellung**. Eine fehlgeschlagene Sicherung ist keine verwendbare Sicherung.
+
+Kopieren Sie die Sicherung vom Server weg. Öffnen Sie dafür ein **neues Terminal auf Ihrem eigenen Computer**. Dieser Befehl kopiert den Backup-Ordner einschließlich der darin enthaltenen versteckten Einstellungsdatei:
+
+```bash
+scp -r SERVER_USER@SERVER_IP:~/pfotenweb-backups ./pfotenweb-backups
+```
+
+Ersetzen Sie wieder die Zugangsdaten. Schützen Sie Ihren Computer und bewahren Sie die Sicherung verschlüsselt auf. Sie enthält persönliche Anfragen und Geheimnisse aus `.env`. Ein zweiter Ordner auf demselben Server hilft nicht, wenn dieser Server verloren geht.
+
+Vereinbaren Sie tägliche Backups mit der Person, die Ihren Server betreut. Der manuelle Befehl richtet keinen Zeitplan ein. Testen Sie die Wiederherstellung auf einer getrennten, leeren Installation nach den [Wiederherstellungshinweisen des Releases](https://github.com/Livvux/pfotenweb/blob/v1.0.1/README.md). Probieren Sie keine überschreibenden Wiederherstellungsbefehle an Ihrer einzigen produktiven Installation aus.
+
+**Verwenden Sie `docker compose down -v` niemals als schnellen Reparaturversuch.** Das `-v` löscht die benannten Speicherbereiche, in denen Ihre Daten liegen.
+
+## Updates bewusst installieren
+
+Erstellen und prüfen Sie vor einem Update eine Sicherung. Lesen Sie die [Release-Hinweise](https://github.com/Livvux/pfotenweb/releases) und sichern Sie eigene Änderungen am Programmcode. Laden Sie die verfügbaren Versionsbezeichnungen:
+
+```bash
+git fetch --tags
+git tag --list --sort=-version:refname
+```
+
+Wählen Sie zuerst ein tatsächlich veröffentlichtes Release. Ersetzen Sie erst dann `RELEASE_TAG` durch dessen Versionsbezeichnung. Das ist ein Platzhalter, den Sie nicht unverändert ausführen sollen:
+
+```bash
+git checkout RELEASE_TAG && sudo docker compose --profile https up -d --build
+```
+
+Prüfen Sie anschließend öffentliche Website, Anmeldung, Fotos und Kontaktformular. Updates können den Aufbau der Datenbank verändern. Für die Rückkehr zu einer älteren Version kann daher die passende Sicherung nötig sein. Nur wieder eine alte Versionsbezeichnung auszuwählen reicht dann nicht.[^edition]
+
+Für einen Datenumzug gilt außerdem: **v1.0.1 importiert nur Archivformat 1**. Neuerer Entwicklungscode unterstützt weitere Formate, diese Fähigkeiten gehören dadurch aber noch nicht zu diesem Release. Prüfen Sie vor einem Umzug die [aktuellen Kompatibilitätshinweise](https://github.com/Livvux/pfotenweb#import-aus-neueren-exporten). Ein Import benötigt eine frisch eingerichtete, ansonsten leere Installation. Bewahren Sie das ursprüngliche Exportarchiv geschützt auf.[^compatibility]
+
+## Wenn etwas nicht funktioniert
+
+| Was Sie sehen | Was Sie zuerst prüfen sollten |
+| --- | --- |
+| Die Domain öffnet sich nicht | A-/AAAA-Einträge, Server-Adresse und Firewall beim Anbieter prüfen. |
+| HTTPS-Warnung | `DOMAIN`, DNS und Ports 80/443 prüfen; Caddy-Meldungen ansehen. Keine Warnung umgehen, um trotzdem ein Passwort zu senden. |
+| Ein Port ist bereits belegt | Ein anderer Dienst nutzt 80, 443 oder 3000. Keine fremde Website stoppen; einen frischen Server verwenden oder die Einrichtung mit Hilfe anpassen. |
+| `no configuration file provided` | Vor dem Compose-Befehl `cd ~/pfotenweb` ausführen. |
+| `setup` ist fehlgeschlagen | `INITIAL_*`-Werte und Passwortlänge sowie die `setup`-Meldungen prüfen. `Exited (0)` bedeutet Erfolg, nicht Fehler. |
+| Die Anmeldung scheitert | Gewählten Benutzernamen und Administratorpasswort verwenden, nicht das Datenbankpasswort. Eine Änderung in `.env` setzt kein bestehendes Konto zurück. |
+| Keine Benachrichtigungs-E-Mail | Zuerst **Anfragen** öffnen. SMTP ist optional und wird separat eingerichtet. |
+| Nach einem Serverumzug fehlen Fotos | Prüfen, ob der Upload-Speicher gemeinsam mit der Datenbank gesichert und wiederhergestellt wurde. |
+
+Für Fehlerberichte gibt es den [Issue-Bereich des Projekts](https://github.com/Livvux/pfotenweb/issues). Nennen Sie Ihre Release-Version und eine bereinigte Fehlermeldung. Teilen Sie niemals Ihre Einstellungsdatei oder persönliche Anfragen.
+
+Das Ziel ist nicht, zum Server-Spezialisten zu werden. Es geht darum, eine hilfreiche Website online zu bringen, Tierinformationen aktuell zu halten und sicherzustellen, dass echte Menschen Anfragen erhalten und beantworten.
+
+*Abgeglichen mit den verlinkten v1.0.1-Dateien und der offiziellen Docker-/Caddy-Dokumentation am 24. September 2026. Die Anleitung wurde anhand der Quellen geprüft; für diesen Artikel wurde keine neue produktive Serverinstallation durchgeführt.*
+
+[^edition]: [Pfotenweb v1.0.1: Installation, Umfang und Wartung](https://github.com/Livvux/pfotenweb/blob/v1.0.1/README.md).
+[^compose]: [Compose-Datei des Releases](https://github.com/Livvux/pfotenweb/blob/v1.0.1/compose.yaml), [Dockerfile](https://github.com/Livvux/pfotenweb/blob/v1.0.1/Dockerfile) und [Build-Ausschlüsse](https://github.com/Livvux/pfotenweb/blob/v1.0.1/.dockerignore).
+[^release]: [Veröffentlichtes Release v1.0.1](https://github.com/Livvux/pfotenweb/releases/tag/v1.0.1).
+[^docker]: [Docker Engine auf Ubuntu installieren, einschließlich Firewall-Hinweisen](https://docs.docker.com/engine/install/ubuntu/).
+[^https]: [Caddy: Voraussetzungen für automatisches HTTPS](https://caddyserver.com/docs/automatic-https).
+[^setup]: [Prüfung der Ersteinrichtung](https://github.com/Livvux/pfotenweb/blob/v1.0.1/scripts/setup.ts) und [mitgelieferte Einstellungsvorlage](https://github.com/Livvux/pfotenweb/blob/v1.0.1/.env.example).
+[^screens]: [Verwaltungsseiten im geprüften Release](https://github.com/Livvux/pfotenweb/tree/v1.0.1/src/app/admin).
+[^animals]: [Tierformular: Felder, Status und Speichern](https://github.com/Livvux/pfotenweb/blob/v1.0.1/src/components/admin/animal-form.tsx).
+[^posts]: [Beitragsformular: Entwurf und Veröffentlichung](https://github.com/Livvux/pfotenweb/blob/v1.0.1/src/components/admin/post-form.tsx).
+[^team]: [Formulare für Teamzugänge und Passwörter](https://github.com/Livvux/pfotenweb/blob/v1.0.1/src/components/admin/team-forms.tsx).
+[^roles]: [Rollenbezeichnungen und Berechtigungen](https://github.com/Livvux/pfotenweb/blob/v1.0.1/src/lib/roles.ts).
+[^compatibility]: [Aktuelles README: Import-Kompatibilität von Release und Entwicklungsstand](https://github.com/Livvux/pfotenweb/blob/main/README.md).
