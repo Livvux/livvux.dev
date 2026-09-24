@@ -1,0 +1,176 @@
+---
+title: "Website für Tierschutzvereine: schnell, aktuell und authentisch"
+publishedAt: "2026-09-24"
+author: "Livvux"
+summary: "Wie ich eine Tierschutz-Website technisch planen würde: ehrliche Tierprofile, Adoptantenerfahrungen, Nachbetreuung und eine schlanke Umsetzung mit Pfotenweb, Astro oder WordPress."
+---
+
+Ein Mensch entdeckt einen Hund auf Social Media, öffnet den Link zum Verein und möchte wissen: Sucht dieses Tier noch ein Zuhause? Passt es zu meinem Alltag? Wer beantwortet meine Fragen?
+
+Die Website sollte diese Fragen beantworten, bevor sie irgendetwas anderes tut. Nicht erst ein Video abspielen, fünf Animationen laden oder nach einer Anmeldung fragen.
+
+**Transparenz vorweg: [Pfotenweb](https://pfotenweb.de/) ist mein eigenes Projekt.** Ich empfehle es hier ausdrücklich aus dieser Perspektive, nicht als unabhängiger Vergleichsautor. Für Menschen, die eine Website technisch selbst umsetzen und betreiben möchten, empfehle ich **Astro oder WordPress**. Entscheidend ist für mich nicht das Logo des Systems, sondern ob die Website glaubwürdig, aktuell und leicht zu pflegen bleibt.
+
+## Eine Vereinswebsite ist mehr als eine Visitenkarte
+
+Eine gute Website für Tierschutzvereine verbindet die öffentliche Darstellung mit dem tatsächlichen Vereinsalltag. Besucher brauchen Tierprofile, einen verständlichen Vermittlungsablauf, Kontaktmöglichkeiten sowie Informationen über Pflegestellen und Unterstützung.
+
+Ich würde diese Wege zuerst planen: **Tier finden, Verein kennenlernen, Kontakt aufnehmen, helfen.** Nicht jede Information muss auf die Startseite. Dort genügen eine kurze Vorstellung, aktuelle Tiere und gut erkennbare nächste Schritte.
+
+Die technische Frage dahinter lautet: Welche Informationen werden nur einmal gepflegt und anschließend überall konsistent angezeigt? Der Status eines Tiers sollte nicht separat in einer Startseiten-Kachel, einem Steckbrief und einer handgebauten Vermittlungsliste geändert werden müssen.
+
+Genau diese Trennung zwischen redaktioneller Verantwortung und wiederholbarer technischer Arbeit beschreibe ich auch in meinem Artikel über [Technik im Tierschutz](/blog/technology-animal-welfare/de).
+
+## Authentizität ist wichtiger als Hochglanz
+
+Ich möchte auf einer Vereinswebsite erkennen können, wer hinter dem Verein steht, wie gearbeitet wird und wo die Grenzen liegen. Dazu gehören echte Menschen, echte Fotos und nachvollziehbare Beschreibungen. Nicht austauschbare Werbesätze oder erfundene Erfolgsgeschichten.
+
+Bei Tierprofilen würde ich beobachtetes Verhalten von Vermutungen trennen. „In der Pflegestelle lebt sie ruhig mit einer anderen Katze zusammen“ ist konkreter als „mit allen Tieren verträglich“. Unbekannte Eigenschaften dürfen unbekannt bleiben. Eine ehrliche Beschreibung muss das Tier nicht für möglichst viele Menschen passend erscheinen lassen.
+
+Auch technisch sollte das System diese Ehrlichkeit unterstützen: unbekannte Angaben erlauben, Beobachtungen mit ihrem Kontext speichern und den Vermittlungsstatus deutlich als Text zeigen. Ein grüner Punkt allein erklärt nicht, ob ein Tier verfügbar, reserviert oder bereits vermittelt ist.
+
+Gute Gestaltung macht solche Informationen lesbar. Sie soll sie nicht hinter Effekten verstecken.
+
+## Erfahrungen von Adoptanten gehören dazu – Nachbetreuung auch
+
+Ein Vermittlungsprofil endet für mich nicht mit dem Status „vermittelt“. Ich würde bereits beim Kennenlernen erklären, wer nach dem Einzug ansprechbar bleibt und wie der Verein die Eingewöhnung begleitet.
+
+Ein möglicher Ablauf: gemeinsam einen ersten Rückmeldetermin vereinbaren, später noch einmal nachfragen und Schwierigkeiten ernst nehmen. Die konkreten Zeitpunkte sollten zum Tier, den Adoptanten und den Möglichkeiten des Teams passen. Eine automatische Erinnerung kann dabei helfen; eine persönliche Antwort ersetzt sie nicht.
+
+Aus dieser Beziehung können aussagekräftige Erfahrungsberichte entstehen. Statt nur „Alles super!“ würde ich fragen: Wie verlief das Kennenlernen? Was war beim Einzug schwierig? Welche Unterstützung war hilfreich? Wie geht es dem Tier heute?
+
+Auf der Website können daraus kurze Geschichten mit Datum, einem echten Foto und einer freigegebenen Aussage werden. Veröffentlichung und Nachbetreuung bleiben getrennt: Hilfe darf nicht davon abhängen, dass jemand einen positiven Bericht schreibt. Namen, Bilder und Zitate würde ich vor der Veröffentlichung ausdrücklich abstimmen und einen einfachen Kontakt für Änderungen anbieten.
+
+**Gute Erfahrungen sollen der Grund für Empfehlungen sein – nicht ein vorgeschriebenes Lob.** Wer verlässlich begleitet wird, hat einen konkreten Anlass, über den Verein zu sprechen und dessen Website weiterzugeben. Das ist mein Ansatz für langfristiges Vertrauen, keine Zusage für mehr Vermittlungen oder bessere Rankings.
+
+## Tierprofile als strukturierte Daten statt freier Seiten
+
+Für einen Eigenbau würde ich Tiere als eigenen Inhaltstyp modellieren. So kann dieselbe Information in einem Profil, einer Übersicht und einer Suche verwendet werden.
+
+Ein bewusst vereinfachtes TypeScript-Modell für die öffentliche Ausgabe könnte so aussehen. Es ist ein Architekturvorschlag, **nicht das interne Datenmodell von Pfotenweb**:
+
+```ts
+interface PublicAnimalProfile {
+  id: string;
+  slug: string;
+  name: string;
+  species: string;
+  ageDescription: string | null;
+  status: "available" | "reserved" | "adopted";
+  description: string;
+  needs: string[];
+  photos: { src: string; alt: string }[];
+  reviewedAt: string; // ISO-Datum der letzten inhaltlichen Prüfung
+}
+```
+
+Eine feste ID verhindert, dass zwei gleichnamige Tiere verwechselt werden. Eine Altersbeschreibung lässt auch „geschätzt etwa fünf Jahre“ zu, statt ein erfundenes Geburtsdatum zu verlangen. `reviewedAt` würde ich nur nach einer tatsächlichen Prüfung ändern, nicht bei jedem technischen Neubau der Website.
+
+Dieses öffentliche Modell enthält bewusst keine Adressen von Pflegestellen, privaten Gesprächsnotizen oder Daten von Interessenten. Solche Informationen gehören in einen getrennten, zugriffsgeschützten Bereich. Bei einer eigenen Schnittstelle würde ich öffentliche Felder serverseitig ausdrücklich auswählen, statt einen vollständigen Datensatz zu senden und sensible Felder nur im Browser auszublenden.
+
+## Welche Umsetzung ich empfehle
+
+### Pfotenweb: mein Projekt für den Vereinsalltag
+
+[Pfotenweb – meine Website-Lösung für Tierschutzvereine](https://pfotenweb.de/) verbindet die Vereinswebsite mit der Pflege von Tierprofilen, Inhalten und Anfragen. Der Schwerpunkt liegt darauf, diese Aufgaben selbst erledigen zu können, auch vom Smartphone.[^pfotenweb]
+
+Ich empfehle Pfotenweb Vereinen, die dafür keine allgemeine Website-Software selbst zusammensetzen möchten. Die entscheidende Probe ist für mich ein echter Arbeitsablauf: Kann das Team ein Tier anlegen, dessen Status ändern und eine Anfrage bearbeiten, ohne für jede Änderung technische Hilfe zu benötigen?
+
+Die hier beschriebenen Datenmodelle, Nachbetreuungsabläufe und Betriebsmaßnahmen sind Empfehlungen für die Planung einer Vereinswebsite. Sie sind **keine Behauptung, dass Pfotenweb all diese Abläufe automatisch umsetzt**. Den aktuellen Funktionsumfang und passende Beispiele findest du auf der Projektwebsite.
+
+### Astro: für eine individuell entwickelte, schlanke Website
+
+Für einen technisch betreuten Eigenbau empfehle ich Astro, wenn die öffentliche Website überwiegend aus Inhalten besteht. Astro-Komponenten werden zu HTML gerendert; interaktive Komponenten lassen sich gezielt als einzelne „Islands“ aktivieren. Nicht jede Seite muss dafür eine große Browser-Anwendung werden.[^astro-islands]
+
+Tierprofile würde ich über ein Content-Management-System oder eine andere strukturierte Datenquelle pflegen. Astro unterstützt Content Collections mit Schemas sowie Daten aus lokalen oder externen Quellen.[^astro-content]
+
+Wichtig: Astro allein ist noch keine fertige Vereinsverwaltung. Eine nichttechnische Redakteurin sollte keinen Git-Commit erstellen müssen, um ein Foto auszutauschen. Editor, Vorschau, Formulare und Veröffentlichung müssen mitgeplant werden.
+
+Bei zur Build-Zeit eingelesenen Daten wird eine Änderung erst durch einen neuen Build übernommen. Für aktuelle Daten beim Seitenaufruf gibt es andere Ansätze, etwa Live Collections; deren Abruf und Caching müssen ebenfalls geplant werden.[^astro-content] Ich würde deshalb zuerst klären, wie schnell eine Statusänderung sichtbar sein muss, und danach die passende Veröffentlichung wählen.
+
+### WordPress: für redaktionelle Arbeit mit technischer Betreuung
+
+WordPress empfehle ich, wenn der Verein eine redaktionelle Oberfläche braucht und jemand Hosting und Wartung zuverlässig übernimmt. Tierprofile lassen sich als eigener Inhaltstyp, ein **Custom Post Type**, abbilden. WordPress empfiehlt, solche Inhaltstypen in einem Plugin statt im Theme zu registrieren, damit sie bei einem Designwechsel erhalten bleiben.[^wp-types]
+
+Mein Aufbau wäre bewusst klein: ein schlankes Theme, feste Felder für Tiere, klare Vorlagen und nur Erweiterungen, die tatsächlich gebraucht werden. Für öffentliche Seiten kommt gezieltes Caching infrage; WordPress dokumentiert dafür mehrere Ebenen.[^wp-performance]
+
+Updates, Sicherungen und ein getesteter Wiederherstellungsweg gehören für mich zum Betrieb. Ein leicht bedienbarer Editor nimmt diese Verantwortung nicht ab. Genauso wenig muss eine funktionierende WordPress-Website ersetzt werden, nur weil ein anderes Framework neuer wirkt.
+
+### Warum ich Jimdo und andere allgemeine Baukastensysteme nicht empfehle
+
+Für diesen Anwendungsfall empfehle ich **Jimdo und andere allgemeine Baukastensysteme nicht**. Meine Prioritäten sind strukturierte Tierdaten, überprüfbare Veröffentlichungsabläufe, kontrollierbare Auslieferung und ein nachvollziehbarer Weg, Daten bei Bedarf mitzunehmen.
+
+Das ist eine begründete Auswahlentscheidung für solche Projekte, kein gemessener Geschwindigkeitstest und keine Behauptung, dass jede Baukasten-Website langsam oder unbrauchbar sei. Ein visueller Editor ist nicht das Problem. Ich möchte nur nicht von der einfachen Gestaltung der ersten Seite auf die langfristige Eignung für den Vereinsbetrieb schließen.
+
+Diese Fragen muss sich auch mein eigenes Projekt gefallen lassen. Entscheidend ist, ob das konkrete System die benötigten Aufgaben abdeckt und seine Grenzen transparent macht.
+
+## Geschwindigkeit: Bilder und Inhalte zuerst, Effekte zuletzt
+
+Die Website sollte auf einem älteren Smartphone und einer schwachen Mobilfunkverbindung benutzbar sein. „Überall abrufbar“ ist für mich ein Entwicklungsziel: ohne App-Zwang, ohne Konto zum Lesen und ohne unnötige technische Voraussetzungen. Eine Garantie für jede Verbindung ist das nicht.
+
+Ich würde mit wenigen Seitenelementen beginnen und jedes zusätzliche Widget begründen lassen. Keine automatisch laufenden Videos, kein dauernd rotierender Slider und kein eingebetteter Social-Media-Feed allein deshalb, weil dafür ein Plugin existiert.
+
+Bei Bildern würde ich passende Abmessungen und Dateigrößen ausliefern. Breite und Höhe sollten im Markup stehen, damit Platz reserviert wird. Fotos weiter unten können verzögert laden; das wichtige Tierfoto im ersten sichtbaren Bereich dagegen nicht. Die Browser-Dokumentation zum Lazy Loading empfiehlt genau diese Unterscheidung.[^images]
+
+Für die technische Abnahme sind die **Core Web Vitals** eine Orientierung: LCP höchstens **2,5 Sekunden**, INP höchstens **200 Millisekunden** und CLS höchstens **0,1**, jeweils am **75. Perzentil**, getrennt nach Mobilgeräten und Desktop. Sie beschreiben Laden, Reaktionsfähigkeit und visuelle Stabilität.[^vitals]
+
+Das sind Zielwerte, keine hier gemessenen Ergebnisse für Pfotenweb, Astro oder WordPress. Zusätzlich würde ich reale Geräte und gedrosselte Verbindungen testen. Ein guter Laborscore allein sagt mir nicht, ob das Formular im Alltag zuverlässig funktioniert.
+
+Überoptimierung wäre für mich, wegen eines Scores wichtige Fotos unkenntlich zu komprimieren oder ein Formular durch aggressives Verzögern von JavaScript kaputtzumachen. **Schnell soll die Website sein, nicht leer oder fragil.**
+
+## Aktualität ist auch eine technische Anforderung
+
+Ein korrekt gespeicherter Status ist noch nicht automatisch ein korrekt veröffentlichter Status. Zwischen Verwaltung und Besucher können ein Build, ein Seitencache und weitere zwischengespeicherte Kopien liegen.
+
+Mein vorgeschlagener Ablauf wäre:
+
+```text
+Mensch prüft und speichert
+→ Veröffentlichung anstoßen
+→ betroffene Caches aktualisieren
+→ öffentliche Tierseite und Übersicht prüfen
+→ Fehler an die zuständige Person melden
+```
+
+Ein Fehlschlag darf nicht als erfolgreiche Veröffentlichung erscheinen. Nach einer Änderung würde ich sowohl das einzelne Profil als auch die Vermittlungsliste kontrollieren. Bei zeitkritischen Reservierungen sollte zusätzlich ein Mensch vor einer Zusage den aktuellen Stand bestätigen.
+
+Für das Team würde ich eine kleine Routine festlegen: Statusänderungen zeitnah eintragen, regelmäßig offene Profile prüfen und Kontaktwege testen. Verantwortliche und Vertretung müssen feststehen. Eine Website, die nur eine einzige Person bedienen kann, ist für mich nicht gut übergeben.
+
+Nach einer Vermittlung kann ein Profil mit klar geändertem Status und hilfreichem Inhalt erreichbar bleiben. Ich würde es aus der Liste verfügbarer Tiere nehmen, statt weiterhin Anfragen dafür zu sammeln. Eine spätere Erfolgsgeschichte ist ein eigener, abgestimmter Inhalt, kein automatisches Nebenprodukt des Statuswechsels.
+
+## Social Media bringt Aufmerksamkeit, die Website hält Informationen zusammen
+
+Ich würde Social Media bewusst nutzen: Tiere vorstellen, Einblicke geben, Unterstützer erreichen und auf aktuelle Inhalte hinweisen. **Es ersetzt die eigene Website nicht.**
+
+Mein bevorzugter Weg ist: das vollständige Profil auf der Vereinswebsite pflegen und aus Social-Media-Beiträgen dorthin verlinken. Dort stehen die aktuelle Beschreibung, der Vermittlungsablauf und der zuständige Kontakt zusammen. Eine stabile Adresse pro Tier ist dafür hilfreicher als bei jedem Update eine neue Seite.
+
+Titel, Überschriften und Linkvorschauen würde ich verständlich formulieren. Ein Ort gehört hinein, wenn er die tatsächliche Arbeit oder Vermittlung beschreibt – nicht als Vorwand für Dutzende fast identische Ortsseiten. Ziel ist eine hilfreiche Informationsquelle, kein Suchwortkatalog.
+
+Auch Erfahrungsberichte nach der Adoption können geteilt werden, sofern die Beteiligten damit einverstanden sind. So führt ein Beitrag nicht nur zu einem Foto, sondern zu einer nachvollziehbaren Geschichte und einem erreichbaren Verein.
+
+## Kontakt und Betrieb müssen genauso zuverlässig sein
+
+Ein kleines Kontaktformular braucht verständliche Beschriftungen, nachvollziehbare Fehlermeldungen und eine klare Bestätigung. Die W3C-Anleitung für Formulare empfiehlt solche Hilfen und kurze Formulare mit den tatsächlich nötigen Angaben.[^forms]
+
+Für einen Eigenbau würde ich zusätzlich serverseitige Validierung, begrenzte Anfrageraten, getrennte Teamzugänge und eine kontrollierte Zustellung einplanen. Eine Erfolgsmeldung allein reicht als Test nicht: Die Anfrage muss auch bei der zuständigen Person ankommen. Ein alternativer Kontaktweg sollte sichtbar bleiben.
+
+Sicherungen würde ich nicht nur erstellen, sondern ihre Wiederherstellung testen. Und ich würde die Erreichbarkeit wichtiger Seiten überwachen, nicht nur darauf warten, dass ein Interessent einen Fehler meldet.
+
+## Mein Fazit
+
+Eine gute Tierschutz-Website muss nicht möglichst viel darstellen. Sie muss die richtigen Informationen zuverlässig zeigen: echte Tiere, ehrliche Beschreibungen, Erfahrungen von Adoptanten und Menschen, die auch nach einer Vermittlung ansprechbar bleiben.
+
+Für Vereine, die eine darauf ausgerichtete Lösung suchen, empfehle ich [mein Projekt Pfotenweb](https://pfotenweb.de/). Für einen technisch selbst betreuten Aufbau empfehle ich Astro oder WordPress – mit einem redaktionellen Ablauf, den das Team tatsächlich beherrscht.
+
+**Aktuell halten, schnell ausliefern, glaubwürdig bleiben.** Daran würde ich die Website messen, nicht an der Zahl ihrer Effekte.
+
+## Technische Quellen
+
+[^pfotenweb]: [Pfotenweb: Projekt und Funktionsübersicht](https://pfotenweb.de/). Eigenes Projekt des Autors; die Empfehlung ist nicht unabhängig.
+[^astro-islands]: [Astro: Islands architecture](https://docs.astro.build/en/concepts/islands/).
+[^astro-content]: [Astro: Content collections](https://docs.astro.build/en/guides/content-collections/), insbesondere Build-time und Live Collections.
+[^wp-types]: [WordPress: Registering Custom Post Types](https://developer.wordpress.org/plugins/post-types/registering-custom-post-types/).
+[^wp-performance]: [WordPress: Optimization](https://developer.wordpress.org/advanced-administration/performance/optimization/), insbesondere Caching.
+[^images]: [web.dev: Browser-level image lazy loading](https://web.dev/articles/browser-level-image-lazy-loading).
+[^vitals]: [web.dev: Web Vitals](https://web.dev/articles/vitals), Definitionen und Schwellenwerte.
+[^forms]: [W3C WAI: Forms Tutorial](https://www.w3.org/WAI/tutorials/forms/).
