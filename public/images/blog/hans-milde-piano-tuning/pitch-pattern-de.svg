@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="580" viewBox="0 0 960 580" role="img" aria-labelledby="title desc" xml:lang="de">
+<title id="title">Gleiche Gesamtlage. Anderes Muster.</title>
+<desc id="desc">Alle sechs Töne der durchgezogenen Reihe liegen 31,77 Cent unter der Referenz. In der gestrichelten Reihe liegt E4 weitere 18 Cent tiefer und A4 18 Cent höher. Beide Mediane sind identisch.</desc>
+<rect width="960" height="580" rx="16" fill="Canvas"/>
+<g font-family="system-ui, sans-serif" fill="CanvasText">
+<text x="48" y="48" font-size="27" font-weight="700">Gleiche Gesamtlage. Anderes Muster.</text>
+<text x="48" y="83" font-size="18">Abweichung zur Referenz auf Basis von 440 Hz (Cent)</text>
+<path d="M48 116H92" stroke="CanvasText" stroke-width="3"/><circle cx="70" cy="116" r="5" fill="CanvasText"/>
+<text x="108" y="122" font-size="17">Gleichmäßige Verschiebung: A4 = 432 Hz</text>
+<path d="M48 150H92" stroke="CanvasText" stroke-width="3" stroke-dasharray="8 6"/><rect x="65" y="145" width="10" height="10" fill="Canvas" stroke="CanvasText" stroke-width="2"/>
+<text x="108" y="156" font-size="17">Gleicher Median, ungleichmäßige Töne</text>
+<path d="M104 223H824" stroke="CanvasText" stroke-opacity="0.2" stroke-dasharray="3 5"/>
+<text x="86" y="229" text-anchor="end" font-size="16">0</text>
+<path d="M104 268H824" stroke="CanvasText" stroke-opacity="0.2"/>
+<text x="86" y="274" text-anchor="end" font-size="16">-10</text>
+<path d="M104 313H824" stroke="CanvasText" stroke-opacity="0.2"/>
+<text x="86" y="319" text-anchor="end" font-size="16">-20</text>
+<path d="M104 358H824" stroke="CanvasText" stroke-opacity="0.2"/>
+<text x="86" y="364" text-anchor="end" font-size="16">-30</text>
+<path d="M104 403H824" stroke="CanvasText" stroke-opacity="0.2"/>
+<text x="86" y="409" text-anchor="end" font-size="16">-40</text>
+<path d="M104 448H824" stroke="CanvasText" stroke-opacity="0.2"/>
+<text x="86" y="454" text-anchor="end" font-size="16">-50</text>
+<path d="M104 493H824" stroke="CanvasText" stroke-opacity="0.2"/>
+<text x="86" y="499" text-anchor="end" font-size="16">-60</text>
+<text x="104" y="524" text-anchor="middle" font-size="18">C4</text>
+<text x="248" y="524" text-anchor="middle" font-size="18">D4</text>
+<text x="392" y="524" text-anchor="middle" font-size="18">E4</text>
+<text x="536" y="524" text-anchor="middle" font-size="18">G4</text>
+<text x="680" y="524" text-anchor="middle" font-size="18">A4</text>
+<text x="824" y="524" text-anchor="middle" font-size="18">C5</text>
+<polyline data-series="uniform" points="104,365.95 248,365.95 392,365.95 536,365.95 680,365.95 824,365.95" fill="none" stroke="CanvasText" stroke-width="3"/>
+<circle cx="104" cy="365.95" r="5" fill="CanvasText"/>
+<circle cx="248" cy="365.95" r="5" fill="CanvasText"/>
+<circle cx="392" cy="365.95" r="5" fill="CanvasText"/>
+<circle cx="536" cy="365.95" r="5" fill="CanvasText"/>
+<circle cx="680" cy="365.95" r="5" fill="CanvasText"/>
+<circle cx="824" cy="365.95" r="5" fill="CanvasText"/>
+<polyline data-series="uneven" points="104,365.95 248,365.95 392,446.95 536,365.95 680,284.95 824,365.95" fill="none" stroke="CanvasText" stroke-width="3" stroke-dasharray="8 6"/>
+<rect x="99" y="360.95" width="10" height="10" fill="Canvas" stroke="CanvasText" stroke-width="2"/>
+<rect x="243" y="360.95" width="10" height="10" fill="Canvas" stroke="CanvasText" stroke-width="2"/>
+<rect x="387" y="441.95" width="10" height="10" fill="Canvas" stroke="CanvasText" stroke-width="2"/>
+<rect x="531" y="360.95" width="10" height="10" fill="Canvas" stroke="CanvasText" stroke-width="2"/>
+<rect x="675" y="279.95" width="10" height="10" fill="Canvas" stroke="CanvasText" stroke-width="2"/>
+<rect x="819" y="360.95" width="10" height="10" fill="Canvas" stroke="CanvasText" stroke-width="2"/>
+<text x="48" y="560" font-size="17">Rechenbeispiel, keine aufgenommenen Klaviermessungen.</text>
+</g>
+</svg>
