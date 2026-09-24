@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { mkdir, open, readFile, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { allPosts } from "content-collections";
+import sharp from "sharp";
 import { z } from "zod";
 import { postId } from "@/lib/posts";
 
@@ -15,6 +16,7 @@ const requestSchema = z.object({
 
 const MAX_BODY_BYTES = 1024;
 const MAX_CLOCK_SKEW_SECONDS = 300;
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 
 function reply(status: number, result: string) {
   return Response.json({ result }, {
@@ -83,6 +85,41 @@ async function writeMarker(path: string, marker: Marker) {
   await rename(temporary, path);
 }
 
+async function loadOgImage(path: string): Promise<string> {
+  const origin = new URL(`http://127.0.0.1:${process.env.PORT || "3000"}`);
+  const url = new URL(path, origin);
+  if (url.origin !== origin.origin) throw new Error("OG image must be local");
+  const response = await fetch(url, {
+    cache: "no-store",
+    redirect: "error",
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!response.ok || !response.headers.get("content-type")?.startsWith("image/")) {
+    throw new Error("OG image unavailable");
+  }
+  const declaredSize = Number(response.headers.get("content-length") || 0);
+  if (declaredSize > MAX_IMAGE_BYTES) throw new Error("OG image too large");
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error("OG image has no body");
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > MAX_IMAGE_BYTES) {
+      await reader.cancel();
+      throw new Error("OG image too large");
+    }
+    chunks.push(value);
+  }
+  const jpeg = await sharp(Buffer.concat(chunks), { limitInputPixels: 40_000_000 })
+    .flatten({ background: "#ffffff" })
+    .jpeg({ quality: 88 })
+    .toBuffer();
+  return jpeg.toString("base64");
+}
+
 export async function POST(request: Request) {
   const signingSecret = process.env.BLOG_STATUS_WEBHOOK_SECRET;
   const apiKey = process.env.WAHA_API_KEY;
@@ -118,6 +155,15 @@ export async function POST(request: Request) {
   const publishedAt = Date.parse(post.publishedAt);
   if (!Number.isFinite(publishedAt) || publishedAt > Date.now()) {
     return reply(422, "post_not_published");
+  }
+
+  const german = post._meta.path.endsWith("/de");
+  const ogImagePath = post.image || "/blog/og/" + input.slug + (german ? "/de" : "");
+  let imageData: string;
+  try {
+    imageData = await loadOgImage(ogImagePath);
+  } catch {
+    return reply(503, "og_image_unavailable");
   }
 
   const origin = new URL(baseUrl);
@@ -165,15 +211,15 @@ export async function POST(request: Request) {
     throw error;
   }
 
-  const path = "/blog/" + input.slug + (post._meta.path.endsWith("/de") ? "/de" : "");
-  const text = "Neuer Blogbeitrag\n\n" + post.title + "\n\nhttps://livvux.dev" + path;
+  const path = "/blog/" + input.slug + (german ? "/de" : "");
+  const caption = "Neuer Blogbeitrag\n\n" + post.title + "\n\nhttps://livvux.dev" + path;
   try {
     const response = await fetch(
-      new URL(api.pathname + "/status/text", origin),
+      new URL(api.pathname + "/status/image", origin),
       {
         method: "POST",
         headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ file: { mimetype: "image/jpeg", data: imageData }, caption }),
         cache: "no-store",
         signal: AbortSignal.timeout(30_000),
       },

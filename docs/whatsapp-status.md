@@ -2,8 +2,12 @@
 
 Adding the first `content/<slug>/en.mdx` or `de.mdx` file on `main` starts the
 GitHub Actions workflow. It waits until the deployed app contains the post,
-then sends one text status with its title and URL through WAHA. Existing posts,
+then sends one image status through WAHA. The image is the post's Open Graph
+image, converted to JPEG for WhatsApp; its caption contains the title and URL.
+The German post is preferred when both translations exist. Existing posts,
 edits, and later translations do not trigger a status.
+If the OG image cannot be loaded or converted, the bridge returns `503` before
+creating a delivery marker; the workflow retries instead of posting text only.
 
 The workflow signs each request with `BLOG_STATUS_WEBHOOK_SECRET` (GitHub Actions
 secret). The same value must be set in the Dokploy app, alongside
