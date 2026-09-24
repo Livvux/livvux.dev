@@ -2,11 +2,13 @@
 
 Adding the first `content/<slug>/en.mdx` or `de.mdx` file on `main` starts the
 GitHub Actions workflow. It waits until the deployed app contains the post,
-then sends one text status containing the post URL through WAHA. Link preview
-is explicitly requested, so WhatsApp can use the post's Open Graph title,
-description, and image. If preview generation fails, the URL remains the main
-content of the status. The German post is preferred when both translations
-exist. Existing posts, edits, and later translations do not trigger a status.
+then sends two consecutive statuses through WAHA: first the post's Open Graph
+image (converted to JPEG), then a text status with the post URL. WhatsApp does
+not reliably display link-preview images inside text statuses, so the image is
+sent separately; the second card keeps the link readable and tappable. The
+image caption also contains the URL as a fallback. The German post is preferred
+when both translations exist. Existing posts, edits, and later translations do
+not trigger a status.
 
 The workflow signs each request with `BLOG_STATUS_WEBHOOK_SECRET` (GitHub Actions
 secret). The same value must be set in the Dokploy app, alongside
@@ -17,10 +19,12 @@ secret). The same value must be set in the Dokploy app, alongside
 dashboard needs a public port.
 
 The marker volume prevents duplicate statuses across workflow reruns and app
-deployments. When WAHA accepts a status, the marker becomes `sent`. If the
-request outcome is ambiguous, it becomes `uncertain` and automatic retries
-stop; inspect WAHA and the marker before deciding whether to resend. Deleting
-or editing a marker without checking the account can post a duplicate.
+deployments. After the image is accepted, the marker becomes `image_sent`; after
+the link is accepted, it becomes `sent`. If a request outcome is ambiguous, it
+becomes `uncertain` and automatic retries stop; inspect WAHA and the marker
+before deciding whether to resend. Deleting or editing a marker without
+checking the account can post duplicate cards. If the OG image cannot be loaded
+or converted, the bridge returns `503` before creating a marker.
 
 The bridge returns `401` for unsigned requests. Workflow retries `404`, `425`
 (post not deployed yet), and `503` (temporary configuration/session issue) for
