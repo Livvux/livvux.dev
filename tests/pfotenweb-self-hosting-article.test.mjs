@@ -81,7 +81,8 @@ for (const [lang, content] of Object.entries(articles)) {
     assert.match(commands, /trap 'sudo docker compose start app' EXIT/);
     assert.match(commands, /pg_dump[^\n]+database\.dump/);
     assert.match(commands, /\/data\/uploads[^\n]+uploads\.tar\.gz/);
-    assert.match(commands, /scp -r SERVER_USER@SERVER_IP/);
+    assert.match(commands, /scp -r SERVER_USER@SERVER_IP:~\/pfotenweb-backups/);
+    assert.match(commands, /backup_dir="\$HOME\/pfotenweb-backups\//, 'Backups must stay outside the Docker build context');
     assert.match(commands, /Suites: noble/);
     assert.doesNotMatch(commands, /import_archives|IMPORT_ARCHIVE_DIR/, 'No unreleased volume in the v1.0.1 recipe');
     const env = examples.find((b) => b.language === 'dotenv')?.code;

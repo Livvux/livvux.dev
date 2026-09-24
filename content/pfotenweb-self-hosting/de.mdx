@@ -290,13 +290,13 @@ Fragen Sie Ihren E-Mail-Anbieter nach Servername, Port, Verschlüsselung, Benutz
 
 Tiere und Nachrichten liegen in der Datenbank, Fotos in einem getrennten Upload-Bereich. **Sie brauchen beides.** Eine Kopie des Programmcodes von GitHub ist keine Sicherung Ihrer Vereinsinhalte.[^compose]
 
-Die folgende manuelle Sicherung stoppt die App kurz, damit Datenbank und Bilder zusammenpassen. Sie erstellt einen Ordner mit Zeitstempel und startet die App beim Verlassen des Blocks wieder. Führen Sie den Block auf dem Server im Ordner `~/pfotenweb` aus:
+Die folgende manuelle Sicherung stoppt die App kurz, damit Datenbank und Bilder zusammenpassen. Sie erstellt einen Ordner mit Zeitstempel unter `~/pfotenweb-backups`, **außerhalb des Projektordners**. So gelangen private Sicherungen nicht versehentlich in einen späteren Docker-Build. Beim Verlassen des Blocks wird die App wieder gestartet. Führen Sie den Block auf dem Server im Ordner `~/pfotenweb` aus:
 
 ```bash
 (
   set -eu
   umask 077
-  backup_dir="backup/$(date +%Y%m%d-%H%M%S)"
+  backup_dir="$HOME/pfotenweb-backups/$(date +%Y%m%d-%H%M%S)"
   mkdir -p "$backup_dir"
   sudo -v
   trap 'sudo docker compose start app' EXIT
@@ -316,7 +316,7 @@ Prüfen Sie, ob der Vorgang ohne Fehler beendet wurde und Ihre Website wieder er
 Kopieren Sie die Sicherung vom Server weg. Öffnen Sie dafür ein **neues Terminal auf Ihrem eigenen Computer**. Dieser Befehl kopiert den Backup-Ordner einschließlich der darin enthaltenen versteckten Einstellungsdatei:
 
 ```bash
-scp -r SERVER_USER@SERVER_IP:~/pfotenweb/backup ./pfotenweb-backups
+scp -r SERVER_USER@SERVER_IP:~/pfotenweb-backups ./pfotenweb-backups
 ```
 
 Ersetzen Sie wieder die Zugangsdaten. Schützen Sie Ihren Computer und bewahren Sie die Sicherung verschlüsselt auf. Sie enthält persönliche Anfragen und Geheimnisse aus `.env`. Ein zweiter Ordner auf demselben Server hilft nicht, wenn dieser Server verloren geht.
@@ -364,7 +364,7 @@ Das Ziel ist nicht, zum Server-Spezialisten zu werden. Es geht darum, eine hilfr
 *Abgeglichen mit den verlinkten v1.0.1-Dateien und der offiziellen Docker-/Caddy-Dokumentation am 24. September 2026. Die Anleitung wurde anhand der Quellen geprüft; für diesen Artikel wurde keine neue produktive Serverinstallation durchgeführt.*
 
 [^edition]: [Pfotenweb v1.0.1: Installation, Umfang und Wartung](https://github.com/Livvux/pfotenweb/blob/v1.0.1/README.md).
-[^compose]: [Compose-Datei des Releases](https://github.com/Livvux/pfotenweb/blob/v1.0.1/compose.yaml) und [Dockerfile](https://github.com/Livvux/pfotenweb/blob/v1.0.1/Dockerfile).
+[^compose]: [Compose-Datei des Releases](https://github.com/Livvux/pfotenweb/blob/v1.0.1/compose.yaml), [Dockerfile](https://github.com/Livvux/pfotenweb/blob/v1.0.1/Dockerfile) und [Build-Ausschlüsse](https://github.com/Livvux/pfotenweb/blob/v1.0.1/.dockerignore).
 [^release]: [Veröffentlichtes Release v1.0.1](https://github.com/Livvux/pfotenweb/releases/tag/v1.0.1).
 [^docker]: [Docker Engine auf Ubuntu installieren, einschließlich Firewall-Hinweisen](https://docs.docker.com/engine/install/ubuntu/).
 [^https]: [Caddy: Voraussetzungen für automatisches HTTPS](https://caddyserver.com/docs/automatic-https).

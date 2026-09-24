@@ -21,6 +21,7 @@ release, not against unreleased changes on `main`.
 - Release README: https://github.com/Livvux/pfotenweb/blob/v1.0.1/README.md
 - Compose: https://github.com/Livvux/pfotenweb/blob/v1.0.1/compose.yaml
 - Build: https://github.com/Livvux/pfotenweb/blob/v1.0.1/Dockerfile
+- Build exclusions: https://github.com/Livvux/pfotenweb/blob/v1.0.1/.dockerignore
 - Configuration: https://github.com/Livvux/pfotenweb/blob/v1.0.1/.env.example
 - First-run setup: https://github.com/Livvux/pfotenweb/blob/v1.0.1/scripts/setup.ts
 - Import boundary: https://github.com/Livvux/pfotenweb/blob/main/README.md
@@ -71,8 +72,11 @@ The 2-vCPU / 4-GB / 40-GB suggestion is an explicitly unbenchmarked editorial
 planning estimate, not an upstream minimum or a capacity claim. Automatic HTTPS
 still requires correct public DNS and reachable, available ports 80/443.
 
-The backup example adds a timestamp, restrictive permissions and an EXIT trap to
-restart the app. It performs only basic file checks. Off-server encrypted storage
+The backup example writes to `~/pfotenweb-backups`, outside the project and Docker
+build context. The released `.dockerignore` does not exclude a `backup` directory;
+keeping archives beside the Dockerfile risks including private data in a build.
+The example adds a timestamp, restrictive permissions and an EXIT trap to restart
+the app. It performs only basic file checks. Off-server encrypted storage
 and a separate restoration test remain necessary. No destructive restore command
 is offered as a beginner copy-and-paste operation.
 

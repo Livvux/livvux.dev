@@ -286,13 +286,13 @@ Use the provider's exact combination of port and encryption; do not guess. Send 
 
 Your animals and messages live in the database; their photos live in a separate upload area. **You need both.** A GitHub copy of the application is not a backup of your rescue's content.[^compose]
 
-The following manual backup briefly stops the app so its database and photos stay consistent. It uses a timestamped folder and arranges for the app to start again when the block exits. Run it on the server, inside `~/pfotenweb`:
+The following manual backup briefly stops the app so its database and photos stay consistent. It uses a timestamped folder under `~/pfotenweb-backups`, **outside the project folder**, so private backups are not accidentally included in a later Docker build. It arranges for the app to start again when the block exits. Run it on the server, inside `~/pfotenweb`:
 
 ```bash
 (
   set -eu
   umask 077
-  backup_dir="backup/$(date +%Y%m%d-%H%M%S)"
+  backup_dir="$HOME/pfotenweb-backups/$(date +%Y%m%d-%H%M%S)"
   mkdir -p "$backup_dir"
   sudo -v
   trap 'sudo docker compose start app' EXIT
@@ -312,7 +312,7 @@ Check that it finished without errors and your website is back. The checks above
 Copy the backup off the server. In a **new terminal on your own computer**, this copies the backup folder, including its hidden settings file:
 
 ```bash
-scp -r SERVER_USER@SERVER_IP:~/pfotenweb/backup ./pfotenweb-backups
+scp -r SERVER_USER@SERVER_IP:~/pfotenweb-backups ./pfotenweb-backups
 ```
 
 Replace the login details again. Protect your computer and keep the backup in encrypted storage: it contains personal enquiries and your `.env` secrets. A second folder on the same server does not protect against losing that server.
@@ -360,7 +360,7 @@ The goal is not to become a server specialist. It is to get a useful website onl
 *Checked against the linked v1.0.1 files and official Docker/Caddy documentation on 24 September 2026. This is a source-reviewed walkthrough, not a claim that a new production deployment was performed for this article.*
 
 [^edition]: [Pfotenweb v1.0.1: installation, scope and maintenance](https://github.com/Livvux/pfotenweb/blob/v1.0.1/README.md).
-[^compose]: [The release's Compose file](https://github.com/Livvux/pfotenweb/blob/v1.0.1/compose.yaml) and [Dockerfile](https://github.com/Livvux/pfotenweb/blob/v1.0.1/Dockerfile).
+[^compose]: [The release's Compose file](https://github.com/Livvux/pfotenweb/blob/v1.0.1/compose.yaml), [Dockerfile](https://github.com/Livvux/pfotenweb/blob/v1.0.1/Dockerfile) and [build exclusions](https://github.com/Livvux/pfotenweb/blob/v1.0.1/.dockerignore).
 [^release]: [Published release v1.0.1](https://github.com/Livvux/pfotenweb/releases/tag/v1.0.1).
 [^docker]: [Docker Engine installation on Ubuntu, including firewall limitations](https://docs.docker.com/engine/install/ubuntu/).
 [^https]: [Caddy: requirements for automatic HTTPS](https://caddyserver.com/docs/automatic-https).
