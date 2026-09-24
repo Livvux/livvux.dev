@@ -1,0 +1,67 @@
+name: External links
+
+on:
+  pull_request:
+    paths:
+      - 'src/app/**'
+      - 'src/components/**'
+      - 'src/data/resume.tsx'
+      - 'src/lib/external-links.ts'
+      - 'src/lib/remark-content-links.ts'
+      - 'src/mdx-components.tsx'
+      - 'content/**'
+      - 'content-collections.ts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'tests/external-links.test.mjs'
+      - '.github/workflows/external-links.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: external-links-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test URL classification, rel attributes and MDX anchors
+        run: node --experimental-strip-types --test tests/external-links.test.mjs
+      - uses: pnpm/action-setup@v4
+      - name: Install existing dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint changed application files
+        run: >-
+          pnpm exec eslint content-collections.ts src/mdx-components.tsx
+          src/lib/external-links.ts src/lib/remark-content-links.ts
+          src/components/content-link.tsx src/components/project-card.tsx
+          src/components/navbar.tsx src/app/page.tsx tests/external-links.test.mjs
+      - name: Build the site and compile all MDX articles
+        run: pnpm build
+      - name: Verify links in production HTML, including English and German articles
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm start > /tmp/external-links-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          ready=false
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:3000/ >/dev/null; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" != true ]; then
+            cat /tmp/external-links-next.log
+            exit 1
+          fi
+          EXTERNAL_LINKS_BASE_URL=http://localhost:3000 node --experimental-strip-types --test tests/external-links.test.mjs

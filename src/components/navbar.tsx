@@ -8,6 +8,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { DATA } from "@/data/resume";
+import { isExternalHref } from "@/lib/external-links";
 import { Link2 } from "lucide-react";
 
 export default function Navbar() {
@@ -15,7 +16,7 @@ export default function Navbar() {
     <div className="pointer-events-none fixed inset-x-0 bottom-4 z-30">
       <Dock className="z-50 pointer-events-auto relative h-14 p-2 w-fit max-w-[calc(100vw-2rem)] mx-auto flex justify-start gap-1 overflow-x-auto sm:justify-center sm:gap-2 sm:overflow-visible border bg-card/90 backdrop-blur-3xl shadow-[0_0_10px_3px] shadow-primary/5">
         {[...DATA.navbar, { href: "/tools", label: "Tools", icon: Link2 }].map((item) => {
-          const isExternal = item.href.startsWith("http");
+          const isExternal = isExternalHref(item.href);
           return (
             <Tooltip key={item.href}>
               <TooltipTrigger asChild>
@@ -48,7 +49,7 @@ export default function Navbar() {
         {Object.entries(DATA.contact.social)
           .filter(([_, social]) => social.navbar)
           .map(([name, social], index) => {
-            const isExternal = social.url.startsWith("http");
+            const isExternal = isExternalHref(social.url);
             const IconComponent = social.icon;
             return (
               <Tooltip key={`social-${name}-${index}`}>

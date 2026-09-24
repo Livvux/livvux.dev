@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { ContentLink } from "@/components/content-link";
+import { getExternalLinkProps } from "@/lib/external-links";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
@@ -64,8 +66,7 @@ export function ProjectCard({
       <div className="relative shrink-0">
         <Link
           href={href || "#"}
-          target="_blank"
-          rel="noopener noreferrer"
+          {...getExternalLinkProps(href)}
           className="block"
         >
           {video ? (
@@ -89,8 +90,7 @@ export function ProjectCard({
               <Link
                 href={link.href}
                 key={idx}
-                target="_blank"
-                rel="noopener noreferrer"
+                {...getExternalLinkProps(link.href)}
                 onClick={(e) => e.stopPropagation()}
               >
                 <Badge
@@ -113,8 +113,7 @@ export function ProjectCard({
           </div>
           <Link
             href={href || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
+            {...getExternalLinkProps(href)}
             className="text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
             aria-label={`Open ${title}`}
           >
@@ -122,7 +121,7 @@ export function ProjectCard({
           </Link>
         </div>
         <div className="text-xs flex-1 prose max-w-full text-pretty font-sans leading-relaxed text-muted-foreground dark:prose-invert">
-          <Markdown>{description}</Markdown>
+          <Markdown components={{ a: ContentLink }}>{description}</Markdown>
         </div>
         {tags && tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-auto">
