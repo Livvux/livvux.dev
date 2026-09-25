@@ -1,0 +1,55 @@
+name: Screen recorder comparison
+
+on:
+  pull_request:
+    paths:
+      - 'content/screen-recorders-recordly-screendrop-screen-studio-cap/**'
+      - 'docs/screen-recorder-comparison-sources.md'
+      - 'tests/screen-recorder-comparison.test.mjs'
+      - '.github/workflows/screen-recorder-comparison.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: screen-recorder-article-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check article structure, evidence parity and arithmetic
+        run: node --test tests/screen-recorder-comparison.test.mjs
+      - uses: pnpm/action-setup@v4
+      - name: Install existing dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build site and compile both MDX articles
+        run: pnpm build
+      - name: Type check
+        run: pnpm exec tsc --noEmit
+      - name: Check actual article routes, metadata and external links
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm start > /tmp/screen-recorder-article-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          ready=false
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:3000/blog/screen-recorders-recordly-screendrop-screen-studio-cap >/dev/null; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" != true ]; then
+            cat /tmp/screen-recorder-article-next.log
+            exit 1
+          fi
+          ARTICLE_BASE_URL=http://localhost:3000 node --test tests/screen-recorder-comparison.test.mjs
