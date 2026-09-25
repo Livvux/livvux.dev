@@ -1,0 +1,168 @@
+---
+title: "Recordly vs Screendrop vs Screen Studio vs Cap: My Pick"
+publishedAt: "2026-09-25"
+author: "Livvux"
+summary: "Four screen recorders, different priorities. My comparison of editing, exports, pricing, open source, privacy and sharing—and which one I would choose."
+---
+
+**I want to show what I built. Not become a video editor first.**
+
+A useful recording explains something. A bug. A feature. A change a client needs to approve. Nice backgrounds are welcome. They are not the point.
+
+That is how I would choose between [Recordly](https://recordly.dev/), [Screendrop](https://github.com/fayazara/Screendrop), [Screen Studio](https://screen.studio/) and [Cap](https://cap.so/): how much work sits between having something to show and the other person understanding it?
+
+There are two different jobs here. Producing a finished video. And sending someone a useful recording with a link. Mixing them produces a bad comparison.
+
+*Checked September 25, 2026. This is a comparison of official documentation, pricing and release notes, not a hands-on benchmark of all four apps. Recommendations are my assessment of those capabilities. I have not measured export speed, resource usage or transcription accuracy. Current repository documentation can be ahead of a downloadable release; an undocumented feature is not necessarily absent.*
+
+## My recommendation first
+
+| What I need | What I would try first | Why |
+| --- | --- | --- |
+| Client updates, bug reports and occasional polished demos | **Cap** | Local editing and link-first communication in one product |
+| A paid Mac app specifically for product videos | **Screen Studio** | A focused recording-to-presentation workflow |
+| Free, locally edited demos across operating systems | **Recordly** | Presentation tools without a paid app tier |
+| Screenshots, recordings and locally generated transcripts on a recent Mac | **Screendrop** | A broader capture toolbox with optional self-hosted sharing |
+
+These are priorities, not performance scores. The features behind them—and the catches—are below.
+
+**Without another requirement, I would start with Cap.** Not because it wins every category. Because the distinction between its recording modes maps well to the work I would use it for. Screen Studio would be my first paid comparison for a launch video.
+
+## Platforms and the versions behind this comparison
+
+| Tool | Platform requirements or availability | Latest release listed when checked |
+| --- | --- | --- |
+| Recordly | macOS 14+; Windows 10 build 19041+ for native capture; modern Linux | 1.4.0, September 8, 2026 |
+| Screendrop | macOS 26.4+ | 0.33.0, September 22, 2026 |
+| Screen Studio | macOS 13.1+; Apple Silicon recommended, supported Intel Macs also listed | 3.7.5-4595, August 5, 2026 |
+| Cap | macOS, Windows and Linux downloads; macOS 13.1+ recommended; Windows download marked beta | Desktop 0.6.0, August 31, 2026 |
+
+Sources: [Recordly requirements](https://github.com/webadderallorg/Recordly#system-requirements) and [release](https://github.com/webadderallorg/Recordly/releases/tag/v1.4.0), [Screendrop requirements](https://github.com/fayazara/Screendrop#requirements) and [releases](https://github.com/fayazara/Screendrop/releases), [Screen Studio requirements](https://screen.studio/guide/system-requirements) and [changelog](https://screen.studio/changelog), [Cap downloads](https://cap.so/download) and [changelog](https://cap.so/changelog).
+
+The big filter is Screendrop's macOS requirement. Check that before comparing features. Also, “cross-platform” does not promise identical capture behavior. Recordly documents Linux cursor limitations, while Cap's release notes distinguish Windows and Linux fixes from macOS-specific features.
+
+## Recordly: free demos, with platform caveats
+
+Recordly interests me because it puts the presentation work next to the recording. Its [official site](https://recordly.dev/) describes automatic zoom, a smoothed cursor, changing webcam overlays, styled backgrounds and a timeline. You can adjust speed, add annotations and audio, then export MP4 or GIF. It is offered free, without paid feature tiers.
+
+That is a compelling starting point for showing an app. I would rather try a free editor on a real example than buy an alternative because its landing page looks expensive.
+
+The important caveat is capture behavior. Recordly's [limitations](https://github.com/webadderallorg/Recordly#limitations) say Linux cannot hide the original cursor. Adding its styled cursor can therefore produce **two cursors**. Linux system audio generally needs PipeWire. That is much more useful to know than a generic “Linux supported” checkmark.
+
+Its [1.4.0 release notes](https://github.com/webadderallorg/Recordly/releases/tag/v1.4.0) mention fixes for Windows audio and automatic captions, window recording and washed-out colors. They also tell Windows and Linux users to install that release manually because an older update prompt could be invisible. Captions therefore should not be marked simply “missing”; I could not verify the caption engine's processing location from the material checked.
+
+I would choose Recordly when the deliverable is a video file and I am happy to handle distribution separately. I did not find a documented hosted team-review system equivalent to Cap's. That is a scope distinction, not proof that no sharing integration exists.
+
+## Screendrop: more than a screenshot app
+
+Screendrop is the one I would examine when several capture utilities are starting to overlap. Its [README](https://github.com/fayazara/Screendrop) covers screenshots, annotations, OCR, redaction and a capture library alongside recording. It is a native Mac app, with local transcription and no mandatory central cloud account for local capture.
+
+Its recording side is not just an extra record button. The [Recording Studio release](https://github.com/fayazara/Screendrop/releases/tag/v0.30.0) documents separate screen, camera, audio and interaction data; editable cuts and speed; automatic zooms; reconstructed cursor movement; and keystroke captions. Keeping those elements editable matters more to me than adding another decorative frame.
+
+There is also transcript-based editing and a teleprompter in the [documented workflow](https://github.com/fayazara/Screendrop#screen-recording). That combination is interesting for narrated walkthroughs: correct the explanation, then clean up the presentation.
+
+The [0.32.0 release](https://github.com/fayazara/Screendrop/releases/tag/v0.32.0) added a unified library, Metal-assisted export and explicit 30/60 fps controls. Its performance improvement is the maintainer's claim, not evidence that it exports faster than these competitors. The current [release history](https://github.com/fayazara/Screendrop/releases) also confirms MP4 export, added in 0.30.1.
+
+My reservation is practical: the project explicitly warns about active development and rough edges, and requires a very recent macOS version. I would test a complete capture–edit–reopen–export cycle before relying on it for an important recording. I like its direction. That is not the same as promising release stability.
+
+## Screen Studio: my paid Mac demo candidate
+
+Screen Studio has the clearest appeal when the finished video is the product. Its [guide](https://screen.studio/guide) brings together automatic and manual zoom, cursor styling, cuts, faster typing segments, masks, camera layouts, background music and reusable presets. It also documents iPhone and iPad recording, which is relevant when a demo crosses desktop and mobile.
+
+That is the experience I would pay for: fewer presentation decisions between recording and publishing. Not a promise that paying automatically makes an explanation good.
+
+A useful detail is [caption processing](https://screen.studio/guide/captions). The documented engines run locally: Whisper, or Apple Speech Recognition on macOS 26+. **Captions use microphone voiceover, not arbitrary system audio.** A recorded browser video is therefore not automatically covered by the same caption workflow.
+
+[Exports](https://screen.studio/guide/explanation-of-export-settings) include MP4 and GIF with resolution and frame-rate controls. The product advertises up to 4K/60 fps; that describes an output option, not measured sustained recording performance on every Mac.
+
+It also has hosted [shareable links](https://screen.studio/guide/shareable-links) and comments. Calling it “local files only” would be wrong. The documented **30-minute maximum concerns shared recordings**, not a blanket limit on locally recorded or exported videos.
+
+My trade-off is the subscription and Mac-only availability. The [activation guide](https://screen.studio/guide/activating-screen-studio) explicitly separates subscriptions from legacy one-time licenses. Old lifetime-price comparisons are not a reliable buying guide for new customers.
+
+## Cap: the all-rounder I would start with
+
+Cap's main advantage for me is not one effect. It is that its two modes have different purposes.
+
+[Studio Mode](https://cap.so/features/studio-mode) records locally and gives you an editor before export or sharing. [Instant Mode](https://cap.so/features/instant-mode) uploads while recording so the link is ready when you stop. A client update and a launch demo do not need the same amount of preparation.
+
+Cap is also no longer accurately described as just a basic Loom-style recorder. The [0.6.0 changelog](https://cap.so/changelog) includes more track controls, images, animated text, color correction and microphone noise reduction. It separately introduces an **optional GPUI native-app preview**. I would not silently treat every preview feature as the default, equally mature experience on every platform.
+
+For collaboration, Cap documents [comments, transcripts, analytics and storage choices](https://github.com/CapSoftware/Cap). Its paid cloud offering adds password-protected shares, custom domains and richer team workflows. That is why I would start here for everyday communication rather than immediately assemble an editor, file host and feedback tool.
+
+Developers also get [agent and automation documentation](https://cap.so/docs): the product has a CLI and API workflows. Useful when a recording belongs in a repeatable process. Unnecessary complexity when all I need is one video.
+
+The catch is the commercial-use distinction. **The official free desktop build is for personal use.** Client work needs a paid desktop license or Pro under Cap's published policy. Its [commercial-license documentation](https://cap.so/docs/commercial-license) says this restriction applies to official builds, not a version you build yourself from source. Source licensing and the vendor's ready-made downloads are separate questions.
+
+## Capture, editing and exports side by side
+
+The table summarizes the linked product documentation above, with [Screendrop's Studio notes](https://github.com/fayazara/Screendrop/releases/tag/v0.30.0), [Screen Studio's guide](https://screen.studio/guide) and [Cap's Studio documentation](https://cap.so/features/studio-mode) covering the editing workflows. “Not verified” is deliberate.
+
+| Capability | Recordly | Screendrop | Screen Studio | Cap |
+| --- | --- | --- | --- | --- |
+| Capture target | Display, window; crop in editor | Display, window, area | Display, window, area | Display, window, area |
+| Camera, microphone, system audio | Yes; OS caveats | Yes; separate tracks | Yes | Yes; mode/platform differences |
+| Zoom and cursor presentation | Auto suggestions, manual control | Auto/manual, cursor reconstruction | Auto/manual, cursor styling | Auto/manual in Studio |
+| Cuts, speed, backgrounds | Yes | Yes | Yes | Yes in Studio |
+| Dedicated screenshot workflow | Not verified as a comparable toolbox | A major part of the app | Copy a video frame; not its main purpose | Screenshots and drawing documented |
+| Captions | Release notes confirm them; engine not verified | On-device; transcript editing | Local; microphone voiceover | Hosted transcription/AI in Pro; transcript editing on web |
+| Export | MP4, GIF | MP4; 30/60 fps controls | MP4, GIF; up to 4K/60 | MP4, GIF; up to 4K/60 in Studio |
+
+I could not verify an equivalent GIF export for Screendrop or one universal resolution/frame-rate ceiling for Recordly. I will not fill those cells with assumptions. The [Cap web changelog](https://cap.so/changelog) documents transcript editing separately from desktop editing.
+
+## What they actually cost
+
+These are displayed USD prices checked on the date above, without currency conversion or promotional offers. Annual totals below are arithmetic, not additional plans. Check checkout for the final amount and applicable taxes.
+
+| Product or plan | Price | What I am paying for |
+| --- | --- | --- |
+| Recordly | Free | Desktop app; no paid tier advertised |
+| Screendrop | Free | Desktop app; optional hosting has its own costs |
+| Screen Studio monthly | $29/month | Subscription; $348 over 12 monthly payments |
+| Screen Studio yearly | $9/month, billed yearly | $108/year |
+| Cap Desktop | $29/year **or $58 once** | Commercial desktop use without a Pro subscription |
+| Cap Pro monthly | $12/user/month | Desktop rights plus cloud features; $144/user over 12 months |
+| Cap Pro yearly | $8.16/user/month, billed annually | $97.92/user/year |
+
+Sources: [Recordly](https://recordly.dev/), [Screendrop](https://github.com/fayazara/Screendrop), [Screen Studio pricing](https://screen.studio/#pricing) and [Cap pricing](https://cap.so/pricing).
+
+Cap Pro already includes the desktop license; do not add the two prices. The Desktop card includes 20 cloud links per month, up to five minutes each. Pro removes that sharing restriction. Free local personal recordings are described as unlimited in the same page's prose and FAQ, although one comparison-table row contradicts that. I am following the explicit policy text, not pretending the page is perfectly consistent.
+
+For local commercial work, Cap's $58 one-time option is worth noticing. For a free starting point, Recordly and Screendrop deserve a real evaluation. “Free” does not make my setup time worthless, and a subscription does not prove better output.
+
+## Privacy: local capture is not the same as private sharing
+
+I separate four things: where the recording starts, where files are stored, where speech is processed and who can open the finished link.
+
+**Cap:** Studio is the local-first path; Instant uploads during capture. Bringing your own S3 bucket is not the same as self-hosting the application. The [self-hosting guide](https://cap.so/docs/self-hosting) describes the web app, database, media server and storage, plus optional external transcription/AI providers. Hosting the app yourself does not automatically make an enabled external AI service local.
+
+**Screendrop:** The optional [Screendrop Worker](https://github.com/fayazara/screendrop-worker) runs on your Cloudflare account with R2 and D1. It supplies video pages, comments and transcripts. But the documented default is that anyone with a recording link can view it; transcript pages are described as indexable. **The upload token protects uploading. It is not viewer authentication.** Comments requiring sign-in do not make watching private.
+
+**Screen Studio:** Local caption generation does not upload your voice to a transcription service in the documented workflow. Publishing a share link is a separate cloud action. I would still examine the sharing settings before sending confidential material.
+
+**Recordly:** A locally exported file lets me choose the distribution channel. I have not independently audited the app's network traffic or caption engine. “Open source” is not a substitute for that audit.
+
+For sensitive work, I would use a clean demo account, disable unnecessary capture and test with invented data first. A redaction effect in the editor is not proof that the raw project, audio and transcript are clean too.
+
+## Open source and keeping your work
+
+My view has not changed: [code should be inspectable and reusable](/blog/code-must-be-free). Charging for convenient builds, support or hosting is compatible with that.
+
+Recordly's current repository [documents AGPL-3.0](https://github.com/webadderallorg/Recordly#license). Screendrop [returned to CC0-1.0 in 0.32.0](https://github.com/fayazara/Screendrop/releases/tag/v0.32.0) after a brief licensing change. Cap's [license section](https://github.com/CapSoftware/Cap#license) distinguishes AGPLv3 code, MIT-licensed capture/camera crate families and third-party licenses. Screen Studio is the proprietary option. Check the exact version's terms before redistributing a modified build; these are not interchangeable licenses.
+
+There is another kind of ownership: being able to reopen the job. Recordly's [project description](https://github.com/webadderallorg/Recordly#how-it-works) says `.recordly` stores a media path and editor state. Save the source media too. Screendrop's Studio preserves editable recording data. Screen Studio documents [sharing a project](https://screen.studio/guide/sharing-your-project), not just sending a rendered file. For any app, an MP4 is useful delivery, but it is not a backup of an editable timeline.
+
+## What I would test before committing
+
+I would record the same short example in the two strongest candidates: a window, some scrolling, a spoken explanation, a system sound, a camera overlay and one correction in the middle. Then cut it, export it and reopen the project.
+
+I would judge readable text, sensible zooms, audio synchronization, cursor behavior and whether the recipient can access the intended version. For a German tutorial, I would check German speech and technical names explicitly. For a long course, I would also test a long recording; a clean one-minute clip does not prove endurance.
+
+This is a proposed test, not one I have already run. I would measure time to a usable result rather than count animation presets.
+
+## My conclusion
+
+**Cap is where I would start for mixed everyday work. Screen Studio is where I would look first for a paid Mac demo workflow. Recordly is the free local-demo candidate. Screendrop is the capture toolbox I would explore on a sufficiently recent Mac.**
+
+I would not install all four permanently. Pick the main job, try the best two candidates and keep the one that makes explaining the work easier.
+
+A screen recorder should help me show the product. Not become another product I have to manage.
