@@ -1,0 +1,76 @@
+name: Sitemap
+
+on:
+  pull_request:
+    paths:
+      - 'src/app/**'
+      - 'src/lib/posts.ts'
+      - 'src/data/resume.tsx'
+      - 'content/**'
+      - 'content-collections.ts'
+      - 'next.config.mjs'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'tests/sitemap.*'
+      - '.github/workflows/sitemap.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/app/**'
+      - 'src/lib/posts.ts'
+      - 'src/data/resume.tsx'
+      - 'content/**'
+      - 'content-collections.ts'
+      - 'next.config.mjs'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'tests/sitemap.*'
+      - '.github/workflows/sitemap.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sitemap-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+      - name: Install existing dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Test sitemap and robots generation
+        run: node --test tests/sitemap.test.mjs
+      - name: Lint metadata routes and unit tests
+        run: pnpm exec eslint src/app/sitemap.ts src/app/robots.ts tests/sitemap.test.mjs
+      - name: Build the complete site
+        run: pnpm build
+      - name: Validate production XML, coverage and every listed page
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm start > /tmp/sitemap-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          ready=false
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3000/sitemap.xml >/dev/null; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" != true ]; then
+            cat /tmp/sitemap-next.log
+            exit 1
+          fi
+          SITEMAP_BASE_URL=http://127.0.0.1:3000 python3 tests/sitemap.integration.py
