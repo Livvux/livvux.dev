@@ -87,6 +87,22 @@ for (const lang of ['en', 'de']) {
     assert.match(content, /not a hands-on deployment benchmark|kein eigener Deployment-Benchmark/);
   });
 
+  test(`${lang}: copyable agent migration prompt is actionable and production-safe`, () => {
+    const prompts = [...content.matchAll(/^\`\`\`text\n([\s\S]*?)^\`\`\`$/gm)].map((match) => match[1]);
+    assert.equal(prompts.length, 1, 'Expected exactly one copyable text prompt');
+    const prompt = prompts[0];
+    assert.match(prompt, /npm install --global cf/);
+    assert.match(prompt, /cf --version/);
+    assert.match(prompt, /cf login/);
+    assert.match(prompt, /cf migrate --dry-run/);
+    assert.match(prompt, /cf migrate/);
+    assert.match(prompt, /git status --short/);
+    assert.match(prompt, /git diff --stat/);
+    assert.match(prompt, /cf build/);
+    assert.match(prompt, /cf deploy/);
+    assert.match(prompt, /production|Produktion/);
+  });
+
   test(`${lang}: publishing remains a separate command from local development`, () => {
     const blocks = codeBlocks(content);
     assert.ok(blocks.some((block) => block === 'cf init my-worker\ncd my-worker\ncf dev\n'));
@@ -130,6 +146,7 @@ if (process.env.ARTICLE_BASE_URL) {
       assert.ok(html.includes('/blog/code-must-be-free'));
       assert.ok(html.includes('https://blog.cloudflare.com/cloudflare-cf-cli-launch/'));
       assert.ok(html.includes('<pre'));
+      assert.ok(html.includes('Copy code'));
     });
   }
 }
