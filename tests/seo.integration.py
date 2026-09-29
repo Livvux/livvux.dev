@@ -85,14 +85,22 @@ class Page(HTMLParser):
             self._json = None
 
 
+def normalized_url(url):
+    # Next serializes the origin without a trailing slash. An empty root path
+    # and "/" identify the same URL; preserve all non-root paths and queries.
+    parsed = urlsplit(url)
+    return parsed._replace(path=parsed.path or "/").geturl()
+
+
 def page_at(path, canonical):
     status, headers, body = fetch(path)
     assert status == 200, (path, status)
     assert "text/html" in headers.get("Content-Type", ""), path
     page = Page(body.decode("utf-8"))
-    assert page.canonicals == [canonical], (path, page.canonicals)
+    assert len(page.canonicals) == 1, (path, page.canonicals)
+    assert normalized_url(page.canonicals[0]) == normalized_url(canonical), (path, page.canonicals)
     assert page.meta.get("description", "").strip(), path
-    assert page.meta.get("og:url") == canonical, (path, page.meta.get("og:url"))
+    assert normalized_url(page.meta.get("og:url", "")) == normalized_url(canonical), (path, page.meta.get("og:url"))
     assert page.meta.get("og:title") == page.meta.get("twitter:title"), path
     assert page.meta.get("og:description") == page.meta.get("description"), path
     for key in ("og:image", "twitter:image"):
