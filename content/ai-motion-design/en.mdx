@@ -1,0 +1,118 @@
+---
+title: "Why People Go Crazy About AI Doing Motion Design"
+publishedAt: "2026-09-29"
+author: "Livvux"
+summary: "Why AI motion design feels different: watch three creator clips from Revid's gallery, copy the 15-second showreel prompt, and see where direction still matters."
+---
+
+**The impressive part is not that AI can move a rectangle. It is that a short brief can turn into something you actually want to watch.**
+
+A headline arrives with confidence. Shapes change size, the composition shifts, and the whole thing ends before you have finished wondering how it was made. Then someone shares the prompt, and it is basically: make me a ridiculous showreel.
+
+I understand the excitement. This is a much more immediate demonstration than another screenshot of a benchmark. You do not have to understand the model to have an opinion about the result.
+
+The [Claude motion graphics gallery from Revid](https://www.revid.ai/claude-motion-graphics) is a good place to explore that reaction. It brings together creator examples, links to their original posts, and offers a way to use a video as a reference for a new one. The range is the interesting part: showreels, product launches, explainers, and small pieces of brand animation.
+
+## Watch these first
+
+These are **existing creator examples featured by Revid, not videos I generated**. The original posts are embedded below with attribution. Load a post to watch its clip; the site only loads the X widget after you choose to do so. External content may be blocked by your browser, so each example also has an original-post link. The [Revid gallery](https://www.revid.ai/claude-motion-graphics) is another place to watch them.
+
+*Motion note: the examples may contain rapid cuts and high-contrast animation. Loading a post connects your browser to X and its content providers.*
+
+### A 15-second showreel
+
+[Shared by @stephanlivera](https://x.com/stephanlivera/status/2103315922098470926), this is the short-showreel format at the centre of the gallery. Watch it once for the overall impression, then again with a different question: **where does your attention go, and what tells it to move?**
+
+<TweetEmbed id="2103315922098470926" lang="en" />
+
+### A geometric direction
+
+[Shared by @condzxyz](https://x.com/condzxyz/status/2103556754550469102), this 15-second example takes the Bauhaus-style direction identified in Revid's gallery. It is a useful comparison with the first reel: a visual vocabulary can be a more interesting constraint than simply asking for more effects.
+
+<TweetEmbed id="2103556754550469102" lang="en" />
+
+### A logo reveal with a destination
+
+[Shared by @tdinh_me](https://x.com/tdinh_me/status/2103704250329301409), this is a TypingMind logo reveal, listed at 21 seconds. The useful distinction is the brief: a logo reveal has an identity to resolve towards, rather than just a collection of things that can move.
+
+<TweetEmbed id="2103704250329301409" lang="en" />
+
+The gallery is inspiration, not a controlled test. A published clip does not reveal every attempt, reference, edit, or tool behind it. Revid also labels different tools across the collection; being featured there does not mean a clip was made inside Revid.
+
+## Why this particular AI use case hits so hard
+
+My explanation is simple: **the result is visible, the starting point feels approachable, and the possible uses are easy to imagine.**
+
+Motion design sits in an awkward place for people who build things. You might know exactly what your app does and still struggle to turn that into a decent launch video. A static screenshot is straightforward. Giving it pace, hierarchy, transitions, and a satisfying finish is a different job.
+
+A prompt-driven workflow offers a way into that job. Not automatic mastery, but a first version you can react to. There is a big psychological difference between staring at an empty timeline and deciding that an existing sequence needs a calmer opening.
+
+That is what excites me more than a claim about replacing an entire profession. A developer can explore a product announcement. A musician can sketch a visual direction for a release. A designer can test a more aggressive treatment before committing to it. These are the uses I would explore, not promises that every generated draft will be publishable.
+
+The format also makes the idea easy to share. Fifteen seconds is enough to show several decisions without asking someone to sit through a tutorial. Add a short, copyable prompt, and the demonstration becomes an invitation: try your own version.
+
+## The prompt: give it room to show off
+
+Here is the default prompt, unchanged. Use the copy button on the block, then paste it into a motion-generation workflow such as Revid's, or a coding agent with a video project configured:
+
+```text
+make a dynamic 15-second motion graphics video that shows what an incredible motion designer you are, like it's your showreel for a résumé. go all out.
+```
+
+I like this as an exploration prompt because it gives the model a duration, a format, and an attitude without prescribing every frame. A showreel is allowed to be a little excessive. That is the point.
+
+But it is not a client brief. It does not specify an audience, a message, exact wording, brand assets, an aspect ratio, or a delivery format. Two results can look completely different and still satisfy it. It is not a guarantee of reproducing any clip above, either; I have not independently established that each creator used this exact text.
+
+Start broad to find a direction. Then stop asking the model to impress you and start telling it what the video needs to communicate.
+
+For the next pass, I would use something like this:
+
+```text
+Refine the current draft into a coherent 15-second piece.
+Keep the strongest opening and use one consistent visual style.
+Use only the brand name, logo, and wording I supplied. If any are missing, ask before inventing them.
+Give each scene one clear focal point. Keep essential text readable at phone size.
+Make transitions connect ideas rather than adding effects for their own sake.
+Avoid flashing and strobe effects. Hold the final message long enough to read.
+Explain what you changed, and provide a preview before the final export.
+```
+
+This is a suggested revision brief, not a tested recipe or a built-in feature. The important change is the question: not “can you add more?”, but “can you make the decisions work together?”
+
+## It is not always AI-generated footage
+
+There is a technical distinction worth understanding. An AI-assisted motion video does not necessarily come from a model generating every pixel of a scene. A coding agent can instead write a composition that a video framework renders.
+
+[Remotion documents that workflow with coding agents](https://www.remotion.dev/docs/ai/coding-agents). In its [animation model](https://www.remotion.dev/docs/animating-properties), properties such as opacity and scale are calculated from the current frame. The model can write the instructions; the renderer follows them.
+
+Think of a title entering the frame. Its wording can remain ordinary text, while position and scale change over time. With source access, an edit can mean changing a string or a timing value rather than asking a video model to redraw the whole scene.
+
+That is one reason code-driven motion interests me as a developer. There is something concrete to inspect and adjust. It does **not** establish that every example in this article uses Remotion, or that every hosted tool exposes its source code. Revid's gallery and a local Remotion project are different routes into the broader idea.
+
+## Why Revid is a useful starting point
+
+What I like about the [Revid page](https://www.revid.ai/claude-motion-graphics) is the connection between looking and trying. Instead of guessing what “dynamic” should mean, you can start from a visible reference.
+
+Revid describes its flow as choosing a video, selecting **Use as prompt**, signing in, and adapting the prefilled request to your own idea. It says its motion director handles the scenes and rendering, with review and editing in the browser. That is its product description, not a hands-on performance test from me.
+
+I would use the reference to discuss pacing, composition, and energy—not to pass off someone else's work as my own. Bring your own message and assets. The interesting result is a new piece, not a recognisable copy with a different name pasted on top.
+
+I am deliberately not promising a particular render time, cost, or export allowance here. Check the current requirements before committing a project to any hosted tool.
+
+## A showreel is not a finished job
+
+There is still a difference between “that looks cool” and “this does the job.”
+
+For a product announcement, I would want someone to understand the feature after one viewing. For a logo reveal, I would want the identity to survive the animation. For an explainer, I would rather have a clear sequence than an impressive transition that makes the explanation harder to follow.
+
+That is where direction matters. Pause on individual frames. Check the exact text. Watch without sound. Look at the mobile version. Ask whether the most important sentence is readable, whether the ending arrives too quickly, and whether the next revision preserves what was already working.
+
+“Go all out” can get you started. Sometimes the best follow-up is “remove half of it.”
+
+My takeaway is not that motion design has become worthless. It is that the distance between having an idea and being able to evaluate a moving version of it is getting more interesting.
+
+**More people get to try. The craft still matters. And yes, some of the results are very cool.**
+
+Related: [AI, music, and creativity](/blog/ai-music-creativity-2026).
+
+*Sources checked on September 29, 2026: the linked Revid gallery, its creator attributions, and Remotion's official documentation. The clips belong to their respective creators. Their production histories and one-prompt claims have not been independently reproduced for this article.*
