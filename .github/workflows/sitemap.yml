@@ -1,10 +1,11 @@
-name: Sitemap
+name: Sitemap and SEO
 
 on:
   pull_request:
     paths:
       - 'src/app/**'
-      - 'src/lib/posts.ts'
+      - 'src/lib/**'
+      - 'src/components/**'
       - 'src/data/resume.tsx'
       - 'content/**'
       - 'content-collections.ts'
@@ -13,12 +14,14 @@ on:
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
       - 'tests/sitemap.*'
+      - 'tests/seo.*'
       - '.github/workflows/sitemap.yml'
   push:
     branches: [main]
     paths:
       - 'src/app/**'
-      - 'src/lib/posts.ts'
+      - 'src/lib/**'
+      - 'src/components/**'
       - 'src/data/resume.tsx'
       - 'content/**'
       - 'content-collections.ts'
@@ -27,6 +30,7 @@ on:
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
       - 'tests/sitemap.*'
+      - 'tests/seo.*'
       - '.github/workflows/sitemap.yml'
 
 permissions:
@@ -48,13 +52,23 @@ jobs:
       - uses: pnpm/action-setup@v4
       - name: Install existing dependencies
         run: pnpm install --frozen-lockfile
-      - name: Test sitemap and robots generation
-        run: node --test tests/sitemap.test.mjs
-      - name: Lint metadata routes and unit tests
-        run: pnpm exec eslint src/app/sitemap.ts src/app/robots.ts tests/sitemap.test.mjs
+      - name: Test sitemap, robots, metadata, and pagination
+        run: node --test tests/sitemap.test.mjs tests/seo.test.mjs
+      - name: Lint SEO changes
+        run: >-
+          pnpm exec eslint src/app/sitemap.ts src/app/robots.ts
+          src/app/layout.tsx src/app/page.tsx src/app/blog/page.tsx
+          'src/app/blog/[...slug]/page.tsx' src/app/tools/page.tsx
+          src/app/tools/crawler/page.tsx src/app/tools/internal-links/page.tsx
+          src/app/tools/internal-links/layout.tsx src/lib/seo.ts
+          src/lib/posts.ts src/lib/blog-pagination.ts
+          src/components/breadcrumbs.tsx src/components/structured-data.tsx
+          next.config.mjs tests/sitemap.test.mjs tests/seo.test.mjs
       - name: Build the complete site
         run: pnpm build
-      - name: Validate production XML, coverage and every listed page
+      - name: Check types
+        run: pnpm exec tsc --noEmit
+      - name: Validate production XML and rendered SEO across the site
         shell: bash
         run: |
           set -euo pipefail
@@ -74,3 +88,7 @@ jobs:
             exit 1
           fi
           SITEMAP_BASE_URL=http://127.0.0.1:3000 python3 tests/sitemap.integration.py
+          SEO_BASE_URL=http://127.0.0.1:3000 python3 tests/seo.integration.py
+      - name: Show server logs on failure
+        if: failure()
+        run: cat /tmp/sitemap-next.log 2>/dev/null || true

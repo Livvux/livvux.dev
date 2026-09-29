@@ -1,19 +1,18 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import { pageMetadata } from "@/lib/seo";
 import InternalLinks from "@/components/tools/internal-links";
 import styles from "@/components/tools/internal-links.module.css";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Free Internal Link Checker and Audit Tool for SEO",
   description: "Crawl your website, find weak pages, and get contextual internal link suggestions with real anchors and placements. Bring your own TypeSafe API key.",
-  alternates: { canonical: "/tools/internal-links" },
-  openGraph: { title: "Internal links tool | Livvux", description: "Audit up to 500 HTML pages and download contextual link suggestions as CSV or JSON.", url: "/tools/internal-links", type: "website" },
-};
+  path: "/tools/internal-links",
+});
 
 export default function InternalLinksPage() {
   return <main className={styles.page}>
+    <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Tools", href: "/tools" }, { name: "Internal links tool", href: "/tools/internal-links" }]} />
     <header className={styles.intro}>
-      <Link href="/tools" className={styles.brand}>Livvux / Tools</Link>
       <h1>Internal links tool</h1>
       <p className={styles.subtitle}>Crawl your site, find weak pages, and get contextual link suggestions with anchors and placement.</p>
       <p>Enter your site URL in the form below and the internal linking tool will read robots.txt and your sitemap, fetch up to 500 pages, and map existing internal links. It then uses <a href="https://typesafe.ai/" target="_blank" rel="noopener noreferrer">Jev</a> to classify each page and its search intent to recommend an internal linking structure.</p>
