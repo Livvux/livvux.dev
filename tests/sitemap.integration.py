@@ -46,7 +46,9 @@ class MetadataParser(HTMLParser):
 
 headers, xml = fetch("/sitemap.xml")
 assert headers.get_content_type() in {"application/xml", "text/xml"}, headers
-assert "utf-8" in headers.get("Content-Type", "").lower(), headers
+# XML permits an omitted HTTP charset (RFC 7303); Next.js uses application/xml.
+# Reject a conflicting declared charset and strictly decode the actual bytes below.
+assert headers.get_content_charset() in {None, "utf-8"}, headers
 assert len(xml) <= 50 * 1024 * 1024, "Split the sitemap before exceeding 50 MB"
 root = ElementTree.fromstring(xml.decode("utf-8"))
 assert root.tag == f"{{{NS['s']}}}urlset", root.tag
