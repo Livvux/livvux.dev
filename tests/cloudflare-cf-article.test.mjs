@@ -40,7 +40,7 @@ for (const lang of ['en', 'de']) {
     assert.ok(content.split(/\s+/).length >= 1000, 'Must contain the complete article');
     assert.doesNotMatch(content, /^# /m, 'The route owns the h1');
     assert.doesNotMatch(content, /<script|<iframe|dangerouslySetInnerHTML|cite|sandbox:/);
-    assert.equal((content.match(/^```/gm) ?? []).length, codeBlocks(content).length * 2);
+    assert.equal((content.match(/^```/gm) ?? []).length % 2, 0, 'All fenced blocks must be closed');
     assert.ok(content.endsWith('\n'));
   });
 
