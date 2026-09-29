@@ -152,6 +152,38 @@ That does not tell you whether the chosen account is correct, whether a route sh
 
 Whole-platform configuration is still the [roadmap](https://blog.cloudflare.com/cloudflare-cf-cli-launch/#configuration-that-type-checks-your-agent), not a launch-day guarantee.
 
+## Copyable agent prompt: install cf and migrate from Wrangler
+
+If you want an AI coding agent to do the local migration for you, paste the following prompt into the agent while it is working in the root of your existing Wrangler project. The code block has a copy button.
+
+```text
+You are working inside an existing Cloudflare project that currently uses Wrangler. Migrate it carefully to Cloudflare's new `cf` CLI.
+
+Goals:
+- Install and verify the official `cf` CLI.
+- Preserve the project's existing behavior and Cloudflare configuration.
+- Migrate the project using `cf migrate`.
+- Validate the result locally.
+- Do not deploy to production unless I explicitly ask.
+
+Procedure:
+1. Inspect the project first. Identify the package manager, Node.js version, Wrangler configuration, package scripts, Cloudflare bindings and current git status. Do not modify anything yet.
+2. `cf` requires Node.js 22 or newer. If the current runtime is older, use the project's existing version manager if one is configured. Do not make unrelated environment changes.
+3. Make sure the git worktree is clean. If it is not, stop and tell me exactly what is uncommitted. Do not use `git reset`, `git clean` or `cf migrate --force`, and do not discard my work.
+4. Create a migration branch named `chore/migrate-to-cf`.
+5. Install the official CLI with `npm install --global cf`, then run `cf --version` and `cf --help` to verify the installation.
+6. Check authentication. If login is required, run `cf login` and let me complete the browser/OAuth flow. Never print, commit or copy API tokens, secrets or credentials into source files or chat.
+7. Run `cf migrate --dry-run` first. Summarize the proposed file, dependency, script and configuration changes plus all warnings. If the migration reports blockers or ambiguous choices, stop and ask me before applying them.
+8. If the dry run is clean and no destructive or remote approval is needed, run `cf migrate`.
+9. Review the complete result with `git status --short`, `git diff --stat` and `git diff`. Inspect every new or untracked file too.
+10. Run `cf build` plus the project's existing tests, typecheck, lint and build commands where available.
+11. Verify that Cloudflare bindings, routes, compatibility settings, environment-variable/secret references, package scripts and local development behavior still match the original Wrangler setup.
+12. Do not run `cf deploy`, delete Cloudflare resources or make any other remote production changes.
+13. Finish with a concise report containing: what changed, validation results, warnings or required follow-up work, and the exact files I should review.
+
+Work autonomously on safe local migration steps, but stop before any destructive, irreversible, secret-handling or production action.
+```
+
 ## My take: try it deliberately, not everywhere at once
 
 Cloudflare promises [Wrangler maintenance for 18 months after the beta ends](https://blog.cloudflare.com/cloudflare-cf-cli-launch/#migrating-from-wrangler), not after launch. There is no reason to turn this announcement into a rushed migration of every working project.
