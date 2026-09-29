@@ -11,13 +11,13 @@ function loadModule(path, dependencies) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
     fileName: path,
   });
-  const module = { exports: {} };
+  const loadedModule = { exports: {} };
   const require = (name) => {
     assert.ok(Object.hasOwn(dependencies, name), `Unexpected import: ${name}`);
     return dependencies[name];
   };
-  new Function("require", "module", "exports", outputText)(require, module, module.exports);
-  return module.exports;
+  new Function("require", "module", "exports", outputText)(require, loadedModule, loadedModule.exports);
+  return loadedModule.exports;
 }
 
 const origin = "https://livvux.dev";
