@@ -1,0 +1,165 @@
+---
+title: "Cloudflare cf CLI: Less Clicking, Better Tools for AI Agents"
+publishedAt: "2026-09-29"
+author: "Livvux"
+summary: "Cloudflare's new cf CLI explained: install it, log in, discover commands and migrate Wrangler projects safely. What changes for developers and AI agents."
+---
+
+**I do not need an AI agent to become better at clicking through a dashboard. I want it to have a clear command, understand the result and stop before doing something I did not approve.**
+
+That is why Cloudflare's new `cf` CLI interests me. Cloudflare [launched the open beta on September 28, 2026](https://blog.cloudflare.com/cloudflare-cf-cli-launch/).
+
+The quick starting point is simple: install `cf`, run `cf login` when you need to authenticate, and use `cf migrate` to move an existing Wrangler project over. But those commands are only the entry point. The more interesting part is how the tool is designed.
+
+## What is Cloudflare cf?
+
+`cf` is Cloudflare's new command-line interface. Its [official package documentation](https://github.com/cloudflare/cf/blob/main/packages/cli/README.md) describes an interface generated from the public OpenAPI definition: the structured description of Cloudflare's API.
+
+In plain language, developers and agents get terminal commands for Cloudflare operations instead of having to assemble each HTTP request themselves.
+
+According to Cloudflare's [launch announcement](https://blog.cloudflare.com/cloudflare-cf-cli-launch/), cf covers over 3,000 API operations, compared with roughly 280 in Wrangler.
+
+I care less about the command count than the consistency. A repeatable operation should not require a new dashboard tour every time. That applies whether I am doing the work myself or asking an agent to help.
+
+The project is [open source on GitHub](https://github.com/cloudflare/cf). That matters for infrastructure tooling: I want to be able to inspect what a command actually does, not just trust its name. It is the same principle behind my view that [code should be open and inspectable](/blog/code-must-be-free).
+
+## Install it, then log in when needed
+
+You need **Node.js 22 or newer**, according to the [package README](https://github.com/cloudflare/cf/blob/main/packages/cli/README.md). Check the version and install the official npm package:
+
+```bash
+node --version
+npm install --global cf
+cf --help
+```
+
+When you are ready to work with your Cloudflare account:
+
+```bash
+cf login
+```
+
+There is a useful detail here: **`cf login` is an alias for `cf auth login`.** The [implementation explicitly confirms this](https://github.com/cloudflare/cf/blob/main/packages/cli/src/commands/login/index.ts). Use either command, not both in sequence. Authentication and profile management live under `cf auth`.
+
+For automation, the [documented credential order](https://github.com/cloudflare/cf/blob/main/packages/cli/README.md#authentication) gives `CLOUDFLARE_API_TOKEN` precedence over OAuth profiles. That means an exported token can take priority over the profile you expected to use. Check the active credentials and target before changing anything remote. Keep tokens in your secret store, not in source code or agent prompts.
+
+## Start a new Worker without mixing up local and live
+
+The documented new-project workflow is:
+
+```bash
+cf init my-worker
+cd my-worker
+cf dev
+```
+
+The [initializer](https://github.com/cloudflare/cf/blob/main/packages/cli/README.md#projects) creates a Hello World Worker, configuration and development files, and installs dependencies. `cf dev` starts development; it is not the publishing step.
+
+Once the project has been reviewed and tested, stop the development server or open another terminal in the project directory. Deployment is a separate decision:
+
+```bash
+cf deploy
+```
+
+By default, `cf deploy` builds the project and uploads the output. That is [documented deployment behavior](https://github.com/cloudflare/cf/blob/main/packages/cli/README.md#projects), not a temporary link to your laptop.
+
+This is different from the [Quick Tunnels workflow I covered earlier](/blog/cloudflare-quick-tunnels-one-command). A tunnel exposes a running local service. A deployment publishes your project to Cloudflare. I want that distinction to remain obvious, especially when an agent is issuing commands.
+
+## Migrate an existing Wrangler project safely
+
+The command is:
+
+```bash
+cf migrate
+```
+
+My recommendation is to make the change reviewable first. Start in the existing project directory, make sure your work is committed, and use a dedicated branch:
+
+```bash
+git status --short
+git switch -c chore/migrate-to-cf
+cf migrate --dry-run
+```
+
+`git status --short` should be empty before proceeding. The [migration command](https://github.com/cloudflare/cf/blob/main/packages/cli/src/commands/migrate/index.ts) supports `--dry-run` specifically to show which files would change without writing them. It also exposes `--force` for a dirty worktree, but I would not make that the default instruction for a migration.
+
+After reviewing the preview:
+
+```bash
+cf migrate
+```
+
+Read the result before continuing. The [migration runner](https://github.com/cloudflare/cf/blob/main/packages/cli/src/lib/wrangler-migration.ts) can report required follow-up work and exit with an error. Resolve that first; do not continue to deployment because some files were generated.
+
+After a successful migration, inspect both tracked changes and new files:
+
+```bash
+git status --short
+git diff --stat
+git diff
+cf build
+```
+
+`git diff` does not show untracked files. Open any new configuration files listed by `git status --short` as part of the review.
+
+Then run the project's existing tests and inspect its deployment settings before publishing.
+
+There are two important paths. The [bundler selection in the implementation](https://github.com/cloudflare/cf/blob/main/packages/cli/src/commands/migrate/index.ts) defaults to Vite when `@cloudflare/vite-plugin` is declared, otherwise to Wrangler.
+
+So `cf migrate` does not mean every project is automatically rebuilt around Vite. Nor should you treat a configuration migration as proof that production is ready. Review the actual diff, including dependency and script changes.
+
+## Why this is useful for AI agents
+
+The interesting part is not putting “AI” in front of a terminal. It is removing avoidable guesswork.
+
+### Find commands instead of inventing them
+
+An agent can search for the operation it needs:
+
+```bash
+cf cli search "list DNS records"
+```
+
+Cloudflare's [command-discovery guidance](https://github.com/cloudflare/cf/blob/main/packages/cli/src/index.ts) tells agents to search first, then inspect the chosen command with `--help`. The query above describes an operation; it does not change DNS records.
+
+The same guidance says to keep search queries anonymous. Do not include domain names, account IDs, email addresses or tokens. “List DNS records” is enough to discover a command; identifying the actual target belongs in the subsequent, reviewed operation.
+
+My preferred agent instruction would be:
+
+> Discover the command for listing DNS records. Explain which account and zone you would use. Do not create, update or delete anything without my approval.
+
+That is an instruction I would give an agent, not a built-in permission system.
+
+### Return structured data instead of decorative output
+
+The [output documentation](https://github.com/cloudflare/cf/blob/main/packages/cli/README.md#output) says structured API results are JSON on stdout. That makes them suitable for filtering with tools such as `jq` before passing the relevant fields to an agent.
+
+There is a qualification worth keeping: text and binary endpoints can return their payload directly. “JSON-first” does not mean every possible command produces a JSON document.
+
+For me, the benefit is straightforward. Extract the fields needed for the next decision. Do not fill the conversation with a screenful of output that nobody needs.
+
+### Make local operations explicit
+
+The [local-resource documentation](https://github.com/cloudflare/cf/blob/main/packages/cli/README.md#local-resources) describes `--local` for supported resource commands. Unsupported local operations return an error rather than silently falling through to production.
+
+I like that boundary. A command that cannot do the requested local operation should fail visibly. However, the flag is not universal support for every Cloudflare product. Check the command you are actually using.
+
+## TypeScript configuration is useful, but not magic
+
+The [new configuration format](https://github.com/cloudflare/cf#readme) is `cloudflare.config.ts`, starting with Workers, with Vite as the default development direction. Type-aware editing can help a developer or an agent catch an invalid property before running a deployment.
+
+That does not tell you whether the chosen account is correct, whether a route should be public, or whether a credential has too much access. Types help with configuration shape. They do not approve your infrastructure decisions.
+
+Whole-platform configuration is still the [roadmap](https://blog.cloudflare.com/cloudflare-cf-cli-launch/#configuration-that-type-checks-your-agent), not a launch-day guarantee.
+
+## My take: try it deliberately, not everywhere at once
+
+Cloudflare promises [Wrangler maintenance for 18 months after the beta ends](https://blog.cloudflare.com/cloudflare-cf-cli-launch/#migrating-from-wrangler), not after launch. There is no reason to turn this announcement into a rushed migration of every working project.
+
+I would start with a small Worker, then migrate a representative existing project on a branch. Check the generated files. Test the real behavior. Keep production changes behind explicit approval.
+
+What appeals to me is the direction: commands that can be discovered, results that can be processed, and changes that can be reviewed.
+
+**Less dashboard clicking. Less command guessing. More control over what actually happens.**
+
+*Checked against Cloudflare's announcement, package documentation and linked source code on September 29, 2026. This is a source-based guide, not a hands-on deployment benchmark. No Cloudflare account was authenticated or modified for this article.*

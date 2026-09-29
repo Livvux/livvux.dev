@@ -1,0 +1,165 @@
+---
+title: "Cloudflare cf CLI: Weniger Klicks, bessere Tools für KI-Agenten"
+publishedAt: "2026-09-29"
+author: "Livvux"
+summary: "Cloudflares neue cf CLI erklärt: Installation, Login, Befehlssuche und sichere Migration von Wrangler. Was sich für Entwickler und KI-Agenten ändert."
+---
+
+**Ich brauche keinen KI-Agenten, der besser durch ein Dashboard klickt. Ich will, dass er einen klaren Befehl hat, das Ergebnis versteht und stoppt, bevor er etwas tut, das ich nicht freigegeben habe.**
+
+Genau deshalb interessiert mich Cloudflares neue `cf` CLI. Cloudflare hat die [Open Beta am 28. September 2026 vorgestellt](https://blog.cloudflare.com/cloudflare-cf-cli-launch/).
+
+Der Einstieg ist einfach: `cf` installieren, bei Bedarf mit `cf login` anmelden und ein bestehendes Wrangler-Projekt mit `cf migrate` umstellen. Diese Befehle sind aber nur der Anfang. Interessanter ist, wie das Werkzeug aufgebaut ist.
+
+## Was ist Cloudflare cf?
+
+`cf` ist Cloudflares neue Kommandozeilenoberfläche. Laut [offizieller Paketdokumentation](https://github.com/cloudflare/cf/blob/main/packages/cli/README.md) wird sie aus der öffentlichen OpenAPI-Definition erzeugt, also der strukturierten Beschreibung der Cloudflare-API.
+
+Einfach gesagt: Entwickler und Agenten bekommen Terminalbefehle für Cloudflare-Funktionen, statt jede HTTP-Anfrage selbst zusammensetzen zu müssen.
+
+Laut [Cloudflares Ankündigung](https://blog.cloudflare.com/cloudflare-cf-cli-launch/) deckt cf über 3.000 API-Operationen ab, gegenüber ungefähr 280 bei Wrangler.
+
+Mich interessiert daran weniger die Zahl als die Einheitlichkeit. Ein wiederholbarer Vorgang sollte nicht jedes Mal eine neue Tour durchs Dashboard erfordern. Egal, ob ich selbst arbeite oder einen Agenten unterstützend einsetze.
+
+Das Projekt ist [Open Source auf GitHub](https://github.com/cloudflare/cf). Bei Infrastruktur-Werkzeugen ist mir das wichtig: Ich möchte nachsehen können, was ein Befehl tatsächlich macht, statt seinem Namen vertrauen zu müssen. Dahinter steckt derselbe Gedanke wie in meinem Beitrag über [offenen und einsehbaren Code](/blog/code-must-be-free).
+
+## Installieren und bei Bedarf anmelden
+
+Du brauchst **Node.js 22 oder neuer**, wie die [Paket-README](https://github.com/cloudflare/cf/blob/main/packages/cli/README.md) angibt. Prüfe die Version und installiere das offizielle npm-Paket:
+
+```bash
+node --version
+npm install --global cf
+cf --help
+```
+
+Sobald du mit deinem Cloudflare-Konto arbeiten möchtest:
+
+```bash
+cf login
+```
+
+Ein hilfreiches Detail: **`cf login` ist ein Alias für `cf auth login`.** Das bestätigt die [Implementierung ausdrücklich](https://github.com/cloudflare/cf/blob/main/packages/cli/src/commands/login/index.ts). Verwende einen der beiden Befehle, nicht beide hintereinander. Anmeldung und Profilverwaltung liegen unter `cf auth`.
+
+Für Automatisierung hat `CLOUDFLARE_API_TOKEN` laut [dokumentierter Reihenfolge](https://github.com/cloudflare/cf/blob/main/packages/cli/README.md#authentication) Vorrang vor OAuth-Profilen. Ein gesetzter Token kann also das Profil übersteuern, mit dem du eigentlich arbeiten wolltest. Prüfe Zugangsdaten und Ziel, bevor du etwas auf Cloudflare änderst. Tokens gehören in die Secret-Verwaltung, nicht in den Quellcode oder in Agenten-Prompts.
+
+## Einen neuen Worker starten: lokal ist nicht live
+
+Der dokumentierte Ablauf für ein neues Projekt:
+
+```bash
+cf init my-worker
+cd my-worker
+cf dev
+```
+
+Die [Initialisierung](https://github.com/cloudflare/cf/blob/main/packages/cli/README.md#projects) erstellt einen Hello-World-Worker samt Konfiguration und Entwicklungsdateien und installiert die Abhängigkeiten. `cf dev` startet die Entwicklung. Das ist noch keine Veröffentlichung.
+
+Wenn das Projekt geprüft und getestet ist, beende den Entwicklungsserver oder öffne ein weiteres Terminal im Projektverzeichnis. Das Deployment ist eine eigene Entscheidung:
+
+```bash
+cf deploy
+```
+
+`cf deploy` baut das Projekt standardmäßig und lädt das Ergebnis hoch. Das ist das [dokumentierte Deployment-Verhalten](https://github.com/cloudflare/cf/blob/main/packages/cli/README.md#projects), kein temporärer Link zu deinem Laptop.
+
+Hier liegt der Unterschied zum [Quick-Tunnels-Ablauf aus meinem vorherigen Beitrag](/blog/cloudflare-quick-tunnels-one-command). Ein Tunnel macht einen laufenden lokalen Dienst erreichbar. Ein Deployment veröffentlicht dein Projekt auf Cloudflare. Diese Unterscheidung muss klar bleiben, gerade wenn ein Agent die Befehle ausführt.
+
+## Ein bestehendes Wrangler-Projekt sicher migrieren
+
+Der Befehl lautet:
+
+```bash
+cf migrate
+```
+
+Meine Empfehlung: Sorge zuerst dafür, dass du die Änderungen sauber prüfen kannst. Starte im bestehenden Projektverzeichnis, committe deine bisherigen Änderungen und lege einen eigenen Branch an:
+
+```bash
+git status --short
+git switch -c chore/migrate-to-cf
+cf migrate --dry-run
+```
+
+Die Ausgabe von `git status --short` sollte vor dem Fortfahren leer sein. Der [Migrationsbefehl](https://github.com/cloudflare/cf/blob/main/packages/cli/src/commands/migrate/index.ts) unterstützt `--dry-run` ausdrücklich, um die betroffenen Dateien anzuzeigen, ohne sie zu schreiben. Es gibt auch `--force` für ein Arbeitsverzeichnis mit uncommitteten Änderungen. Das würde ich aber nicht zur Standardanleitung für eine Migration machen.
+
+Nach der Prüfung der Vorschau:
+
+```bash
+cf migrate
+```
+
+Lies das Ergebnis, bevor du weitermachst. Der [Migrationsablauf](https://github.com/cloudflare/cf/blob/main/packages/cli/src/lib/wrangler-migration.ts) kann erforderliche Nacharbeiten melden und mit einem Fehler enden. Behebe diese zuerst. Dass Dateien erzeugt wurden, ist noch kein Grund, zum Deployment weiterzugehen.
+
+Prüfe nach erfolgreicher Migration sowohl bestehende Änderungen als auch neue Dateien:
+
+```bash
+git status --short
+git diff --stat
+git diff
+cf build
+```
+
+`git diff` zeigt keine unversionierten Dateien. Öffne deshalb auch neue Konfigurationsdateien, die `git status --short` auflistet.
+
+Führe anschließend die vorhandenen Projekttests aus und prüfe die Deployment-Einstellungen, bevor du veröffentlichst.
+
+Dabei gibt es zwei wichtige Wege. Die [Bundler-Auswahl im Quellcode](https://github.com/cloudflare/cf/blob/main/packages/cli/src/commands/migrate/index.ts) verwendet standardmäßig Vite, wenn `@cloudflare/vite-plugin` deklariert ist, andernfalls Wrangler.
+
+`cf migrate` bedeutet also nicht, dass jedes Projekt automatisch auf Vite umgebaut wird. Und eine migrierte Konfiguration beweist noch nicht, dass alles bereit für Produktion ist. Prüfe den tatsächlichen Diff, einschließlich Änderungen an Abhängigkeiten und Skripten.
+
+## Warum das für KI-Agenten sinnvoll ist
+
+Interessant ist nicht, vor ein Terminal das Wort „KI“ zu schreiben. Interessant ist, unnötiges Raten zu vermeiden.
+
+### Befehle finden statt erfinden
+
+Ein Agent kann nach der benötigten Operation suchen:
+
+```bash
+cf cli search "list DNS records"
+```
+
+Cloudflares [Hinweise zur Befehlssuche](https://github.com/cloudflare/cf/blob/main/packages/cli/src/index.ts) sagen Agenten, zuerst zu suchen und danach den ausgewählten Befehl mit `--help` zu prüfen. Die Suchanfrage oben beschreibt eine Operation. Sie ändert keine DNS-Einträge.
+
+Dieselben Hinweise verlangen anonyme Suchanfragen. Keine Domainnamen, Konto-IDs, E-Mail-Adressen oder Tokens hineinschreiben. „List DNS records“ reicht, um einen Befehl zu finden. Das konkrete Ziel gehört in den anschließenden, geprüften Aufruf.
+
+Meine Anweisung an einen Agenten wäre:
+
+> Finde den Befehl zum Auflisten von DNS-Einträgen. Erkläre, welches Konto und welche Zone du verwenden würdest. Erstelle, ändere oder lösche nichts ohne meine Freigabe.
+
+Das ist eine Anweisung, die ich einem Agenten geben würde, kein eingebautes Berechtigungssystem.
+
+### Strukturierte Daten statt dekorativer Ausgabe
+
+Laut [Ausgabedokumentation](https://github.com/cloudflare/cf/blob/main/packages/cli/README.md#output) erscheinen strukturierte API-Ergebnisse als JSON auf stdout. Dadurch lassen sie sich beispielsweise mit `jq` filtern, bevor die relevanten Felder an einen Agenten gehen.
+
+Eine Einschränkung gehört dazu: Text- und Binär-Endpunkte können ihre Daten direkt ausgeben. „JSON-first“ heißt nicht, dass jeder denkbare Befehl ein JSON-Dokument zurückliefert.
+
+Für mich liegt der Nutzen auf der Hand: Nur die Felder herausziehen, die für die nächste Entscheidung gebraucht werden. Nicht die ganze Unterhaltung mit Ausgabe füllen, die niemand benötigt.
+
+### Lokale Operationen ausdrücklich kennzeichnen
+
+Die [Dokumentation lokaler Ressourcen](https://github.com/cloudflare/cf/blob/main/packages/cli/README.md#local-resources) beschreibt `--local` für unterstützte Ressourcenbefehle. Nicht unterstützte lokale Operationen liefern einen Fehler, statt still auf Produktion auszuweichen.
+
+Diese Grenze gefällt mir. Ein Befehl, der die gewünschte lokale Operation nicht ausführen kann, sollte sichtbar scheitern. Das Flag bedeutet aber nicht, dass jedes Cloudflare-Produkt vollständig lokal unterstützt wird. Prüfe den konkreten Befehl.
+
+## TypeScript-Konfiguration ist hilfreich, aber keine Magie
+
+Das [neue Konfigurationsformat](https://github.com/cloudflare/cf#readme) heißt `cloudflare.config.ts`, beginnt bei Workers und setzt für die Entwicklung standardmäßig auf Vite. Typprüfung kann Entwicklern und Agenten helfen, eine ungültige Eigenschaft schon vor dem Deployment zu erkennen.
+
+Sie sagt dir nicht, ob das ausgewählte Konto stimmt, ob eine Route öffentlich sein sollte oder ob Zugangsdaten zu viele Rechte haben. Typen helfen bei der Struktur einer Konfiguration. Sie genehmigen keine Infrastrukturentscheidungen.
+
+Die Konfiguration der gesamten Plattform ist weiterhin [Roadmap](https://blog.cloudflare.com/cloudflare-cf-cli-launch/#configuration-that-type-checks-your-agent), keine Zusage für den ersten Veröffentlichungstag.
+
+## Mein Fazit: gezielt ausprobieren, nicht überall gleichzeitig
+
+Cloudflare sagt [18 Monate Wrangler-Wartung nach Ende der Beta](https://blog.cloudflare.com/cloudflare-cf-cli-launch/#migrating-from-wrangler) zu, nicht ab Veröffentlichung. Es gibt keinen Grund, aus dieser Ankündigung eine hektische Migration aller funktionierenden Projekte zu machen.
+
+Ich würde mit einem kleinen Worker beginnen und danach ein repräsentatives bestehendes Projekt auf einem Branch migrieren. Erzeugte Dateien prüfen. Das tatsächliche Verhalten testen. Änderungen an Produktion ausdrücklich freigeben.
+
+Mich überzeugt die Richtung: Befehle, die sich finden lassen. Ergebnisse, die sich verarbeiten lassen. Änderungen, die sich nachvollziehen lassen.
+
+**Weniger Dashboard-Klicks. Weniger erratene Befehle. Mehr Kontrolle darüber, was wirklich passiert.**
+
+*Ankündigung, Paketdokumentation und verlinkter Quellcode wurden am 29. September 2026 geprüft. Dies ist eine quellenbasierte Anleitung, kein eigener Deployment-Benchmark. Für den Artikel wurde kein Cloudflare-Konto angemeldet oder verändert.*
