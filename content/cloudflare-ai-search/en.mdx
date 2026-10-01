@@ -1,0 +1,207 @@
+---
+title: "Cloudflare AI Search Is Now Generally Available: Setup Guide"
+publishedAt: "2026-10-01"
+author: "Livvux"
+summary: "Cloudflare AI Search explained: dashboard setup, Wrangler commands, website integration, pricing and a practical Ask QBCore example for documentation."
+---
+
+**I want people to find the right documentation. Not guess the exact wording of a page title.**
+
+That is what interests me about Cloudflare AI Search. Cloudflare announced its [general availability on October 1, 2026](https://blog.cloudflare.com/ai-search-ga/). It is no longer just a beta to keep an eye on.
+
+**In one sentence: Cloudflare AI Search turns your website, documentation or files into Google-like search over your own content, combining keyword matching, semantic retrieval and optional AI answers.**
+
+The important words are **your own content**. This is not a search engine for the whole Internet, and adding it does not put your pages into Google's index. It gives your visitors, application or assistant another way to find what you have published. Cloudflare [manages the indexing and retrieval pipeline](https://developers.cloudflare.com/ai-search/concepts/how-ai-search-works/); you still decide how to present results and who may access them.
+
+## Search first. AI answers when they help.
+
+Imagine a documentation site. One visitor searches for `qb-target`. Another asks, “How do I add an interaction to a vehicle?”
+
+Those are different ways of approaching the same task. I would want the search to handle both, without making the second person learn my navigation first.
+
+Cloudflare supports [three search modes](https://developers.cloudflare.com/ai-search/concepts/search-modes/): keyword search for specific terms, semantic search for related meaning, and hybrid search combining both. **New instances use hybrid search by default.**
+
+There is a separate choice after retrieval: **Search** returns relevant passages; **Chat** uses retrieved content to generate an answer. You do not have to put a chatbot in front of every visitor. A useful results list is a perfectly good outcome.
+
+Under the hood, content is parsed, split into smaller sections and indexed. A question retrieves matching sections, which can then become context for a model. That is the practical idea behind retrieval-augmented generation, or RAG: look things up before answering, rather than relying only on the model's training.
+
+For documentation, my starting point would be hybrid search with clear links to the original pages. Add answers where they genuinely save readers work.
+
+## What changed with general availability?
+
+The [GA announcement](https://blog.cloudflare.com/ai-search-ga/) brings more than a status change: native image retrieval, OCR for scanned PDFs and support for larger files.
+
+Native image retrieval can search visual information rather than only a generated description. Cloudflare lists `@cf/qwen/qwen3-vl-embedding-2b` as an [image-capable embedding model](https://developers.cloudflare.com/ai-search/configuration/models/supported-models/). Do not assume every embedding model has the same image capabilities.
+
+OCR makes text inside scanned pages searchable. The [data-source documentation](https://developers.cloudflare.com/ai-search/configuration/data-source/) explains supported formats and the `indexing_options.use_ocr` option. OCR is off by default; changing the setting triggers a full reindex. This matters for manuals that look like documents to us but are actually images inside a PDF.
+
+There is an important limit distinction: **plain-text/code files and PDFs with OCR enabled can be up to 10 MiB; PDFs without OCR and other formats retain a 4 MiB limit**, according to the [current limits](https://developers.cloudflare.com/ai-search/platform/limits-pricing/). “Every file can now be 10 MiB” would be the wrong takeaway.
+
+For my documentation projects, better text retrieval is still the main attraction. Image search is useful when the actual question is about something visual, such as finding a similar screenshot.
+
+## How to access Cloudflare AI Search
+
+The easiest starting point is the dashboard. You do not need to build a frontend just to see whether the results are useful.
+
+Follow the [official dashboard setup](https://developers.cloudflare.com/ai-search/get-started/dashboard/):
+
+1. Open the [Cloudflare Dashboard](https://dash.cloudflare.com/), select your account and go to **AI → AI Search**.
+2. Select **Create Instance** and give it a name, such as `qbcore-docs`.
+3. Optionally connect your website or an R2 bucket, review the configuration and select **Create**.
+4. For manual uploads, open the created instance's **Items** tab and upload your files.
+5. Wait for indexing, then open **Playground**, choose **Search** or **Chat**, and try a question.
+
+**Website prerequisite:** the domain must be onboarded to the same Cloudflare account. The [website-source guide](https://developers.cloudflare.com/ai-search/configuration/data-source/website/) also warns that bot protection can block the crawler. Do not disable protection globally; investigate the specific blocked requests.
+
+My first test would be deliberately ordinary: a resource name, a natural-language question and something the documentation does not answer. I want to see both whether it finds the right material and how it behaves when the material is missing.
+
+## Create a documentation index with Wrangler
+
+The [official CLI guide](https://developers.cloudflare.com/ai-search/get-started/wrangler/) documents this workflow through Wrangler. In a local project directory, install it and authenticate:
+
+```bash
+npm install --save-dev wrangler@latest
+npx wrangler login
+```
+
+For a site you own, such as `qbcore.net` in my example:
+
+```bash
+npx wrangler ai-search create qbcore-docs \
+  --type web-crawler \
+  --source qbcore.net
+```
+
+Check indexing:
+
+```bash
+npx wrangler ai-search stats qbcore-docs
+```
+
+Then test retrieval:
+
+```bash
+npx wrangler ai-search search qbcore-docs \
+  --query "How do I use qb-target?"
+```
+
+Replace the domain and instance name for your project. The create command provisions a real Cloudflare resource; the others inspect or query it. These are documented examples, not a claim that I have run them against `qbcore.net`.
+
+I recently covered the [new Cloudflare cf CLI](/blog/cloudflare-cf-cli). Here I am intentionally using the commands in AI Search's Wrangler guide rather than inventing equivalent `cf` syntax.
+
+## Three ways to connect it to your website
+
+### 1. Public endpoint: the simplest route for public documentation
+
+Inside the instance, go to **Settings → Public Endpoint → Enable Public Endpoint**, then copy the generated URL. The [public-endpoint guide](https://developers.cloudflare.com/ai-search/api/search/public-endpoint/) documents separate paths for search and chat.
+
+A search request looks like this. Replace `PUBLIC_ENDPOINT_ID` with the identifier Cloudflare gives you:
+
+```bash
+curl --fail-with-body \
+  "https://PUBLIC_ENDPOINT_ID.search.ai.cloudflare.com/search" \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"How do I use qb-target?"}]}'
+```
+
+Use `/chat/completions` instead when you want a generated answer. The hostname is generated; naming an instance `qbcore-docs` does not make that its public hostname.
+
+Configure [allowed origins and rate limits](https://developers.cloudflare.com/ai-search/configuration/retrieval/public-endpoint/) before connecting a browser. **CORS is not authentication.** It does not turn a public endpoint into a private knowledge base. My recommendation is to expose only material you intend to make public and enable only the endpoints you need.
+
+Cloudflare also provides [ready-made search and chat components](https://developers.cloudflare.com/ai-search/configuration/retrieval/public-endpoint/embed-search-snippets/), including an inline search bar and a keyboard-triggered search modal. Their [UI library is open source](https://github.com/cloudflare/ai-search-snippet). That is a useful shortcut, though it is not the same as self-hosting the managed search service.
+
+### 2. Workers binding: my choice for a Cloudflare-hosted backend
+
+A [Workers binding](https://developers.cloudflare.com/ai-search/get-started/workers/) lets a Worker call AI Search without putting an API token in the application code. Add this fragment to the existing Wrangler configuration, preserving its other settings:
+
+```json
+{
+  "ai_search_namespaces": [
+    {
+      "binding": "AI_SEARCH",
+      "namespace": "default",
+      "remote": true
+    }
+  ]
+}
+```
+
+Inside an asynchronous Worker handler, the retrieval call can be:
+
+```javascript
+const results = await env.AI_SEARCH.get("qbcore-docs").search({
+  messages: [{ role: "user", content: "How do I use qb-target?" }],
+  ai_search_options: {
+    retrieval: { max_num_results: 5 }
+  }
+});
+
+return Response.json(results.chunks);
+```
+
+These are integration fragments, not a complete authenticated endpoint. Validate incoming questions and add access controls and abuse protection where needed. Also, `remote: true` means local development calls the remote service; it is not an offline search emulator.
+
+For Next.js, this choice depends on the deployment runtime. A Node.js server elsewhere does not acquire Workers bindings merely because it runs Next.js. Use the REST API there.
+
+### 3. REST API: for a Node.js or other server-side backend
+
+The [REST setup](https://developers.cloudflare.com/ai-search/api/search/rest-api/) currently requires an API token with **Account → AI Search:Edit** and **Account → AI Search:Run**. Scope it to the intended account and keep it server-side, never in a `NEXT_PUBLIC_` variable.
+
+The current search route is namespace-scoped:
+
+```text
+POST https://api.cloudflare.com/client/v4/accounts/ACCOUNT_ID/ai-search/namespaces/default/instances/qbcore-docs/search
+```
+
+Send a bearer token and a JSON `messages` array, as in the public example. This gives your backend a place to enforce authentication, limits and application-specific rules before querying. No Cloudflare token belongs in the browser bundle.
+
+## What an Ask QBCore feature could look like
+
+For [qbcore.net](https://qbcore.net/), I would begin with an **Ask QBCore** option alongside the existing documentation search, rather than replace a working search experience immediately.
+
+The proposed flow is simple:
+
+```text
+qbcore.net documentation
+        ↓
+Cloudflare AI Search index
+        ↓
+/search or /ask in the website
+        ↓
+“How do I create a vehicle target?”
+        ↓
+Relevant documentation + optional AI answer
+```
+
+This is a proposed integration, not an already-deployed feature or a measured result.
+
+I would make the source links more prominent than the model's confidence. Readers should be able to open the documentation behind an answer, especially before copying code.
+
+My acceptance test would be a small set of real questions: exact resource names, beginner descriptions, ambiguous questions and unsupported requests. Compare the retrieved pages with the existing search. Check mobile behavior, keyboard navigation, empty results and service failures. Keep the original search available while judging whether the new option actually helps.
+
+An answer that admits missing context is preferable to a convincing example for a function that does not exist.
+
+## Pricing: retrieval and answer generation are different costs
+
+**AI Search billing starts on November 1, 2026**, not on the October 1 launch date. The [published pricing](https://developers.cloudflare.com/ai-search/platform/limits-pricing/) and [GA billing announcement](https://blog.cloudflare.com/ai-search-ga/) describe monthly allowances and subsequent usage-based charges:
+
+| Usage | Included monthly | Beyond the allowance |
+| --- | --- | --- |
+| Ingestion | 5 million tokens | $0.75 / million tokens |
+| Stored data | 10 GB-month | $2.00 / GB-month |
+| Semantic / hybrid queries | 1,000 | $0.75 / 1,000 queries |
+| Full-text queries | 1,000 | $0.10 / 1,000 queries |
+
+Image processing adds $0.50 per million tokens and shares the ingestion allowance. Generation, query rewriting and external model providers can incur separate charges.
+
+My budgeting rule: estimate the questions people submit and the answers you generate separately. A search box that returns links and an assistant that writes a long answer are not the same workload. Check the linked pricing again before launch rather than treating this article as a permanent rate card.
+
+## My take
+
+I like the direction. Make the content searchable without turning every documentation project into a search-infrastructure project.
+
+But I would not call an application production-ready simply because its search provider is generally available. The useful work is still yours: choose the right content, protect private material, test relevance, show sources and provide a fallback.
+
+**Start with good search. Add AI answers where they make the documentation easier to use. Not because every page needs another chat bubble.**
+
+*Checked against Cloudflare's announcement and documentation on October 1, 2026. This is a source-based setup guide, not a hands-on benchmark. No Cloudflare account was authenticated or modified for this article.*

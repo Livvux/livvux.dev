@@ -1,0 +1,52 @@
+name: Cloudflare AI Search article
+
+on:
+  pull_request:
+    paths:
+      - 'content/cloudflare-ai-search/**'
+      - 'tests/cloudflare-ai-search-article.test.mjs'
+      - '.github/workflows/cloudflare-ai-search-article.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-ai-search-article-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate translations, sources and example syntax
+        run: node --test tests/cloudflare-ai-search-article.test.mjs
+      - uses: pnpm/action-setup@v4
+      - name: Install existing dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build site and compile both MDX articles
+        run: pnpm build
+      - name: Verify production routes and metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm start > /tmp/cloudflare-ai-search-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          ready=false
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:3000/blog/cloudflare-ai-search >/dev/null; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" != true ]; then
+            cat /tmp/cloudflare-ai-search-next.log
+            exit 1
+          fi
+          ARTICLE_BASE_URL=http://localhost:3000 node --test tests/cloudflare-ai-search-article.test.mjs
