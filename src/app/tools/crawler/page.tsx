@@ -1,10 +1,15 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+import { pageMetadata } from "@/lib/seo";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 
-export const metadata: Metadata = { title: "LivvuxBot crawler", description: "How the internal links tool crawls websites, follows robots.txt, and limits requests.", alternates: { canonical: "/tools/crawler" } };
+export const metadata = pageMetadata({
+  title: "LivvuxBot Crawler: Robots.txt & Crawl Limits",
+  description: "How the internal link audit crawler follows robots.txt, limits requests, handles redirects and protects private networks. Learn how to block LivvuxBot.",
+  path: "/tools/crawler",
+});
+
 export default function CrawlerPage() {
   return <main className="space-y-6">
-    <Link href="/tools/internal-links" className="text-sm underline underline-offset-4">Internal links tool</Link>
+    <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Tools", href: "/tools" }, { name: "LivvuxBot", href: "/tools/crawler" }]} />
     <h1 className="text-3xl font-semibold tracking-tight">LivvuxBot</h1>
     <p className="leading-relaxed">LivvuxBot is the on-demand crawler for this website’s internal link audit. It runs only when someone submits a website and their own TypeSafe API key. It does not continuously index the web.</p>
     <pre className="overflow-x-auto rounded-md border p-4 text-xs">LivvuxBot/1.0 (+https://livvux.dev/tools/crawler)</pre>
