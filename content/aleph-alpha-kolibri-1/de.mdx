@@ -1,0 +1,262 @@
+---
+title: "Kolibri-1: Aleph Alphas 78B-Modell zum Selbsthosten"
+publishedAt: "2026-10-03"
+author: "Livvux"
+summary: "Aleph Alpha veröffentlicht Kolibri-1: offene Gewichte unter Apache 2.0, Deutsch, Englisch und bis zu 1M Kontext. Benchmarks, Hardwarebedarf und vLLM-Einstieg."
+---
+
+**Kolibri-1 interessiert mich, weil ich das Modell herunterladen kann, statt nur Zugang zur API eines anderen zu bekommen.**
+
+Aleph Alpha hat [Kolibri-1 am 3. Oktober 2026 veröffentlicht](https://huggingface.co/Aleph-Alpha/Kolibri-1).
+Das Modell hat 78 Milliarden Parameter, davon 3,46 Milliarden pro Token aktiv, unterstützt Deutsch und Englisch und bietet ein Kontextfenster bis ungefähr eine Million Tokens.
+Die Gewichte stehen unter Apache 2.0 bereit.
+
+Im [Ankündigungspost](https://x.com/Aleph__Alpha/status/2106306840657297814) heißt es:
+
+> Small bird, fast wings, Kolibri is here.
+
+Die Richtung gefällt mir.
+Gib Entwicklern die Gewichte und lass sie entscheiden, wo das Modell läuft.
+Beim kleinen Vogel muss man allerdings eine Sache dazusagen: **Effizient bei der aktiven Berechnung heißt nicht klein beim Speicherbedarf.**
+
+Diese Einordnung basiert auf der [Model Card](https://huggingface.co/Aleph-Alpha/Kolibri-1) und dem [technischen Bericht](https://aleph-alpha.com/downloads/tech-report.pdf).
+Ich habe keinen eigenen Inferenz-Benchmark durchgeführt.
+
+## Was ist Kolibri-1?
+
+Kolibri-1 ist ein Reasoning-Modell von Aleph Alpha mit einer Mixture-of-Experts-Architektur.
+Es verarbeitet Text und gibt Text aus, unterstützt Tool-Aufrufe, einstellbaren Denkaufwand und lange Dokumente.
+Laut den [Trainingsdetails](https://huggingface.co/Aleph-Alpha/Kolibri-1#training-details) wurde es von Grund auf trainiert.
+
+Die wichtigsten Angaben aus der [Modellübersicht](https://huggingface.co/Aleph-Alpha/Kolibri-1#model-overview):
+
+| Eigenschaft | Kolibri-1 |
+| --- | --- |
+| Parameter insgesamt | 78,1 Milliarden |
+| Aktive Parameter pro Token | 3,46 Milliarden |
+| Hauptsprachen | Deutsch und Englisch |
+| Eingabe und Ausgabe | Text |
+| Natives Kontextfenster | 262.144 Tokens |
+| Validierter erweiterter Kontext | 1.048.576 Tokens |
+| Empfohlener Kontext für Effizienz und komplexe Aufgaben | Höchstens 262.144 Tokens |
+| Veröffentlichter Checkpoint | FP8, einzelne Komponenten in BF16 |
+| Ungefährer Speicherbedarf der Gewichte | 78 GB, zusätzlich Speicher für Laufzeit und Kontext-Cache |
+| Lizenz für Gewichte und Konfigurationsdateien | Apache 2.0 |
+
+**Ich kann das Modell selbst hosten, und Deutsch steht bewusst im Mittelpunkt.**
+Das interessiert mich mehr als die nächste Chat-Oberfläche.
+
+## 78B insgesamt, 3,46B aktiv: Was bedeutet das?
+
+Bei einem Mixture-of-Experts-Modell übernimmt pro Token nur ein Teil des Netzes die Expertenberechnung.
+Kolibri aktiviert dabei ungefähr 4,4 Prozent seiner gesamten Parameter.
+Deshalb unterscheiden sich die beiden Zahlen so stark.
+
+Die [Architekturbeschreibung](https://huggingface.co/Aleph-Alpha/Kolibri-1#model-architecture) nennt 384 auswählbare Experten pro MoE-Schicht.
+Sechs werden pro Token ausgewählt, dazu kommt ein gemeinsam genutzter Experte.
+Die meisten Attention-Schichten berücksichtigen nahe Textstellen; jede fünfte schaut auf den gesamten Kontext.
+So soll der Rechenaufwand sinken, ohne dass jede Schicht den kompletten Kontext auf dieselbe Weise verarbeiten muss.
+
+Der Haken ist der Speicher.
+Die gerade nicht aktiven Experten verschwinden nicht aus dem Checkpoint.
+Beim [beschriebenen Betrieb](https://huggingface.co/Aleph-Alpha/Kolibri-1#design-goals) liegt weiterhin das gesamte Modell im Speicher.
+
+**„3,46B aktiv“ beschreibt die Berechnung. Es verspricht nicht, dass Kolibri überall läuft, wo ein kleines dichtes Modell hineinpasst.**
+
+## Deutsch ist Teil der Entwicklung
+
+Der [Vortrainingsmix](https://huggingface.co/Aleph-Alpha/Kolibri-1#model-overview) enthält ungefähr 23,9 Prozent Deutsch, 62,5 Prozent Englisch und 13,6 Prozent Code.
+Aleph Alpha beschreibt außerdem einen Tokenizer namens UniBPE, der Wortstrukturen und insbesondere deutsche zusammengesetzte Wörter effizienter verarbeiten soll.
+Im anschließenden Training werden auch deutsches Reasoning und sprachlich konsistente Antworten gezielt berücksichtigt.
+
+Das ist für mich relevant.
+Eine deutsche Supportfrage sollte nicht erst ins Englische umgeschrieben werden müssen, damit eine brauchbare Antwort herauskommt.
+Ich würde Fachbegriffe, Alltagssprache und Anweisungen testen, die deutschen Text mit englischen Funktionsnamen mischen.
+
+Laut der [Einleitung des Berichts](https://aleph-alpha.com/downloads/tech-report.pdf#page=4) haben Teams in Deutschland das Modell entwickelt; trainiert wurde auf Infrastruktur in Deutschland und Finnland.
+Damit steckt hinter „Built in Europe“ mehr als ein Etikett.
+
+Dass jede deutsche Antwort besser als bei der Konkurrenz ausfällt, beweist das noch nicht.
+Das muss sich an Deinen tatsächlichen Aufgaben zeigen.
+
+## Apache 2.0 ist für mich der entscheidende Punkt
+
+Die [Apache-2.0-Lizenz](https://www.apache.org/licenses/LICENSE-2.0) erlaubt kommerzielle Nutzung, Veränderungen und Weitergabe unter ihren Bedingungen.
+Bei Kolibri umfasst diese [Lizenzfreigabe](https://huggingface.co/Aleph-Alpha/Kolibri-1#license-and-terms) ausdrücklich die im Repository veröffentlichten Gewichte und Konfigurationsdateien.
+Sie erstreckt sich nicht auf die gesamte Trainingspipeline oder andere unveröffentlichte Bestandteile.
+
+Deshalb würde ich von einem **Open-Weight-Release** sprechen.
+Die Behauptung, alles für eine vollständige Reproduktion des Trainings sei offengelegt, ginge zu weit.
+
+Praktisch bedeutet das mehr Entscheidungsfreiheit.
+Du musst keine gehostete Aleph-Alpha-API verwenden, um diese Gewichte auszuführen.
+Du bestimmst die Infrastruktur und wie Deine Anwendung das Modell anspricht.
+
+Kostenloser Rechenbetrieb ist das nicht.
+Hardware, Speicher und Betrieb bleiben Deine Aufgabe.
+Bei einem Projekt mit wenigen Anfragen würde ich diese Kosten mit einem gehosteten Dienst vergleichen, bevor ich einen großen GPU-Server miete.
+
+## Die Benchmarks sind interessant. Ein Durchmarsch ist es nicht.
+
+Hier eine kleine Auswahl aus den [veröffentlichten Evaluationen von Aleph Alpha](https://huggingface.co/Aleph-Alpha/Kolibri-1#post-training).
+Das sind Messungen des Herstellers, keine eigenen Tests und keine unabhängige Rangliste.
+Qwen3.5 35B-A3B ist wegen seiner ähnlichen aktiven Parameterzahl ein sinnvoller Vergleich, hat insgesamt aber deutlich weniger Parameter.
+
+| Evaluation | Kolibri-1 | Qwen3.5 35B-A3B |
+| --- | ---: | ---: |
+| GPQA Diamond, Englisch | 84.3 | 83.8 |
+| LiveCodeBench v6 | 85.9 | 77.8 |
+| SWE-Bench Verified | 66.4 | 71.6 |
+| BFCL v4, gesamt | 61.4 | 70.5 |
+
+Die Zahlen sind in der Schreibweise der Quelle übernommen.
+Kolibri liegt in den ersten beiden Zeilen vorne und in den anderen beiden dahinter.
+Das ist hilfreicher als „schlägt alles“.
+Laut Evaluationsbeschreibung läuft Kolibri mit hohem Denkaufwand; jedes Modell verwendet seine dokumentierten Sampling-Einstellungen und Kontextgrenzen.
+
+Aus einem Coding-Benchmark würde ich nicht ableiten, dass ein Agent meine Anwendungen ohne Kontrolle warten kann.
+Mein Test müsste einen echten Bug, eine klar begrenzte Codeänderung und eine Dokumentationsfrage ohne ausreichende Belege enthalten.
+
+### Und wie schnell sind die „fast wings“?
+
+[Abbildung 1 und Anhang A](https://aleph-alpha.com/downloads/tech-report.pdf#page=130) messen auf acht B200-GPUs den Durchsatz bei vielen parallelen Anfragen, in ausgegebenen Bytes pro Sekunde und GPU.
+Die 2,7-fache Steigerung im Diagramm bezieht sich auf das interne Vorgängermodell Kolibri Origin, nicht auf sämtliche Konkurrenten.
+
+Das misst nicht, wie schnell ein einzelner Chat auf Deiner Hardware antwortet.
+Ich würde zusätzlich die Zeit bis zur ersten Antwort, erledigte Aufgaben und meinen Kontrollaufwand messen.
+Derselbe Unterschied ist mir bei [Claude Opus 5.5](/blog/claude-opus-5-5/de) wichtig: Eine brauchbare Antwort zählt mehr als eine isolierte Zahl aus der Ankündigung.
+
+## Eine Million Tokens: Die zweite Zahl gehört dazu
+
+Die [Erklärung zum langen Kontext](https://huggingface.co/Aleph-Alpha/Kolibri-1#intended-use) trennt das deutlich.
+Kolibri wurde in seiner letzten Kontexterweiterungsphase mit bis zu 262.144 Tokens trainiert.
+Aleph Alpha hat die Erweiterung auf 1.048.576 Tokens validiert, empfiehlt für effizienten Betrieb und komplexe Aufgaben aber höchstens 262.144.
+
+**Das größte unterstützte Kontextfenster ist nicht automatisch die beste Einstellung.**
+
+[Anhang G](https://aleph-alpha.com/downloads/tech-report.pdf#page=167) zeigt außerdem Unterschiede nach Aufgabe: Ohne Reasoning gelingt die Nadelsuche besser, mit Reasoning die Beantwortung von Fragen bei längstem Kontext.
+Die Ausgabebudgets unterscheiden sich; der Reasoning-Effekt wird also nicht isoliert gemessen.
+
+Bei einem Dokumentationsassistenten würde ich weiterhin zuerst die relevanten Abschnitte heraussuchen.
+Ein riesiges Eingabebudget ist Reserve, kein Grund, bei jeder Frage sämtliche Seiten mitzuschicken.
+Innerhalb des Kontextbudgets muss außerdem Platz für die erzeugte Antwort bleiben.
+
+## Läuft Kolibri auf eigener Hardware?
+
+Ja. Aber schau Dir die [veröffentlichten Hardwareanforderungen](https://huggingface.co/Aleph-Alpha/Kolibri-1#model-overview) an, bevor daraus „auf meinem Laptop“ wird.
+Allein die FP8-Gewichte benötigen ungefähr 78 GB.
+
+Als Mindestkonfigurationen nennt Aleph Alpha unter anderem **2× A100 80 GB, 2× H100 SXM5, 1× H200, 1× B200 oder 1× B300**.
+Empfohlen werden **2× H100 SXM5, 2× H200, 1× B200 oder 1× B300**.
+
+Das sind Konfigurationen für den Modellbetrieb, keine Zusage für eine Million Tokens bei beliebig vielen gleichzeitigen Anfragen.
+Kontext-Cache, Laufzeit und parallele Anfragen benötigen zusätzliche Kapazität.
+
+Ich würde den offiziellen FP8-Release nicht als Laptop-Modell mit Ein-Befehl-Installation vorstellen.
+Eine kleinere quantisierte Variante wäre ein eigener Aufbau, dessen Kompatibilität und Qualität separat geprüft werden müssten.
+
+## Praktischer Einstieg mit vLLM
+
+Kolibri benötigt das [Plugin aleph-alpha-inference](https://github.com/Aleph-Alpha/aleph-alpha-inference).
+Es installiert auch die unterstützte vLLM-Version.
+Voraussetzung ist eine passende Linux-/NVIDIA-Umgebung mit funktionierenden Treibern und ausreichend GPU-Kapazität, nicht einfach irgendeine Python-Installation auf einem Laptop.
+
+Lege zunächst eine frische virtuelle Umgebung an:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install 'aleph-alpha-inference>=1'
+```
+
+Dieses Beispiel ist für **zwei H100-SXM5-GPUs** gedacht.
+Es ergänzt den [offiziellen Startbefehl](https://huggingface.co/Aleph-Alpha/Kolibri-1#getting-started) um [Tensor-Parallelismus auf zwei GPUs](https://docs.vllm.ai/en/stable/serving/parallelism_scaling/), einen zunächst kleineren Kontext und einen nur lokal erreichbaren Listener:
+
+```bash
+vllm serve Aleph-Alpha/Kolibri-1 \
+  --tensor-parallel-size 2 \
+  --max-model-len 32768 \
+  --kv-cache-dtype fp8 \
+  --reasoning-parser kolibri1 \
+  --tool-call-parser kolibri1 \
+  --enable-auto-tool-choice \
+  --host 127.0.0.1 \
+  --port 8000
+```
+
+Warte, bis Download und Serverstart abgeschlossen sind.
+Öffne dann auf derselben Maschine ein zweites Terminal und schicke eine einfache Anfrage:
+
+```bash
+curl --fail-with-body http://127.0.0.1:8000/v1/chat/completions \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "model": "Aleph-Alpha/Kolibri-1",
+    "messages": [
+      {"role": "user", "content": "Erkläre Mixture-of-Experts-Modelle in drei Sätzen."}
+    ],
+    "temperature": 1.0,
+    "top_p": 0.97,
+    "top_k": 128,
+    "max_tokens": 1024,
+    "chat_template_kwargs": {
+      "reasoning_effort": "none",
+      "enable_thinking": false
+    }
+  }'
+```
+
+Das Beispiel verwendet die empfohlenen Sampling-Werte der Model Card und deaktiviert Reasoning für den ersten Funktionstest.
+Für Aufgaben mit Denkaufwand setzt Du `enable_thinking` auf `true`, wählst bei `reasoning_effort` zwischen `low`, `medium` und `high` und erhöhst bei Bedarf das Ausgabebudget.
+Die API verwendet das OpenAI-kompatible Format von vLLM; diese Anfrage geht an Deinen lokalen Server.
+
+Für einen späteren Test des erweiterten Fensters ersetzt Du `--max-model-len 32768` durch `--max-model-len 1048576` und ergänzt `--hf-overrides '{"max_position_embeddings": 1048576}'`, wie von Aleph Alpha dokumentiert.
+Prüfe vorher Speicherreserven und Verhalten bei kleineren Kontexten.
+
+Das sind Beispiele auf Basis der Dokumentation, kein auf meiner Maschine getestetes Deployment.
+Die [Serveroptionen](https://docs.vllm.ai/en/stable/cli/serve/) enthalten Netzwerk- und Authentifizierungseinstellungen.
+Lass dieses Beispiel privat; vor einem Fernzugriff gehören Authentifizierung, Zugriffskontrollen und Transportverschlüsselung davor.
+
+## Wofür ich es zuerst einsetzen würde
+
+Mein erster Kandidat wäre ein zweisprachiger Dokumentationsassistent.
+Ich würde ein paar passende Seiten heraussuchen, von Kolibri erklären lassen und die Quellen direkt neben der Antwort anzeigen.
+Bei Codebeispielen würde ich die dokumentierte Funktion verlangen, statt einen plausibel klingenden Namen zu akzeptieren.
+
+Das ist derselbe Ansatz mit vorgeschalteter Suche wie in meinem Beitrag zu [Cloudflare AI Search](/blog/cloudflare-ai-search/de).
+Es ist keine Behauptung, dass Cloudflare Kolibri über dieses Produkt ausführen kann.
+
+Tool-Aufrufe machen das interessanter, aber die Anwendung muss die angefragten Funktionen weiterhin prüfen und ausführen.
+Ich würde mit rein lesender Suche anfangen.
+Alles, was Daten verändert oder Code ausführt, braucht ausdrückliche Berechtigungen und Kontrolle.
+Auch die [Model Card](https://huggingface.co/Aleph-Alpha/Kolibri-1#ai-system-types) beschreibt den vorgesehenen Einsatz als Zusammenarbeit mit menschlicher Prüfung.
+
+## Kurze Fragen
+
+### Darf ich Kolibri-1 kommerziell kostenlos nutzen?
+
+Die veröffentlichten Gewichte und Konfigurationsdateien stehen unter Apache 2.0, die kommerzielle Nutzung unter ihren Bedingungen erlaubt.
+GPU-Hosting oder ein Dienst eines Drittanbieters werden dadurch nicht kostenlos.
+
+### Ist Kolibri ein 3B-Modell?
+
+Pro Token sind ungefähr 3,46 Milliarden Parameter aktiv, insgesamt sind es aber 78,1 Milliarden.
+Der offizielle FP8-Checkpoint benötigt weiterhin ungefähr 78 GB allein für seine Gewichte.
+
+### Sollte ich direkt mit einer Million Tokens anfangen?
+
+Ich würde es nicht tun.
+Beginne mit dem Kontext, den Deine Aufgabe braucht, und miss das Ergebnis.
+Aleph Alpha empfiehlt für Effizienz und komplexe Aufgaben höchstens 262.144 Tokens.
+
+## Meine Einschätzung
+
+Ich mag Veröffentlichungen, bei denen Entwickler am Ende etwas bekommen, das sie tatsächlich selbst ausführen können.
+Der Fokus auf Deutsch, die herunterladbaren Gewichte und der dokumentierte Betrieb machen einen ernsthaften Test sinnvoll.
+
+Wegen einer Grafik aus der Ankündigung würde ich nicht sämtliche Projekte umstellen.
+Ich würde mit einer klar begrenzten Aufgabe anfangen, die Antworten prüfen und die Infrastruktur ehrlich durchrechnen.
+
+**Kontrolle darüber, wie ein Modell läuft, ist für mich ein guter Grund, Kolibri-1 genauer anzuschauen.**
+
+*Quellen geprüft am 3. Oktober 2026: Model Card, Inferenz-Repository und technischer Bericht von Aleph Alpha sowie die verlinkte Apache- und vLLM-Dokumentation. Benchmarkwerte stammen vom Hersteller. Für diesen Artikel wurde kein Inferenzserver bereitgestellt.*
