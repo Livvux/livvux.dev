@@ -1,0 +1,496 @@
+---
+title: "OpenBot vs. OpenMaus vs. OpenAI Dots vs. OpenDots: 2026 Comparison"
+publishedAt: "2026-10-06"
+author: "Livvux"
+summary: "OpenBot, OpenMaus, OpenAI Dots and CopilotKit OpenDots compared in detail: open source, licensing, models, multi-agent work, computers, automation, privacy, security and cost."
+---
+
+**The new AI-agent race is no longer about who has the nicest chat box. It is about who gets the computer, who owns the data, which models you can use, and whether the agent still belongs to you when you stop paying.**
+
+That is why I wanted to compare [OpenBot](https://openbot.run/), [OpenMaus](https://www.openmausbot.com/), [OpenAI Dots](https://help.openai.com/en/articles/20001530-getting-started-with-your-dot) and [CopilotKit OpenDots](https://www.copilotkit.ai/opendots) properly.
+
+They all point toward the same future: persistent AI coworkers that can remember work, use tools, access computers and keep going after one chat turn.
+
+But they are **not the same product category**, and they are definitely not equally open.
+
+This comparison is based on the current product pages, documentation and repositories checked on **October 6, 2026**. I did not run one controlled benchmark across all four products, so I will not invent a "smartest agent" winner.
+
+## The short version
+
+| Category | Winner | Why |
+| --- | --- | --- |
+| Best open-source agent workspace | **OpenMaus** | Apache-2.0 core, local-first, multi-provider and usable as a complete product |
+| Best permissive foundation for your own product | **OpenDots** | MIT-licensed application template |
+| Best managed personal agent | **OpenAI Dots** | Always-on cloud computer, deep ChatGPT integration, almost no infrastructure work |
+| Best provider portability | **OpenBot** | Agent identity and workspace are separated from the underlying model provider |
+| Best multi-agent setup | **OpenMaus** | Multiple persistent bots, rooms, delegation and separate models |
+| Best for self-hosting | **OpenMaus** | Local machine, server, VM and cloud options |
+| Best for zero-maintenance cloud use | **OpenAI Dots** | OpenAI manages the orchestration and computer layer |
+| Best commercial licensing for a ready-to-use open product | **OpenMaus** | Apache 2.0 outside the clearly separated enterprise directory |
+| Most permissive code license | **OpenDots** | MIT |
+| Best for building a Dots competitor | **OpenDots** | It is explicitly designed as a customizable starting point |
+
+My overall pick for developers who want to **run their own agent system** is **OpenMaus**.
+
+My pick for people who want the agent without owning the infrastructure is **OpenAI Dots**.
+
+And if the goal is to build your own agent product rather than use someone else's, I would look at **OpenDots** first.
+
+## First: these four products are solving different problems
+
+The easiest mistake is to compare the feature lists without looking at the architecture.
+
+| Product | What it really is |
+| --- | --- |
+| **OpenBot** | A local-first desktop workspace around persistent AI agents and provider CLIs |
+| **OpenMaus** | A local-first multi-agent workspace with bots, computers, apps and orchestration |
+| **OpenAI Dots** | A managed always-on agent inside ChatGPT with its own cloud computer |
+| **OpenDots** | An open-source template for building and self-hosting a Dots-like application |
+
+OpenBot and OpenMaus are the closest competitors. Both sit around existing agent engines and give them persistence, workspaces and a product layer.
+
+OpenAI Dots goes in the opposite direction. OpenAI owns the orchestration, cloud computer and model stack. According to the current [Dots getting-started documentation](https://help.openai.com/en/articles/20001530-getting-started-with-your-dot), a dot is powered by GPT-6 Astra, has its own cloud computer, can work across connected apps and can keep making progress between conversations.
+
+OpenDots is different again. CopilotKit calls it an **open-source template**, currently marked Alpha, rather than a finished hosted product. The current [OpenDots page](https://www.copilotkit.ai/opendots) explicitly positions it as something you clone, self-host and modify.
+
+That difference explains most of the winners below.
+
+## Open source: the most important comparison
+
+This is the part I would check before comparing almost anything else.
+
+A public GitHub repository is not automatically open source.
+
+### OpenBot: source-available, not unrestricted open source
+
+OpenBot publishes its source code and is very transparent about its architecture.
+
+But current versions are licensed under **PolyForm Noncommercial 1.0.0**. The project itself says commercial use requires a separate license. Versions up to and including 0.1.11 remain Apache-2.0, but the current code does not.
+
+The [OpenBot repository](https://github.com/nightly-labs/openbot) even describes the project as **source-available**.
+
+That wording is correct.
+
+You can inspect the code, modify it for permitted non-commercial purposes and understand what is running. But you cannot treat the current project like a normal commercially reusable Apache/MIT codebase.
+
+**Open-source verdict: 5/10**
+
+I like the transparency. I do not consider the current commercial rights equivalent to open source.
+
+### OpenMaus: real Apache-2.0 core with an explicit open-core boundary
+
+OpenMaus is much cleaner here.
+
+The main project is licensed under **Apache License 2.0**. The exception is the `enterprise/` directory, which uses a separate source-available enterprise license.
+
+The important part is not just that this is documented. The project's [licensing document](https://github.com/milind-soni/OpenMausBot/blob/main/LICENSING.md) explicitly says that deleting `enterprise/` leaves the open-source edition and ordinary standalone operation remains available.
+
+That gives me a much clearer trust boundary.
+
+Core features that ordinary users can want belong in the Apache-licensed core. Organization- and enterprise-specific functionality is separated.
+
+**Open-source verdict: 9/10**
+
+For a complete agent application I can actually run, modify and commercially build around, OpenMaus is the strongest open-source option in this comparison.
+
+### OpenAI Dots: proprietary by design
+
+Dots is simple to classify.
+
+It is a managed OpenAI product.
+
+You do not get the source code for the orchestration stack, cloud computer layer or product backend. You cannot fork Dots and host the same system yourself.
+
+In return, you also do not have to operate that stack.
+
+**Open-source verdict: 0/10**
+
+That is not automatically a negative. It is a different trade: convenience over ownership.
+
+### OpenDots: MIT wins the license comparison, but the full stack needs context
+
+The [OpenDots repository](https://github.com/CopilotKit/OpenDots) is MIT-licensed.
+
+From a pure code-license perspective, that is the most permissive option here. You can fork it, modify it, commercialize your version and turn it into a completely different product.
+
+But I would not stop the analysis at the LICENSE file.
+
+The current [OpenDots setup guide](https://github.com/CopilotKit/OpenDots/blob/main/docs/SETUP.md) uses **CopilotKit Intelligence** for persistent conversations. Intelligence can be consumed as a hosted service or self-hosted on supported paid deployment paths; it is a separate layer from the MIT application code.
+
+So there are two different questions:
+
+- Is the OpenDots application itself open source? **Yes.**
+- Is the complete default production stack simply "MIT and free to self-host with no additional platform layer"? **No.**
+
+**Open-source verdict: 8/10**
+
+For builders, this is still excellent. For someone who only wants a completely independent end-user product, OpenMaus is currently the simpler answer.
+
+If this distinction matters to you, it is the same reason I keep arguing that [code and ownership matter, not just feature lists](/blog/code-must-be-free).
+
+## Models and providers: who controls the intelligence?
+
+### OpenBot wins provider switching
+
+One of OpenBot's best ideas is separating the **agent** from the **provider**.
+
+Its current repository documents support for the local Codex App Server and Claude Code, plus Grok, OpenCode, Gemini, Cursor and Cline through ACP.
+
+That means the workspace and agent identity are not supposed to disappear just because you change the underlying provider.
+
+This is a strong architecture if you actively move between Claude, Codex and other providers.
+
+**Winner: OpenBot**
+
+### OpenMaus wins heterogeneous agent teams
+
+OpenMaus is less about swapping one agent and more about letting different bots use different engines.
+
+The current [OpenMaus repository](https://github.com/milind-soni/OpenMausBot) documents direct use of Claude, Codex and Grok CLIs and support for custom/compatible providers. Each bot can have its own personality, model, computer and connected applications.
+
+That makes a setup like this natural:
+
+| Bot | Engine |
+| --- | --- |
+| Research | Claude |
+| Coding | Codex |
+| Fast triage | Grok or another compatible provider |
+| Review | Different model again |
+
+For a real agent team, that flexibility matters more to me than one global model selector.
+
+**Winner for mixed-model teams: OpenMaus**
+
+### OpenAI Dots wins integration, loses model freedom
+
+Dots is deliberately opinionated.
+
+The current product is powered by GPT-6 Astra. You get the advantage of OpenAI controlling more of the stack, but you do not get provider independence.
+
+You cannot turn the same Dot into a Claude-powered worker because you prefer Anthropic for one project.
+
+**Winner for simplicity: OpenAI Dots**
+
+**Winner for model freedom: OpenBot / OpenMaus**
+
+## Multi-agent work: OpenMaus is the clearest winner
+
+Creating multiple agents is not the same thing as orchestrating them.
+
+OpenMaus is built around a roster of persistent bots. The ecosystem also has explicit team playbooks that can create bots, a Chief of Staff, rooms, workflows and paused routines.
+
+That shape makes sense to me.
+
+A realistic engineering team could look like:
+
+**Coordinator → Research → Implementation → Review**
+
+Each role can have its own model, memory, files and computer.
+
+OpenBot also supports agent-to-agent messaging and shared work patterns, and recent releases added stronger orchestration around Slack.
+
+Dots can delegate work into separate background tasks and OpenAI-managed environments.
+
+OpenDots has specialist Dots and scheduling, but the current product page still describes multi-Dot group collaboration and full shared editing as work that is not yet complete.
+
+**Winner: OpenMaus**
+
+## Computers: managed convenience vs. infrastructure control
+
+The "computer" is where these products become much more than chat clients.
+
+### OpenAI Dots: best managed cloud computer
+
+A Dot has its own cloud computer.
+
+It can keep files and browser state, continue work while your laptop is off and optionally use your connected personal computer when you explicitly enable that access.
+
+The current [Dots documentation](https://help.openai.com/en/articles/20001530-getting-started-with-your-dot) also says local computer access starts turned off and requires the ChatGPT desktop app on that computer.
+
+This is the cleanest option if you do not want to operate agent infrastructure yourself.
+
+**Winner for managed cloud computers: OpenAI Dots**
+
+### OpenMaus: best infrastructure freedom
+
+OpenMaus lets you stay much closer to the machine.
+
+The project supports local-first operation and can combine bots with cloud Linux desktops, isolated local VMs or supported host-computer control. It can also run as a background service on a VPS.
+
+That gives you a choice Dots intentionally does not.
+
+**Winner for infrastructure control: OpenMaus**
+
+### OpenBot: powerful, but read the permission model carefully
+
+OpenBot also gives agents real computer capabilities.
+
+The current repository contains an unusually explicit warning: the project is a development preview and agents currently run with `danger-full-access` and `approvalPolicy: never` after first-launch consent.
+
+At the same time, [OpenBot 0.22](https://openbot.run/changelog) introduced an enforced **Workspace only** mode for supported combinations. Full access remains the default, and some provider/OS combinations cannot run in restricted mode.
+
+So I would not treat "local" as automatically "safe".
+
+If the agent can execute commands on your workstation, the permission boundary matters more than where the UI is hosted.
+
+## Automation: who can work while you are gone?
+
+### Dots: best managed always-on automation
+
+Dots is built around ongoing responsibility.
+
+You can schedule recurring checks, keep active work running between conversations and receive updates later. Because the primary computer is in OpenAI's cloud, your laptop does not need to stay on.
+
+**Winner: OpenAI Dots**
+
+### OpenMaus: best self-hosted automation
+
+OpenMaus supports always-on deployment patterns and scheduled tasks. The current Pro plan also explicitly sells a 24/7 cloud workspace where scheduled tasks continue even with your laptop off.
+
+If you self-host instead, you control the machine and therefore also control whether it is actually online.
+
+**Winner for self-hosting: OpenMaus**
+
+### OpenBot: useful routines, not a transaction scheduler
+
+OpenBot has had routines for a long time, including timezone-aware schedules and run history.
+
+I would use that for tasks such as:
+
+- daily research
+- repository summaries
+- periodic checks
+- recurring content preparation
+
+I would not treat an AI routine system as a replacement for a transactional production scheduler where exactly-once execution is the primary requirement.
+
+## Security and permissions
+
+This category is impossible to separate from the computer access.
+
+### OpenAI Dots: strongest managed guardrails
+
+OpenAI's current [Dots safety FAQ](https://help.openai.com/en/articles/20001529-dots-privacy-security-and-safety-faqs) documents approval rules, proactive-research restrictions, action reviews and cases where the user must take over.
+
+Workspace administrators also get additional controls for cloud browsers, cloud computer use, local computer access and connected applications. The current [workspace documentation](https://help.openai.com/en/articles/20001554-manage-dots-in-chatgpt-workspaces) makes those boundaries explicit.
+
+For organizations that want a managed policy layer instead of designing one themselves, this is an advantage.
+
+**Winner for managed guardrails: OpenAI Dots**
+
+### OpenMaus: strongest self-hosted control
+
+OpenMaus gives you more control over where the agent actually runs.
+
+That means you can solve part of the security problem with infrastructure rather than prompts: separate users, dedicated hosts, isolated VMs and limited credentials.
+
+The trade-off is obvious: you are responsible for designing and maintaining those boundaries.
+
+**Winner for user-controlled isolation: OpenMaus**
+
+### OpenDots: treat it as a template, not a security appliance
+
+I like how direct OpenDots is here.
+
+Its [security document](https://github.com/CopilotKit/OpenDots/blob/main/SECURITY.md) says the project is an application template under development, is currently single-owner in its local prototype and is **not a security-audited autonomous agent**.
+
+That is exactly the right expectation.
+
+If I built a commercial multi-user product on OpenDots, authorization would be part of my product engineering work, not something I would assume the template already solved.
+
+## Privacy and data ownership
+
+"Local-first" and "private" are not synonyms.
+
+A local desktop application can still send prompts, file excerpts and tool results to the selected model provider.
+
+OpenBot's own repository says exactly that: the application is local-first, not offline-only. Codex still talks to OpenAI, Claude to Anthropic, Grok to xAI and so on.
+
+OpenMaus is similar, but gives you more room to choose compatible providers and your own infrastructure.
+
+OpenAI Dots is the opposite philosophy: the managed cloud environment is the product.
+
+OpenDots lets you choose where much of your application runs, but the complete data path depends on how you configure Intelligence, the model provider, computers, voice and messaging.
+
+**Winner for maximum architecture control: OpenMaus**
+
+**Winner for managed governance: OpenAI Dots**
+
+## Pricing: software price is not the whole cost
+
+These products price different layers, so one number can be misleading.
+
+### OpenMaus
+
+The current official [OpenMaus pricing](https://www.openmausbot.com/pricing) is:
+
+| Plan | Price |
+| --- | ---: |
+| Free local edition | **$0** |
+| Pro | **$89/month** |
+| Enterprise | Custom |
+
+The local edition is Apache-2.0 licensed and uses your own AI accounts or API keys.
+
+Pro adds an always-on cloud workspace, included cloud computers, cloud scheduling and other hosted conveniences. AI model usage is still billed by your model provider.
+
+For a developer who already pays for Claude or ChatGPT, the local edition is an extremely strong value proposition.
+
+### OpenBot
+
+Local non-commercial use can be effectively free apart from the AI provider.
+
+The complication is commercial use: the current PolyForm Noncommercial license requires a separate commercial license.
+
+That means there is no clean public "software TCO" I can compare without knowing that commercial agreement.
+
+### OpenAI Dots
+
+Your first Dot is currently included with eligible plans.
+
+The important detail for Europe is availability. The current OpenAI documentation says personal Pro rollout excludes the **European Economic Area, Switzerland and the UK**, while Business Premium is available across supported ChatGPT regions.
+
+Current [ChatGPT Business pricing](https://openai.com/business/pricing/) is:
+
+| Business seat | Annual billing | Monthly billing |
+| --- | ---: | ---: |
+| Standard | $20/month | $25/month |
+| Premium | **$100/month** | **$125/month** |
+
+A Business workspace requires at least two paid seats, and Standard/Premium seats can be mixed.
+
+That makes Dots materially less straightforward for a single developer in Germany than "just install OpenMaus".
+
+### OpenDots
+
+The application code itself has no license fee.
+
+The surrounding production stack may.
+
+Current [CopilotKit pricing](https://www.copilotkit.ai/pricing) starts with a free Developer tier for Intelligence, followed by Pro and higher tiers. Self-hosted Intelligence is a separate deployment path.
+
+You also need to account for the model API and whichever machines run your application and Dot computers.
+
+This is why I never translate **MIT licensed** into **zero operating cost**.
+
+## Which one gives the best answers?
+
+I am deliberately not giving this category a winner.
+
+OpenBot and OpenMaus can run some of the same underlying providers and agent CLIs.
+
+If both are running comparable Codex setups against the same repository, the UI does not magically change the base model's reasoning ability.
+
+What can change the result is the system around it:
+
+- context handling
+- tool access
+- memory
+- run duration
+- permissions
+- delegation
+- computer environment
+- review loops
+
+Those factors matter a lot.
+
+But without a controlled benchmark across the same tasks, repositories, models and settings, declaring one platform "smarter" would just be marketing.
+
+## Who wins where?
+
+| Use case | My choice |
+| --- | --- |
+| I want a real open-source agent workspace | **OpenMaus** |
+| I want the most permissive code to build on | **OpenDots** |
+| I want a managed always-on personal agent | **OpenAI Dots** |
+| I want Claude, Codex and other providers in one system | **OpenMaus** |
+| I constantly switch one agent between providers | **OpenBot** |
+| I want multiple specialist agents working as a team | **OpenMaus** |
+| I want work to continue with my laptop off | **OpenAI Dots** |
+| I want to run the agent server myself | **OpenMaus** |
+| I want strong managed policy controls | **OpenAI Dots** |
+| I want maximum infrastructure ownership | **OpenMaus** |
+| I want to build my own Dots-like SaaS | **OpenDots** |
+| I need current code I can commercially modify without negotiating a custom license | **OpenMaus core / OpenDots** |
+| I am a single developer in Germany | **OpenMaus** |
+
+## My final ranking
+
+| Rank | Product | Best at |
+| ---: | --- | --- |
+| **1** | **OpenMaus** | Overall developer/self-hosted agent platform |
+| **2** | **OpenAI Dots** | Managed always-on agent |
+| **3** | **OpenBot** | Provider-portable persistent agents |
+| **4** | **OpenDots** | Building your own agent platform |
+
+That ranking is intentionally based on **using the product today**.
+
+If I were ranking only developer foundations, OpenDots would move much higher.
+
+### 1. OpenMaus — my overall winner for developers
+
+OpenMaus currently has the best balance of openness and actual usability.
+
+I can run it locally, use models and subscriptions I already have, build real teams of bots, put them on their own computers and keep the core under a recognized open-source license.
+
+The `enterprise/` carve-out prevents me from calling every byte Apache-licensed, but the boundary is explicit and the open-source edition is a real product rather than a demo shell.
+
+**Rating: 9/10**
+
+### 2. OpenAI Dots — best when I do not want to own the infrastructure
+
+Dots is the most convincing answer if the goal is simply:
+
+> I want an AI coworker that is always there and I do not want to operate its servers.
+
+OpenAI owns more of the stack, which is exactly why the experience can be more integrated.
+
+It is also exactly why Dots loses on model portability, source availability and infrastructure ownership.
+
+**Managed experience: 9/10**
+
+**Ownership/control: 3/10**
+
+### 3. OpenBot — one excellent architectural idea, one major licensing caveat
+
+I really like the idea that the agent should survive the model provider.
+
+That is how I want this category to evolve.
+
+But for commercial use, PolyForm Noncommercial changes the decision significantly. "The source is on GitHub" is not enough for me to call current OpenBot open source.
+
+**Rating: 7.5/10**
+
+### 4. OpenDots — the most interesting choice if you want to build the next one
+
+OpenDots is the one I would study if I wanted to create my own agent product.
+
+It gives you a modern MIT-licensed application, specialist agents, Spaces, Pages, computers, scheduling, calls and a clear place to start changing the product.
+
+I would just treat it as what its maintainers call it: a template and an Alpha, not a drop-in enterprise agent platform.
+
+**As a development foundation: 8.5/10**
+
+**As a finished personal assistant today: 6/10**
+
+## The bigger takeaway
+
+The feature race is interesting.
+
+The ownership question is more important.
+
+**OpenMaus is open source with an Apache-2.0 core.**
+
+**OpenDots is an MIT-licensed application template, with additional infrastructure choices around CopilotKit Intelligence.**
+
+**OpenBot is source-available under a non-commercial license in current versions.**
+
+**OpenAI Dots is proprietary and managed.**
+
+Those are not small legal details hidden below the feature table.
+
+They determine whether you can self-host the product, modify it commercially, move away from the vendor and keep operating the system on your own terms.
+
+For persistent AI coworkers that may eventually touch our repositories, email, browser, infrastructure and business processes, I think that distinction matters more than ever.
+
+*Sources and product documentation checked October 6, 2026. This is a source-based product comparison, not a controlled hands-on benchmark of all four systems.*
