@@ -1,0 +1,114 @@
+---
+title: "AI Game Modding: Why These Mashups Honestly Blow My Mind"
+publishedAt: "2026-10-06"
+author: "Livvux"
+summary: "Minecraft in GTA, parkour in Skyrim and a skateboard in WoW: why I find AI game modding and reverse engineering genuinely wild right now."
+---
+
+**The video connects Minecraft with GTA, puts Mirror’s Edge parkour into Skyrim and brings skateboarding to World of Warcraft. I honestly find that pretty crazy.**
+
+These sound like ideas you come up with late at night with friends: “Imagine this game with the movement from that other one.” Those are exactly the kinds of combinations presented in [this video about AI game modding and reverse engineering](https://www.youtube.com/watch?v=h5zkzon0gM4).
+
+What blows my mind is not just the ridiculous sight of it. It is the prospect of turning that idea into an experiment you can actually play, change and develop further. Not merely an image of what it might look like.
+
+I want to explain what the video describes and why I find the direction so remarkable. I have not rebuilt or tested the featured mods myself.
+
+## Take a look at the idea behind the mashups
+
+The [opening at 00:00](https://www.youtube.com/watch?v=h5zkzon0gM4&t=0s) introduces the combinations. Alongside Minecraft and GTA, they include Spider-Man in a Batman game, the movement system from Mirror’s Edge in Skyrim, and skateboarding mechanics in completely different game worlds.
+
+A replacement character model would make me think: cool, a mod. But bringing across a mechanic that changes **how a game feels** is another level of interesting to me.
+
+How does a character accelerate? How do they land? How does a skateboard react to the ground? What happens when an action in game A has a consequence in game B? Those questions make the examples more interesting to me than a change of costume.
+
+Even the thought of being able to experiment with those combinations deliberately is wild. Whether they eventually make a good game is a separate question. But being able to find out whether a strange idea is fun would already be worth a lot.
+
+## Reverse engineering without the jargon
+
+[At 01:16](https://www.youtube.com/watch?v=h5zkzon0gM4&t=76s), the video explains source code and a finished program using a cake: the source code is the recipe, compilation is the baking process, and the executable is the finished cake.
+
+Reverse engineering means examining the finished product to understand how it works. The role described for AI in the video is to support that investigation with analysis tools, then help develop modifications or new implementations.
+
+The interesting question for me is this: can an agent do more than write new code? Can it also work its way into an existing system without having the original blueprint openly available?
+
+The cake analogy does have a limit. Understanding a process or producing a working recreation does not prove that the original recipe has been recovered in full. I would not describe every mod as “AI figured out the entire game.” Even the three approaches in the video are substantially different.
+
+## Three approaches that should not be confused
+
+### 1. Connect two running games through a bridge
+
+[At 03:28](https://www.youtube.com/watch?v=h5zkzon0gM4&t=208s), the video discusses **passthrough mods**. In the Minecraft-GTA example it describes, neither game is rewritten from scratch. An additional layer connects their actions instead.
+
+The example in the video is TNT placed in Minecraft. The connection translates its position and eventual explosion event into a corresponding action in GTA. Both games remain involved; the mod communicates between them.
+
+I love the idea that you do not have to build an entirely new game world before experimenting with the combination. The video also names the limitations of that bridge: the original engines remain in place, and collisions or physics can cause problems.
+
+**That connection is not the same thing as a completely rebuilt game. It is still interesting.**
+
+### 2. Reimplement the software behind the game
+
+The second approach is described [at 05:36](https://www.youtube.com/watch?v=h5zkzon0gM4&t=336s). Here, AI is supposed to help investigate a game and rewrite the software that runs it. The video repeatedly mentions Rust as one possible language for this.
+
+The distinction from a bridge is that you are trying to create your own technical foundation, rather than just getting two existing systems to communicate. The video connects this approach to more extensive customization, mentioning World of Warcraft with a skateboard and, later, a combination of Call of Duty and a Minecraft world.
+
+That is a much bigger claim. “Reimplemented” does not, by itself, tell us whether all the content, quirks and gameplay are covered. I treat these as projects presented in the video, not complete remakes I have independently confirmed.
+
+### 3. Bring a particular mechanic into a different world
+
+[At 09:55](https://www.youtube.com/watch?v=h5zkzon0gM4&t=595s), the video reaches the part I find most fascinating: instead of taking an entire game, use a particular system from it in another setting.
+
+Its examples include Mirror’s Edge parkour in Skyrim and Skate 3-style trick physics in other games. The point is not just to make something look different, but to change movement and interaction.
+
+For me, this is the most exciting prospect for original game ideas. I would much rather try a movement mechanic in my own world early on than only talk about whether it might work. If AI makes those experiments more accessible, it changes which ideas I would even consider starting.
+
+The thought of combining familiar game feel in new ways is genuinely remarkable to me. A good combination still needs design, tuning and testing. But the opportunity to try it in the first place is what excites me.
+
+## It is also about new ways to experience old games
+
+[At 09:02](https://www.youtube.com/watch?v=h5zkzon0gM4&t=542s), the video also discusses moving between platforms and virtual reality. Super Mario Galaxy and Mario Kart are among the examples mentioned in connection with VR.
+
+I do not read that as a promise that every game can now be moved to any device without trouble. I am interested in the underlying idea: an existing game could become playable in a way that was never originally intended.
+
+That is why these experiments interest me beyond the most ridiculous mashups. A new perspective on a familiar world can already be a good reason for me to engage with it again.
+
+## The tools that come up in the video
+
+[At 04:49](https://www.youtube.com/watch?v=h5zkzon0gM4&t=289s), the video introduces prepared tools and instructions for agents. As supplementary references, I looked up the original project pages:
+
+[Universal Modder](https://github.com/rehan-remade/universal-modder) packages modding workflows and tools for coding agents. Its documented `mashup-mods` skill includes passthrough mods and reimplementations. [REA — Reverse Engineer Anything](https://github.com/morluto/rea) describes a workflow for investigating, understanding and recreating software features.
+
+[Ghidra](https://github.com/NationalSecurityAgency/ghidra) is a reverse-engineering framework; [ILSpy](https://github.com/icsharpcode/ILSpy) is a .NET decompiler. I resolved the transcript’s spelling “Gedra” using Ghidra’s project page. These are supplementary documentation links, not confirmation that every transformation mentioned in the video is reproducible with them.
+
+One thing I like about the [prompting discussion at 11:57](https://www.youtube.com/watch?v=h5zkzon0gM4&t=717s) is that it explicitly rejects the idea of a magic prompt. The idea is to give the agent a clear goal and suitable tools. I find that much more interesting than searching for a supposedly magical sentence.
+
+## Why this makes me think beyond games
+
+[At 12:25](https://www.youtube.com/watch?v=h5zkzon0gM4&t=745s), the video extends its argument to other software. I am less interested in the provocative idea of simply copying every commercial application. The more interesting question is how building original features changes when existing behavior becomes easier to investigate and understand.
+
+My hope would be more opportunities to implement your own ideas, and fewer situations where you give up before the first attempt. That is my interpretation of the video, not a demonstrated prediction for the entire software industry.
+
+I had a similar reaction to [AI and motion design](/blog/ai-motion-design). What excites me is not the claim that everything suddenly becomes effortless. It is having fewer obstacles between an idea and a result I can respond to.
+
+With games, that is particularly immediate. I do not just want to read about how a mechanic might feel. I want to try it.
+
+## Being excited does not mean accepting every claim
+
+There is one statement in the video I would explicitly avoid generalizing. [At 00:59](https://www.youtube.com/watch?v=h5zkzon0gM4&t=59s), it cites a reverse-engineering benchmark success rate of **over 99 percent after four attempts**. Later, that becomes a much broader claim about almost any game or program.
+
+I have not independently verified the underlying benchmark’s primary source or its exact evaluation for this article. I therefore do **not treat that number as evidence that AI can completely reconstruct 99 percent of all games or programs**. A test’s conditions and the requirements of a complete recreation are not automatically the same thing.
+
+An impressive example also does not tell us how many attempts, manual interventions or unresolved problems sit behind it. That does not take away my excitement. I do not need to claim that everything already works to find the direction impressive.
+
+For my own experiments, I would use original or appropriately licensed material and check the rights before publishing. I am interested in creative mods and original projects, not bypassing copy protection or building cheats against other players.
+
+## This is the kind of AI development I find crazy
+
+What stays with me is a very concrete possibility: somebody has a strange game idea and can get closer to making it playable.
+
+Maybe the combination turns out to be brilliant. Maybe five minutes of playing reveals that it is not fun at all. Both are more interesting than never getting beyond the idea.
+
+That is why I do not find the mashups described in the video merely amusing. They make a possibility tangible that genuinely excites me as a developer: understanding familiar systems, experimenting with them and using that experience to create something original.
+
+**I do not want to rush into declaring that the entire gaming industry has been turned upside down. But I think it is pretty wild that we are even having this conversation. That is exactly why I wanted to write about it.**
+
+*This article is based on the supplied transcript of the linked video. The timestamps point to the sections discussed. The linked tool project pages were consulted on October 6, 2026 as supplementary references for terminology. This is a personal perspective, not a hands-on modding test or benchmark.*
