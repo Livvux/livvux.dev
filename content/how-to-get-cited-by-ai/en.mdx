@@ -1,0 +1,494 @@
+---
+title: "How to Get Cited by AI: A Practical GEO Tutorial"
+publishedAt: "2026-10-06"
+author: "Livvux"
+summary: "How to get cited by ChatGPT, Google AI, Perplexity and Copilot: crawler checks, better source pages, citation tracking and a practical 30-day plan."
+---
+
+**To get cited by AI, give a search system a useful, verifiable page to reference, make that page accessible, and check whether answers actually link to it.** You can improve those conditions. You cannot make an assistant choose your website.
+
+The part I find interesting is the opportunity for specific expertise. A developer who documents a difficult bug, a shop that publishes a proper compatibility table, or a business that answers a question nobody else explains well has something worth referencing.
+
+That is where I would spend my time.
+
+This tutorial covers ChatGPT search, Google AI Overviews and AI Mode, Perplexity, Claude search, and Microsoft Copilot. You will build a question list, improve one source page, check the technical blockers, and set up a repeatable measurement process.
+
+You need access to your website and, ideally, Google Search Console, Bing Webmaster Tools and your analytics. The terminal commands are optional.
+
+*Documentation checked on October 6, 2026. The examples and work plan below are my recommended process, not a claim that I measured a particular citation uplift.*
+
+### Jump to a section
+
+- [Understand what counts as a citation](#citations)
+- [Choose questions and establish a baseline](#baseline)
+- [Check crawlers, indexing and firewalls](#access)
+- [Build a page worth citing](#content)
+- [Connect and maintain the page](#discovery)
+- [Measure results](#measurement)
+- [Follow the 30-day plan](#plan)
+- [Troubleshoot missing citations](#troubleshooting)
+- [Frequently asked questions](#faq)
+
+<h2 id="citations">1. Understand what an AI citation actually is</h2>
+
+For this tutorial, a **citation** is a source link attached to an answer. A brand name appearing in a paragraph is a different observation.
+
+| Outcome | What I would record |
+| --- | --- |
+| Brand mention | The answer names your brand, with or without a link. |
+| Citation to your site | The answer links to a relevant page on your domain as a source. |
+| Third-party coverage | The answer cites someone else's page that discusses you. |
+| Referral visit | A person reaches your website from the answer. |
+| Conversion | That person completes a useful action, such as an inquiry, purchase or sign-up. |
+
+These can happen independently. A citation might generate no visit. A recommendation might cite an external review instead of your product page.
+
+For a useful technical reference, I would measure citations to the reference itself. For a product, I would also track relevant third-party coverage and qualified visits.
+
+### How a page becomes a source
+
+Search-enabled assistants can retrieve web material when composing an answer. Google describes expanding a question into related searches to find supporting pages. The details vary between products. [Google: AI features and your website](https://developers.google.com/search/docs/appearance/ai-features)
+
+My diagnostic questions are:
+
+1. Can the system discover the URL?
+2. Can it retrieve and understand the useful content?
+3. Does the page answer this particular question?
+4. Does the answer actually select and link to it?
+
+A bot request in your logs only helps answer the access question. It cannot establish the last two.
+
+You will see **GEO**, generative engine optimization, and **AEO**, answer engine optimization, used for this work. I use them as labels for improving and measuring visibility in AI answers.
+
+<h2 id="baseline">2. Choose real questions and record a baseline</h2>
+
+Start with one audience and one subject you know well.
+
+For a software project, I would collect questions from support tickets, documentation gaps, issue discussions and sales conversations. Remove personal information before turning any of that material into public examples.
+
+Create a small working list. Twenty questions is a manageable starting point; it is my suggested workload, not an algorithmic threshold.
+
+| Question type | Example | Useful page to create or improve |
+| --- | --- | --- |
+| Decision | “Which backup approach fits a small self-hosted app?” | Comparison with assumptions and tradeoffs |
+| Compatibility | “Does this plugin support this framework version?” | Versioned compatibility table |
+| Implementation | “How do I restore this application from a backup?” | Tested walkthrough with verification steps |
+| Troubleshooting | “Why does this restore fail with this error?” | Reproduction, cause, fix and affected versions |
+| Constraints | “What does the free plan exclude?” | Explicit limits with a checked date |
+
+Group questions that one coherent page can answer. A comparison and its obvious follow-up questions can belong together. Separate pages make sense when the reader's task or the evidence changes substantially.
+
+Then test a representative subset before editing:
+
+1. Open a fresh conversation in the assistant you want to measure.
+2. Use its search-enabled mode and ask the actual question.
+3. Leave your brand and URL out of unbranded discovery tests.
+4. Record the date, language, product, mode, question and linked sources.
+5. Open each relevant source link and check what it supports.
+
+If a question does not produce a search-backed answer, record that too. Do not quietly remove unsuccessful runs.
+
+Look at the cited pages for concrete gaps: missing version information, outdated instructions, no reproducible example, or an unanswered constraint. Your opportunity is the useful material you can contribute.
+
+<h2 id="access">3. Make the intended page accessible to the right systems</h2>
+
+Pick one public article, documentation page or product reference. Check its final URL, not just your homepage.
+
+Start with these basics:
+
+- It loads successfully without an account, challenge page or consent interaction hiding the answer.
+- Its title, main explanation, tables and source links are available as readable content.
+- Important internal pages link to it.
+- Its canonical URL represents the page you intend search engines to use.
+- Google and Bing can discover and index it.
+
+For Google AI Overviews and AI Mode, the page must be indexed and eligible for a Search snippet. Eligibility still does not guarantee selection. [Google: Technical requirements for AI features](https://developers.google.com/search/docs/appearance/ai-features#technical-requirements-for-appearing-in-ai-features)
+
+### Know which crawler does what
+
+| Service | Relevant crawler or control | What to check |
+| --- | --- | --- |
+| ChatGPT search | `OAI-SearchBot` | Search access. `GPTBot` is a separate training crawler. [OpenAI](https://developers.openai.com/api/docs/bots) |
+| Perplexity | `PerplexityBot` | Search discovery; Perplexity says this bot is not for foundation-model training. [Perplexity](https://docs.perplexity.ai/docs/resources/perplexity-crawlers) |
+| Claude search | `Claude-SearchBot`, `Claude-User` | Search indexing and user-requested retrieval. `ClaudeBot` serves potential training use. [Anthropic](https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler) |
+| Google Search AI features | `Googlebot`, Search Console inclusion control | Google Search crawling and participation in its AI features. [Google](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide) |
+| Bing and Copilot | `bingbot`, Bing indexing and content controls | Check Bing's requirements independently. [Bing](https://www.bing.com/webmasters/help/webmaster-guidelines-30fba23a) |
+
+OpenAI explicitly supports allowing its search crawler while disallowing its training crawler. It also distinguishes `ChatGPT-User`, a user-triggered fetcher, from search crawling; its robots rules may not apply to user requests. [OpenAI crawler documentation](https://developers.openai.com/api/docs/bots)
+
+Perplexity says its user-triggered `Perplexity-User` generally ignores robots.txt. Anthropic says its bots honor robots.txt. Do not assume all user fetchers behave identically. [Perplexity](https://docs.perplexity.ai/docs/resources/perplexity-crawlers) · [Anthropic](https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler)
+
+For Google, `Google-Extended` governs certain training and Gemini grounding uses. It does not control inclusion in Google Search. Avoid applying advice about AI Overviews to every standalone Gemini experience. [Google crawler reference](https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers#google-extended)
+
+### Review robots.txt without replacing your existing rules
+
+Open `https://YOUR-DOMAIN/robots.txt` and inspect the response delivered to visitors.
+
+Here is an **illustrative rule group** for public content. The account and administration exclusions are examples: adapt them to your site and merge the policy into existing configuration.
+
+~~~text
+User-agent: OAI-SearchBot
+User-agent: PerplexityBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+Allow: /
+Disallow: /admin/
+Disallow: /account/
+~~~
+
+Keep your existing Googlebot, Bing, sitemap and other rules. A specific crawler group can take precedence over the wildcard group; do not assume restrictions under `User-agent: *` carry over. Google documents this selection behavior explicitly. [Robots.txt group precedence](https://developers.google.com/crawling/docs/robots-txt/robots-txt-spec#order-of-precedence-for-user-agents)
+
+Decide on training crawlers separately. For example, a policy that declines future OpenAI and Anthropic training crawling can include:
+
+~~~text
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+~~~
+
+These are crawler preferences, not authentication. Account data and private downloads need actual access controls.
+
+### Check page directives and headers
+
+Inspect the HTML and the HTTP response for rules that contradict the page's intended visibility.
+
+| Directive | Why to investigate it |
+| --- | --- |
+| `noindex` | Prevents Google indexing when the crawler can read it. |
+| `nosnippet` or `max-snippet:0` | Prevents Google's text snippets and direct content use in AI Overviews and AI Mode. |
+| `data-nosnippet` | Excludes the marked text from Google's relevant previews. |
+| `X-Robots-Tag` | Can deliver restrictions through HTTP headers even when HTML looks fine. |
+
+Google documents these controls and requires crawl access to discover them. Adding an `index` tag does not cancel a conflicting `noindex`. [Google: Robots metadata](https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag)
+
+Bing documents `noarchive` as preventing Copilot/grounding use and `nocache` as limiting use to the URL, title and snippet. Review combined and bot-specific directives too before changing these settings. [Bing Webmaster Guidelines](https://www.bing.com/webmasters/help/webmaster-guidelines-30fba23a)
+
+### Check Google's Search generative AI setting
+
+In **Search Console → Settings → Search generative AI**, verify that the property is included. Inclusion is the default; a child property may inherit an exclusion from its parent. Google documents worldwide rollout on August 31, 2026. This control concerns Search AI participation, independently of training. [Google: Search generative AI control](https://support.google.com/webmasters/answer/16908024)
+
+For the individual page, paste its published URL into Search Console's **URL Inspection** and record:
+
+- Whether the URL is currently indexed.
+- Whether Google's selected canonical matches the intended URL.
+- Whether a live test retrieves the actual answer.
+- Whether crawl or indexing restrictions remain.
+
+A successful live test demonstrates current access; it does not establish that the page is already indexed. [Google: URL Inspection](https://support.google.com/webmasters/answer/9012289)
+
+Check Bing's URL inspection separately. A successful Google check cannot prove another service has indexed the page.
+
+## 4. Check the response beyond robots.txt
+
+A CDN or firewall can still deny a request that robots.txt allows.
+
+With Cloudflare, an **Allow** setting in AI Crawl Control does not override every WAF rule. Inspect the actual blocking rule and recent security events. Cloudflare's managed robots feature can also prepend rules to the origin's file, so verify the public response after changes. [Cloudflare: WAF interaction](https://developers.cloudflare.com/ai-crawl-control/configuration/ai-crawl-control-with-waf/) · [Managed robots.txt](https://developers.cloudflare.com/bots/additional-configurations/managed-robots-txt/)
+
+For an optional terminal check, replace the two example URLs:
+
+~~~bash
+curl --fail-with-body --silent --show-error --location \
+  --max-time 30 \
+  'https://example.com/robots.txt'
+
+curl --fail-with-body --silent --show-error --location \
+  --max-time 30 \
+  --user-agent 'OAI-SearchBot/1.4' \
+  --dump-header citation-headers.txt \
+  --output citation-page.html \
+  --write-out 'HTTP %{http_code}; final URL %{url_effective}\n' \
+  'https://example.com/guides/your-page'
+~~~
+
+Read the saved headers and HTML. Does the body contain your article, or only a login screen, an empty application shell or a challenge?
+
+**This tests the response from your connection with a chosen user-agent string. It does not authenticate you as the crawler or prove the real crawler succeeds.** Compare against verified crawler requests in your logs. Perplexity documents combining user-agent checks with its current published IP ranges. [Perplexity: WAF configuration](https://docs.perplexity.ai/docs/resources/perplexity-crawlers#waf-configuration)
+
+I would make any exception narrowly for the intended public content and verified crawler. A rule that trusts a bot name supplied by anyone is a poor access policy.
+
+For JavaScript applications, I prefer rendering important editorial content in the initial HTML. That gives more clients a straightforward way to read it. Google can process JavaScript, so “all AI crawlers require a static website” is too broad. Check the actual output of your implementation. [Google: JavaScript SEO basics](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics)
+
+<h2 id="content">5. Build something worth referencing</h2>
+
+Once access works, ask a harder question: **what can someone learn from this page that they cannot get from a generic summary?**
+
+Here are the assets I would prioritize:
+
+| Asset | What I would publish |
+| --- | --- |
+| Reproducible test | Environment, versions, method, results and limitations |
+| Compatibility reference | Supported combinations, checked dates and known exceptions |
+| Original walkthrough | Working steps, expected output and failure recovery |
+| Comparison | Consistent criteria, current evidence and the cases each option fits |
+| Case study | Starting problem, actual intervention and documented outcome |
+| Local or product reference | Accurate services, availability, constraints and ownership |
+
+You do not need to pretend every article is new research. A careful explanation can be useful because it resolves ambiguity, puts scattered official instructions into a working sequence, or demonstrates where an approach fails.
+
+But label the contribution honestly. If you have not tested a product, write “the documentation says” rather than “in my testing.”
+
+### A before-and-after example
+
+Imagine a fictional backup product called ExampleBackup. These examples demonstrate presentation; they are not claims about a real product.
+
+**Weak answer:**
+
+> ExampleBackup offers powerful backup capabilities with easy restoration for modern teams.
+
+There is no usable answer to “Can I restore this from the free plan?”
+
+**A more useful answer:**
+
+> The free plan exports one project at a time. The archive includes uploaded files and a database dump. Restoring it requires command-line access to the destination server. It does not restore account passwords or external storage buckets.
+
+Then show the supporting evidence: a link to the relevant plan documentation, the checked version, a sample archive structure, and a restore procedure you actually verified.
+
+Notice the work being done by the second paragraph. It names the plan, explains the capability, states the requirement and defines the limits. A reader can decide whether it fits.
+
+For your real page, replace every detail with verified information. Invented precision is worse than an honest gap.
+
+## 6. Put the answer where readers can use it
+
+My preferred structure is:
+
+1. A descriptive title stating the question or task.
+2. A direct answer near the beginning.
+3. Conditions, versions and important exceptions.
+4. The explanation, procedure or comparison.
+5. Evidence next to the claims it supports.
+6. Troubleshooting and meaningful follow-up questions.
+7. Author information and a genuine update date.
+
+This is an editorial template. Google explicitly rejects mandatory tiny chunks, special AI prose and ideal page-length formulas. Clear sections are useful; a fixed number of words per paragraph is not a documented requirement. [Google: AI optimization guidance](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide)
+
+Keep important qualifications next to the answer. If a feature works only on one plan, write that in the same passage. A limitation buried much later is easy for a hurried reader to miss.
+
+Use ordinary text and HTML tables for exact comparisons. Screenshots and video can demonstrate the process, but I would also write down the relevant result so readers can search it and check it.
+
+A reusable brief:
+
+~~~text
+Reader and situation:
+Question this page answers:
+Direct answer:
+Conditions and exceptions:
+Original contribution:
+Evidence or working example:
+Steps or comparison criteria:
+Expected result:
+Troubleshooting:
+Author:
+Last meaningful verification:
+~~~
+
+Fill in the evidence section before producing a long draft. If it is empty, decide what you need to research, test or explain.
+
+### Use AI as an editor with an evidence boundary
+
+I would give an assistant a draft and the sources I actually used, then ask it to identify omissions:
+
+~~~text
+Review this page for clarity and usefulness as a source.
+
+Target reader: [reader]
+Question: [question]
+Page draft: [draft]
+Verified evidence: [sources, measurements or documentation]
+
+Check whether:
+- The opening answers the question directly.
+- Important conditions are next to the claims they qualify.
+- Readers can distinguish documentation from first-hand testing.
+- Factual claims have supporting evidence.
+- The steps include verification and likely failure cases.
+- Tables use consistent comparison criteria.
+
+Return specific edits and unresolved factual questions.
+Do not invent data, testimonials, tests, product capabilities
+or statements about unpublished AI ranking systems.
+~~~
+
+That gives me something concrete to review. A request to “make this GEO optimized” leaves too much room for confident filler.
+
+<h2 id="discovery">7. Connect the page to a credible, usable website</h2>
+
+Give the page a stable home in your navigation or topic structure. Add contextual links from relevant existing articles. Use link text that explains the destination, and check that the links are actual crawlable links. [Google: Link best practices](https://developers.google.com/search/docs/crawling-indexing/links-crawlable)
+
+For example, I would connect this tutorial with a guide to auditing internal links where discovery becomes the reader's next task. You can use my [internal link checker](/tools/internal-links) as one part of that review.
+
+For authors and businesses, I would make the basics easy to verify:
+
+- Who wrote the material and why they understand the subject.
+- Which company or project the page describes.
+- Whether the author owns or sells something being recommended.
+- Where readers can find official documentation, support or contact details.
+
+Use accurate structured data when it fits. For an article, review `Article` or `BlogPosting` metadata, including the real author, headline and publication or modification dates. The markup should describe the visible page. [Google: Article structured data](https://developers.google.com/search/docs/appearance/structured-data/article)
+
+Google does not require special AI schema. I would fix incorrect metadata before adding more of it. [Google: AI optimization guidance](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide)
+
+If you publish in English and German, give each version its own accessible URL. Use the appropriate language annotations and a canonical URL for each intended language version. Translate examples and constraints carefully; an outdated translation can give a reader a different answer. [Google: Localized versions](https://developers.google.com/search/docs/specialty/international/localized-versions)
+
+## 8. Publish where the relevant audience can evaluate your work
+
+External coverage can be useful because people discover, test and discuss your material there.
+
+I would share a technical fix in a relevant issue discussion, explain a benchmark in a development community, or offer a useful reference to an industry publication. The contribution should answer that audience's question without requiring an unnecessary click.
+
+For a software project, a working public repository and clear documentation give other people something to inspect. For a business, accurate listings and genuine independent reviews help people evaluate the service.
+
+These are distribution choices I would make for their practical value. I would not promise that a particular platform, backlink type or number of mentions produces AI citations.
+
+My [article about publishing on other platforms](/blog/parasite-seo-explained) goes into the distinction between useful exposure and manufactured search signals.
+
+A useful test: would this contribution still make sense if no assistant ever cited it?
+
+## 9. Keep the evidence current
+
+Assign someone to maintain the facts that can expire: prices, plan limits, versions, availability, compatibility and installation commands.
+
+For each update:
+
+1. Check what materially changed.
+2. Correct the answer, examples and related tables.
+3. Update affected translations.
+4. Record the meaningful revision date.
+5. Check links and notify the relevant discovery systems where supported.
+
+Check that the sitemap contains the page's final canonical URL, loads successfully and has no processing errors in the search consoles. [Google: Sitemaps report](https://support.google.com/webmasters/answer/7451001)
+
+If your CMS or publishing pipeline supports IndexNow, notify participating engines of added, changed or deleted URLs. A successful notification does not guarantee crawling or indexing, and it does not mean Google or ChatGPT has accepted a citation. [IndexNow FAQ](https://www.indexnow.org/faq)
+
+### Where llms.txt fits
+
+`llms.txt` is a proposal for offering compatible agents an overview and links into website content. For documentation, I would consider an automatically maintained version if readers' tools use it. It is an optional navigation aid, not an access-control file. [The llms.txt proposal](https://llmstxt.org/)
+
+Google explicitly says Search ignores these files for visibility and ranking. Keep that separate from their potential usefulness to other tools. [Google: AI optimization guidance](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide)
+
+I would prioritize a correct public page over maintaining a second, contradictory description of the same product.
+
+<h2 id="measurement">10. Measure citations, visits and outcomes separately</h2>
+
+Use three views: provider reports, repeatable answer samples and your own analytics.
+
+### Google Search Console
+
+The **Generative AI performance report (Search)** reports impressions in AI Overviews and AI Mode, with page, country, date and device breakdowns. Google documents worldwide rollout from August 31, 2026, while its help page still lists rollout and insufficient impressions as reasons the report might be absent. Treat these as impressions, not a complete citation or prompt log. [Google: Generative AI performance report](https://support.google.com/webmasters/answer/16984139)
+
+Use it to identify visible pages and changes over time. If the report is missing, investigate the documented availability and eligibility conditions before concluding that a particular edit failed.
+
+### Bing Webmaster Tools
+
+**AI Performance** reports citations and cited pages across Copilot, Bing AI summaries and selected partner experiences. Grounding queries are retrieval phrases, not necessarily the user's original question. Coverage is limited to the supported experiences. [Bing: AI Performance](https://blogs.bing.com/webmaster/2026/2/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview/)
+
+Bing's June 2026 preview also adds Intents, Topics, Citation Share and Compare. Citation Share describes the share of citations for a grounding query; it is not traffic share or a rank. Use it as a directional observation if available. [Bing: New AI visibility insights](https://blogs.bing.com/search/2026/6/New-AI-Visibility-Insights-in-Bing-Webmaster-Tools-Intents-Topics-Citation-Share-Compare/)
+
+### Your own question sample
+
+Repeat the baseline questions at a consistent interval, keeping the language, product, search mode and testing conditions as stable as practical.
+
+For a small project, I would begin weekly with ten important questions and a few fresh runs per question. Record changes in the product or model when visible. Evaluate languages separately.
+
+Use two distinct tests:
+
+- **Discovery:** ask the real question without your domain.
+- **Access diagnosis:** explicitly ask the assistant to read your page and report a specific fact from it.
+
+The second can reveal retrieval problems. It cannot demonstrate independent discovery.
+
+A spreadsheet can start with these columns:
+
+~~~csv
+date,platform,mode,language,test_type,prompt_id,run_id,question,search_used,brand_mentioned,own_site_cited,cited_urls,citation_supports_claim,answer_record,notes
+~~~
+
+Keep the question wording in a fixed reference sheet. Save the answer text or a screenshot so you can verify later what the citation actually supported.
+
+I would calculate:
+
+**Observed discovery citation rate = valid discovery answers citing your domain ÷ all valid discovery answers.**
+
+Keep direct-URL access tests out of this calculation.
+
+Report the counts alongside the percentage. Five citations in twenty valid runs is 25% in that sample. Those numbers are illustrative, not a benchmark for your website.
+
+Count each answer once for this measure, even if it cites three of your pages. Include successful answers that did not use search in the denominator when they came from the same planned testing conditions. Track technical errors separately and disclose any retries. You can additionally report a search-backed-only rate, with that different denominator clearly labeled.
+
+This is your observed sample, not an estimate of every answer the platform gives. It is also different from Bing's Citation Share.
+
+### Analytics and business results
+
+Create a report for identifiable AI referrals, landing pages and useful actions. Keep a separate record of source impressions and citations.
+
+Referrer information can be missing, so label your numbers as identifiable referrals. Avoid assigning unexplained direct traffic to AI.
+
+Then ask whether the visitors are finding what they need. An accurate technical citation with a handful of useful visits can be more valuable to your project than many irrelevant brand mentions.
+
+If citations rise after an update, record the association. To investigate causality, keep comparable unchanged pages where practical and repeat the observation. Changing demand, competing pages and product behavior can also change results.
+
+<h2 id="plan">A 30-day implementation plan</h2>
+
+This is a work schedule. It is not a promise that citations arrive within thirty days.
+
+| Period | Work | Concrete output |
+| --- | --- | --- |
+| Days 1–3 | Choose a subject, collect real questions and run baseline samples. | Question list and saved answers |
+| Days 4–7 | Check important URLs, crawler rules, headers, indexing and firewall events. | Documented blockers and verified fixes |
+| Days 8–14 | Improve one strong page with a direct answer, evidence and usable examples. | Published reference and source record |
+| Days 15–21 | Add relevant internal links, verify metadata and translations, share where useful. | Connected, reviewed page |
+| Days 22–30 | Repeat the samples and review provider reports plus analytics. | Findings and the next specific improvement |
+
+If I had only one afternoon, I would pick one important question and one page. Check access, improve the answer, add evidence, link it from relevant content, then record the starting state.
+
+That is enough to begin learning.
+
+<h2 id="troubleshooting">Why your page still is not being cited</h2>
+
+| Observation | Next check |
+| --- | --- |
+| A direct URL request fails. | Response status, authentication, firewall, robots rules and content rendering |
+| Direct access works, but unbranded discovery fails. | Indexing, internal links, relevance and missing evidence |
+| Your page is indexed but never sampled as a source. | What the existing sources answer better; whether your sample represents real demand |
+| Your brand appears with a link to someone else. | Record third-party coverage separately and inspect whether it is accurate. |
+| A source link does not support the adjacent claim. | Record the attribution error; inspect whether the page's wording or qualifications are ambiguous. |
+| Citations appear but visits do not. | Whether the answer already satisfies the task; whether a visit offers a useful next step |
+| Results differ between English and German. | Query wording, translated evidence, language-specific competition and discovery |
+| Visibility drops after a site change. | Redirects, canonicals, newly restrictive rules, missing content and the last verified crawl |
+
+Do not rewrite the whole site because of one answer. Find the failure you can actually demonstrate.
+
+<h2 id="faq">Frequently asked questions</h2>
+
+### Can a small website get cited?
+
+I would focus a small site's effort on a narrow question it can answer unusually well. There is no useful guarantee based on site size alone. Start with evidence, access and a realistic measurement sample.
+
+### Do I have to let AI companies train on my content?
+
+Search and training permissions can be separate, as the crawler table explains. Review the specific provider's controls instead of assuming training access buys visibility.
+
+### Should I add FAQ schema?
+
+Add useful answers when readers need them. Choose structured data that truthfully fits the page. There is no documented universal FAQ markup requirement for AI citations.
+
+### Should I put “cite this page” instructions in my website?
+
+I would publish a clear title, author, date and stable URL so a source is easy to identify. Commands aimed at manipulating an assistant are no substitute for useful evidence.
+
+### Will an AI-written article be cited?
+
+The practical question is whether the resulting page is accurate, useful and supported. Review every claim and add a contribution you can stand behind. Automating the draft does not establish any of those qualities.
+
+### How long does it take?
+
+There is no dependable timetable covering crawling, indexing and source selection across all these services. Track the individual stages and improve the part you can verify.
+
+## What I would do next
+
+Take one question your readers already ask. Publish the clearest answer you can support, including the awkward exceptions. Make the page easy to reach and maintain.
+
+Then check whether the systems you care about actually reference it, and whether the resulting attention helps your readers or business.
+
+That gives you an improvement process with observable results.

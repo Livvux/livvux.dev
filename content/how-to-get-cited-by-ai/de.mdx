@@ -1,0 +1,494 @@
+---
+title: "Von KI zitiert werden: Ein praktisches GEO-Tutorial"
+publishedAt: "2026-10-06"
+author: "Livvux"
+summary: "Von KI zitiert werden: Crawler prüfen, Inhalte verbessern und Zitate von ChatGPT, Google AI, Perplexity und Copilot messen. Mit 30-Tage-Plan."
+---
+
+**Wenn du von KI zitiert werden möchtest, braucht das Suchsystem eine nützliche, überprüfbare Seite als Quelle. Mach diese Seite zugänglich und prüfe, ob Antworten tatsächlich darauf verlinken.** Du kannst diese Voraussetzungen verbessern. Ob ein Assistent deine Website auswählt, kannst du nicht bestimmen.
+
+Interessant finde ich daran die Chance für konkretes Fachwissen. Ein Entwickler, der einen schwierigen Bug dokumentiert, ein Shop mit einer ordentlichen Kompatibilitätstabelle oder ein Unternehmen, das eine bisher schlecht erklärte Frage beantwortet: Sie alle liefern etwas, das als Quelle nützlich sein kann.
+
+Genau dafür würde ich meine Zeit einsetzen.
+
+Dieses Tutorial behandelt die ChatGPT-Suche, Google AI Overviews und AI Mode, Perplexity, die Claude-Suche und Microsoft Copilot. Du erstellst eine Fragenliste, verbesserst eine Seite als Quelle, prüfst technische Hindernisse und richtest eine wiederholbare Messung ein.
+
+Du brauchst Zugriff auf deine Website und idealerweise auf Google Search Console, Bing Webmaster Tools und deine Webanalyse. Die Terminalbefehle sind optional.
+
+*Dokumentation geprüft am 6. Oktober 2026. Die Beispiele und der Arbeitsplan zeigen mein empfohlenes Vorgehen. Sie sind keine Behauptung, dass ich damit einen bestimmten Anstieg von KI-Zitaten gemessen habe.*
+
+### Direkt zum Abschnitt
+
+- [Verstehen, was als Zitat zählt](#citations)
+- [Fragen auswählen und den Ausgangszustand erfassen](#baseline)
+- [Crawler, Indexierung und Firewalls prüfen](#access)
+- [Eine Seite erstellen, die als Quelle taugt](#content)
+- [Die Seite verknüpfen und aktuell halten](#discovery)
+- [Ergebnisse messen](#measurement)
+- [Den 30-Tage-Plan umsetzen](#plan)
+- [Fehlenden Zitaten auf den Grund gehen](#troubleshooting)
+- [Häufige Fragen](#faq)
+
+<h2 id="citations">1. Verstehe, was ein KI-Zitat überhaupt ist</h2>
+
+In diesem Tutorial zählt als **Zitat** ein Quellenlink, der zu einer Antwort gehört. Wenn nur ein Markenname in einem Absatz auftaucht, ist das eine andere Beobachtung.
+
+| Ergebnis | Was ich erfassen würde |
+| --- | --- |
+| Markenerwähnung | Die Antwort nennt deine Marke, mit oder ohne Link. |
+| Zitat deiner Website | Die Antwort verlinkt als Quelle auf eine passende Seite deiner Domain. |
+| Berichterstattung Dritter | Die Antwort zitiert eine fremde Seite, die über dich berichtet. |
+| Besuch über den Quellenlink | Eine Person gelangt aus der Antwort auf deine Website. |
+| Conversion | Diese Person führt eine sinnvolle Aktion aus, etwa eine Anfrage, einen Kauf oder eine Registrierung. |
+
+Diese Ergebnisse können unabhängig voneinander auftreten. Ein Zitat führt möglicherweise zu keinem Besuch. Eine Empfehlung verlinkt vielleicht einen externen Testbericht statt deiner Produktseite.
+
+Bei einer hilfreichen technischen Referenz würde ich Zitate dieser Referenz messen. Bei einem Produkt würde ich zusätzlich relevante Berichterstattung Dritter und qualifizierte Besuche erfassen.
+
+### Wie eine Seite zur Quelle wird
+
+Assistenten mit Websuche können beim Schreiben einer Antwort Webinhalte abrufen. Google beschreibt, wie eine Frage in verwandte Suchanfragen erweitert wird, um passende Quellen zu finden. Die Details unterscheiden sich je nach Produkt. [Google: KI-Funktionen und deine Website](https://developers.google.com/search/docs/appearance/ai-features)
+
+Meine Fragen zur Diagnose wären:
+
+1. Kann das System die URL entdecken?
+2. Kann es die nützlichen Inhalte abrufen und verstehen?
+3. Beantwortet die Seite genau diese Frage?
+4. Wählt die Antwort diese Seite tatsächlich aus und verlinkt sie?
+
+Eine Bot-Anfrage in deinen Logs hilft nur bei der Frage nach dem Zugriff. Die letzten beiden Punkte belegt sie nicht.
+
+Für diese Arbeit begegnen dir die Begriffe **GEO**, Generative Engine Optimization, und **AEO**, Answer Engine Optimization. Ich verwende sie als Bezeichnungen dafür, die Sichtbarkeit in KI-Antworten zu verbessern und zu messen.
+
+<h2 id="baseline">2. Wähle echte Fragen und erfasse den Ausgangszustand</h2>
+
+Beginne mit einer Zielgruppe und einem Thema, mit dem du dich gut auskennst.
+
+Für ein Softwareprojekt würde ich Fragen aus Supporttickets, Lücken in der Dokumentation, Issue-Diskussionen und Verkaufsgesprächen sammeln. Entferne personenbezogene Informationen, bevor du daraus öffentliche Beispiele machst.
+
+Erstelle eine kleine Arbeitsliste. Zwanzig Fragen sind ein überschaubarer Anfang. Das ist mein Vorschlag für den Arbeitsumfang, kein Schwellenwert eines Algorithmus.
+
+| Art der Frage | Beispiel | Sinnvolle Seite zum Erstellen oder Verbessern |
+| --- | --- | --- |
+| Entscheidung | „Welcher Backup-Ansatz passt zu einer kleinen, selbst gehosteten App?“ | Vergleich mit Annahmen und Abwägungen |
+| Kompatibilität | „Unterstützt dieses Plugin diese Framework-Version?“ | Kompatibilitätstabelle mit Versionsangaben |
+| Umsetzung | „Wie stelle ich diese Anwendung aus einem Backup wieder her?“ | Getestete Anleitung mit Prüfschritten |
+| Fehlerbehebung | „Warum schlägt die Wiederherstellung mit diesem Fehler fehl?“ | Reproduktion, Ursache, Lösung und betroffene Versionen |
+| Einschränkungen | „Was ist im kostenlosen Tarif nicht enthalten?“ | Klare Grenzen mit Prüfdatum |
+
+Fasse Fragen zusammen, die eine schlüssige Seite beantworten kann. Ein Vergleich und seine naheliegenden Folgefragen können zusammengehören. Eigene Seiten sind sinnvoll, wenn sich die Aufgabe des Lesers oder die erforderlichen Belege deutlich unterscheiden.
+
+Teste dann eine repräsentative Auswahl, bevor du Inhalte bearbeitest:
+
+1. Öffne eine neue Unterhaltung in dem Assistenten, den du messen möchtest.
+2. Nutze seinen Modus mit Websuche und stelle die tatsächliche Frage.
+3. Lass deine Marke und URL bei Tests ohne Markenbezug weg.
+4. Notiere Datum, Sprache, Produkt, Modus, Frage und verlinkte Quellen.
+5. Öffne jeden relevanten Quellenlink und prüfe, was er belegt.
+
+Falls eine Frage keine Antwort mit Webquellen erzeugt, halte auch das fest. Entferne erfolglose Durchläufe nicht stillschweigend.
+
+Suche auf den zitierten Seiten nach konkreten Lücken: fehlende Versionsangaben, veraltete Anweisungen, kein nachvollziehbares Beispiel oder eine unbeantwortete Einschränkung. Deine Chance liegt in dem nützlichen Material, das du ergänzen kannst.
+
+<h2 id="access">3. Mach die gewünschte Seite für die richtigen Systeme zugänglich</h2>
+
+Wähle einen öffentlichen Artikel, eine Dokumentationsseite oder eine Produktreferenz. Prüfe die endgültige URL, nicht nur deine Startseite.
+
+Beginne mit diesen Grundlagen:
+
+- Die Seite lädt erfolgreich, ohne dass ein Konto, eine Sicherheitsabfrage oder ein Einwilligungsdialog die Antwort verdeckt.
+- Titel, Haupterklärung, Tabellen und Quellenlinks stehen als lesbare Inhalte bereit.
+- Wichtige interne Seiten verlinken darauf.
+- Die kanonische URL entspricht der Seite, die Suchmaschinen verwenden sollen.
+- Google und Bing können sie entdecken und indexieren.
+
+Für Google AI Overviews und AI Mode muss die Seite indexiert sein und für ein Such-Snippet infrage kommen. Auch dann ist ihre Auswahl nicht garantiert. [Google: Technische Anforderungen für KI-Funktionen](https://developers.google.com/search/docs/appearance/ai-features#technical-requirements-for-appearing-in-ai-features)
+
+### Verstehe, welcher Crawler was macht
+
+| Dienst | Relevanter Crawler oder relevante Einstellung | Was du prüfen solltest |
+| --- | --- | --- |
+| ChatGPT-Suche | `OAI-SearchBot` | Zugriff für die Suche. `GPTBot` ist ein separater Trainingscrawler. [OpenAI](https://developers.openai.com/api/docs/bots) |
+| Perplexity | `PerplexityBot` | Auffindbarkeit in der Suche; laut Perplexity dient dieser Bot nicht dem Training von Basismodellen. [Perplexity](https://docs.perplexity.ai/docs/resources/perplexity-crawlers) |
+| Claude-Suche | `Claude-SearchBot`, `Claude-User` | Suchindexierung und vom Nutzer angeforderter Abruf. `ClaudeBot` dient der möglichen Trainingsnutzung. [Anthropic](https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler) |
+| KI-Funktionen der Google-Suche | `Googlebot`, Teilnahme-Einstellung in Search Console | Crawling für Google Search und Teilnahme an dessen KI-Funktionen. [Google](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide) |
+| Bing und Copilot | `bingbot`, Bing-Indexierung und Inhaltsvorgaben | Prüfe Bings Anforderungen gesondert. [Bing](https://www.bing.com/webmasters/help/webmaster-guidelines-30fba23a) |
+
+OpenAI unterstützt ausdrücklich, den Suchcrawler zuzulassen und den Trainingscrawler zu sperren. Außerdem unterscheidet OpenAI `ChatGPT-User`, einen vom Nutzer ausgelösten Abrufdienst, vom Suchcrawling. Dessen robots-Regeln gelten möglicherweise nicht für Nutzeranfragen. [OpenAI: Crawler-Dokumentation](https://developers.openai.com/api/docs/bots)
+
+Laut Perplexity ignoriert der vom Nutzer ausgelöste `Perplexity-User` die robots.txt normalerweise. Anthropic erklärt, dass seine Bots die robots.txt beachten. Geh nicht davon aus, dass sich alle Abrufdienste für Nutzeranfragen gleich verhalten. [Perplexity](https://docs.perplexity.ai/docs/resources/perplexity-crawlers) · [Anthropic](https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler)
+
+Bei Google regelt `Google-Extended` bestimmte Nutzungen für Training und Gemini-Grounding. Es steuert nicht die Aufnahme in Google Search. Übertrage Hinweise zu AI Overviews nicht pauschal auf jede eigenständige Gemini-Funktion. [Google: Crawler-Referenz](https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers#google-extended)
+
+### Prüfe die robots.txt, ohne deine bestehenden Regeln zu ersetzen
+
+Öffne `https://DEINE-DOMAIN/robots.txt` und prüfe die Antwort, die Besucher erhalten.
+
+Hier ist eine **beispielhafte Regelgruppe** für öffentliche Inhalte. Die ausgeschlossenen Konto- und Verwaltungsbereiche sind Beispiele: Passe sie an deine Website an und übernimm die Vorgaben in die bestehende Konfiguration.
+
+~~~text
+User-agent: OAI-SearchBot
+User-agent: PerplexityBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+Allow: /
+Disallow: /admin/
+Disallow: /account/
+~~~
+
+Behalte deine bestehenden Regeln für Googlebot, Bing, Sitemaps und andere Zwecke bei. Eine spezielle Crawler-Gruppe kann Vorrang vor der Wildcard-Gruppe haben. Geh nicht davon aus, dass Einschränkungen unter `User-agent: *` übernommen werden. Google dokumentiert dieses Auswahlverhalten ausdrücklich. [Rangfolge der robots.txt-Gruppen](https://developers.google.com/crawling/docs/robots-txt/robots-txt-spec#order-of-precedence-for-user-agents)
+
+Entscheide über Trainingscrawler gesondert. Eine Vorgabe, die künftiges Trainingscrawling von OpenAI und Anthropic ablehnt, kann beispielsweise Folgendes enthalten:
+
+~~~text
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+~~~
+
+Das sind Vorgaben für Crawler, keine Authentifizierung. Kontodaten und private Downloads brauchen echte Zugriffskontrollen.
+
+### Prüfe Seitenvorgaben und Header
+
+Untersuche das HTML und die HTTP-Antwort auf Regeln, die der beabsichtigten Sichtbarkeit widersprechen.
+
+| Direktive | Warum du sie prüfen solltest |
+| --- | --- |
+| `noindex` | Verhindert die Google-Indexierung, wenn der Crawler die Vorgabe lesen kann. |
+| `nosnippet` oder `max-snippet:0` | Verhindert Googles Text-Snippets und die direkte Inhaltsnutzung in AI Overviews und AI Mode. |
+| `data-nosnippet` | Schließt den markierten Text von den entsprechenden Google-Vorschauen aus. |
+| `X-Robots-Tag` | Kann Einschränkungen über HTTP-Header ausliefern, obwohl im HTML alles richtig aussieht. |
+
+Google dokumentiert diese Vorgaben und benötigt Crawl-Zugriff, um sie zu erkennen. Ein zusätzliches `index`-Tag hebt ein widersprüchliches `noindex` nicht auf. [Google: Robots-Metadaten](https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag)
+
+Bing beschreibt `noarchive` als Ausschluss der Nutzung für Copilot und Grounding. `nocache` begrenzt die Nutzung auf URL, Titel und Snippet. Prüfe auch kombinierte und botspezifische Vorgaben, bevor du diese Einstellungen änderst. [Bing Webmaster Guidelines](https://www.bing.com/webmasters/help/webmaster-guidelines-30fba23a)
+
+### Prüfe Googles Einstellung für generative KI in der Suche
+
+Prüfe unter **Search Console → Settings → Search generative AI**, ob die Property eingeschlossen ist. Die Teilnahme ist standardmäßig aktiviert; eine untergeordnete Property kann einen Ausschluss von ihrer übergeordneten Property erben. Google dokumentiert die weltweite Einführung zum 31. August 2026. Diese Einstellung betrifft die Teilnahme an KI-Funktionen der Suche, unabhängig vom Training. [Google: Search generative AI control](https://support.google.com/webmasters/answer/16908024)
+
+Füge für die einzelne Seite ihre veröffentlichte URL in die **URL-Prüfung** der Search Console ein und halte fest:
+
+- Ob die URL aktuell indexiert ist.
+- Ob die von Google gewählte kanonische URL der gewünschten entspricht.
+- Ob ein Live-Test die tatsächliche Antwort abruft.
+- Ob weiterhin Einschränkungen für Crawling oder Indexierung bestehen.
+
+Ein erfolgreicher Live-Test zeigt, dass der Zugriff aktuell funktioniert. Er belegt nicht, dass die Seite bereits indexiert ist. [Google: URL-Prüfung](https://support.google.com/webmasters/answer/9012289)
+
+Prüfe die URL in Bing gesondert. Ein erfolgreicher Google-Test belegt nicht, dass ein anderer Dienst die Seite indexiert hat.
+
+## 4. Prüfe die Antwort auch außerhalb der robots.txt
+
+Ein CDN oder eine Firewall kann eine Anfrage weiterhin blockieren, obwohl die robots.txt sie erlaubt.
+
+Bei Cloudflare setzt **Allow** in AI Crawl Control nicht jede WAF-Regel außer Kraft. Prüfe die tatsächlich blockierende Regel und aktuelle Sicherheitsereignisse. Cloudflares verwaltete robots-Funktion kann außerdem Regeln vor die Datei des Ursprungsservers setzen. Kontrolliere nach Änderungen deshalb die öffentlich ausgelieferte Antwort. [Cloudflare: Zusammenspiel mit der WAF](https://developers.cloudflare.com/ai-crawl-control/configuration/ai-crawl-control-with-waf/) · [Verwaltete robots.txt](https://developers.cloudflare.com/bots/additional-configurations/managed-robots-txt/)
+
+Für eine optionale Prüfung im Terminal ersetzt du die beiden Beispiel-URLs:
+
+~~~bash
+curl --fail-with-body --silent --show-error --location \
+  --max-time 30 \
+  'https://example.com/robots.txt'
+
+curl --fail-with-body --silent --show-error --location \
+  --max-time 30 \
+  --user-agent 'OAI-SearchBot/1.4' \
+  --dump-header citation-headers.txt \
+  --output citation-page.html \
+  --write-out 'HTTP %{http_code}; final URL %{url_effective}\n' \
+  'https://example.com/guides/your-page'
+~~~
+
+Lies die gespeicherten Header und das HTML. Enthält der Antwortinhalt deinen Artikel oder nur eine Anmeldeseite, ein leeres App-Grundgerüst oder eine Sicherheitsabfrage?
+
+**Damit prüfst du die Antwort von deiner Verbindung aus mit einer gewählten User-Agent-Zeichenfolge. Du authentifizierst dich nicht als Crawler und beweist nicht, dass der echte Crawler erfolgreich zugreifen kann.** Vergleiche das mit verifizierten Crawler-Anfragen in deinen Logs. Perplexity beschreibt dafür die Kombination aus User-Agent-Prüfung und seinen aktuell veröffentlichten IP-Bereichen. [Perplexity: WAF-Konfiguration](https://docs.perplexity.ai/docs/resources/perplexity-crawlers#waf-configuration)
+
+Ich würde jede Ausnahme eng auf die gewünschten öffentlichen Inhalte und den verifizierten Crawler begrenzen. Eine Regel, die einem beliebig angegebenen Bot-Namen vertraut, ist eine schlechte Zugriffsvorgabe.
+
+Bei JavaScript-Anwendungen würde ich wichtige redaktionelle Inhalte möglichst im initialen HTML ausgeben. Das erleichtert mehr Clients den direkten Zugriff. Google kann JavaScript verarbeiten. „Alle KI-Crawler brauchen eine statische Website“ ist deshalb zu pauschal. Prüfe die tatsächliche Ausgabe deiner Umsetzung. [Google: Grundlagen von JavaScript-SEO](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics)
+
+<h2 id="content">5. Erstelle etwas, auf das sich ein Verweis lohnt</h2>
+
+Sobald der Zugriff funktioniert, stelle die schwierigere Frage: **Was lernt jemand auf dieser Seite, das eine beliebige Zusammenfassung nicht liefert?**
+
+Diese Inhalte würde ich priorisieren:
+
+| Inhalt | Was ich veröffentlichen würde |
+| --- | --- |
+| Reproduzierbarer Test | Umgebung, Versionen, Methode, Ergebnisse und Grenzen |
+| Kompatibilitätsreferenz | Unterstützte Kombinationen, Prüfdaten und bekannte Ausnahmen |
+| Eigene Anleitung | Funktionierende Schritte, erwartete Ausgabe und Vorgehen bei Fehlern |
+| Vergleich | Einheitliche Kriterien, aktuelle Belege und passende Einsatzfälle pro Option |
+| Fallstudie | Ausgangsproblem, tatsächlich umgesetzte Maßnahme und dokumentiertes Ergebnis |
+| Lokale Informationen oder Produktreferenz | Korrekte Leistungen, Verfügbarkeit, Einschränkungen und Verantwortliche |
+
+Du musst nicht so tun, als wäre jeder Artikel neue Forschung. Eine sorgfältige Erklärung kann nützlich sein, weil sie Unklarheiten auflöst, verstreute offizielle Anweisungen in eine funktionierende Reihenfolge bringt oder zeigt, wo ein Ansatz scheitert.
+
+Beschreibe deinen Beitrag aber ehrlich. Wenn du ein Produkt nicht getestet hast, schreib „laut Dokumentation“ statt „in meinem Test“.
+
+### Ein Vorher-nachher-Beispiel
+
+Stell dir ein fiktives Backup-Produkt namens ExampleBackup vor. Diese Beispiele zeigen die Darstellung. Sie behaupten nichts über ein echtes Produkt.
+
+**Schwache Antwort:**
+
+> ExampleBackup bietet leistungsstarke Backup-Funktionen mit einfacher Wiederherstellung für moderne Teams.
+
+Das beantwortet nicht die Frage: „Kann ich das mit dem kostenlosen Tarif wiederherstellen?“
+
+**Eine nützlichere Antwort:**
+
+> Der kostenlose Tarif exportiert jeweils ein Projekt. Das Archiv enthält hochgeladene Dateien und einen Datenbank-Dump. Für die Wiederherstellung brauchst du Zugriff auf die Kommandozeile des Zielservers. Kontopasswörter und externe Storage-Buckets werden nicht wiederhergestellt.
+
+Zeige anschließend die Belege: einen Link zur relevanten Tarifdokumentation, die geprüfte Version, eine beispielhafte Archivstruktur und ein Wiederherstellungsverfahren, das du tatsächlich überprüft hast.
+
+Achte darauf, was der zweite Absatz leistet. Er nennt den Tarif, erklärt die Funktion, benennt die Voraussetzung und definiert die Grenzen. Der Leser kann entscheiden, ob das passt.
+
+Ersetze auf deiner echten Seite jedes Detail durch überprüfte Informationen. Erfundenes Detailwissen ist schlechter als eine ehrlich benannte Lücke.
+
+## 6. Platziere die Antwort dort, wo Leser sie brauchen
+
+Meine bevorzugte Struktur:
+
+1. Ein aussagekräftiger Titel, der die Frage oder Aufgabe benennt.
+2. Eine direkte Antwort nahe am Anfang.
+3. Bedingungen, Versionen und wichtige Ausnahmen.
+4. Die Erklärung, Anleitung oder der Vergleich.
+5. Belege direkt bei den Aussagen, die sie stützen.
+6. Fehlerbehebung und sinnvolle Folgefragen.
+7. Angaben zum Autor und ein echtes Aktualisierungsdatum.
+
+Das ist eine redaktionelle Vorlage. Google widerspricht ausdrücklich der Idee vorgeschriebener Miniabschnitte, spezieller KI-Prosa und einer idealen Seitenlänge. Klare Abschnitte sind hilfreich. Eine feste Wortzahl pro Absatz ist keine dokumentierte Anforderung. [Google: Hinweise zur KI-Optimierung](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide)
+
+Halte wichtige Einschränkungen direkt bei der Antwort. Wenn eine Funktion nur in einem bestimmten Tarif verfügbar ist, gehört das in denselben Abschnitt. Eine viel später versteckte Einschränkung übersieht ein eiliger Leser leicht.
+
+Nutze normalen Text und HTML-Tabellen für genaue Vergleiche. Screenshots und Videos können den Ablauf zeigen. Ich würde das relevante Ergebnis zusätzlich aufschreiben, damit Leser es durchsuchen und überprüfen können.
+
+Ein wiederverwendbares Briefing:
+
+~~~text
+Leser und Situation:
+Frage, die diese Seite beantwortet:
+Direkte Antwort:
+Bedingungen und Ausnahmen:
+Eigener Beitrag:
+Belege oder funktionierendes Beispiel:
+Schritte oder Vergleichskriterien:
+Erwartetes Ergebnis:
+Fehlerbehebung:
+Autor:
+Letzte inhaltlich relevante Überprüfung:
+~~~
+
+Fülle den Abschnitt zu den Belegen aus, bevor du einen langen Entwurf schreibst. Wenn er leer bleibt, entscheide zuerst, was du recherchieren, testen oder erklären musst.
+
+### Nutze KI als Redakteur mit klaren Grenzen bei den Belegen
+
+Ich würde einem Assistenten einen Entwurf und die tatsächlich verwendeten Quellen geben. Anschließend würde ich ihn nach Lücken suchen lassen:
+
+~~~text
+Prüfe diese Seite auf Verständlichkeit und Nutzen als Quelle.
+
+Zielgruppe: [Leser]
+Frage: [Frage]
+Seitenentwurf: [Entwurf]
+Überprüfte Belege: [Quellen, Messungen oder Dokumentation]
+
+Prüfe, ob:
+- Der Einstieg die Frage direkt beantwortet.
+- Wichtige Bedingungen bei den Aussagen stehen, die sie einschränken.
+- Leser Dokumentation von eigenen Tests unterscheiden können.
+- Tatsachenbehauptungen durch Belege gestützt werden.
+- Die Schritte eine Prüfung und wahrscheinliche Fehlerfälle enthalten.
+- Tabellen einheitliche Vergleichskriterien verwenden.
+
+Nenne konkrete Änderungen und offene Sachfragen.
+Erfinde keine Daten, Kundenstimmen, Tests, Produktfunktionen
+oder Aussagen über unveröffentlichte KI-Rankingsysteme.
+~~~
+
+Damit bekomme ich etwas Konkretes zum Prüfen. Die Bitte „Mach das GEO-optimiert“ lässt zu viel Raum für selbstbewusst formulierten Fülltext.
+
+<h2 id="discovery">7. Binde die Seite in eine glaubwürdige, gut nutzbare Website ein</h2>
+
+Gib der Seite einen festen Platz in deiner Navigation oder Themenstruktur. Verlinke sie im passenden Kontext aus bestehenden Artikeln. Nutze Linktexte, die das Ziel erklären, und prüfe, ob es sich um tatsächlich crawlbare Links handelt. [Google: Empfehlungen für Links](https://developers.google.com/search/docs/crawling-indexing/links-crawlable)
+
+Dieses Tutorial würde ich beispielsweise mit einer Anleitung zur Prüfung interner Links verbinden, wenn Auffindbarkeit die nächste Aufgabe des Lesers ist. Meinen [Internal Link Checker](/tools/internal-links) kannst du für einen Teil dieser Prüfung verwenden.
+
+Bei Autoren und Unternehmen würde ich diese Grundlagen leicht überprüfbar machen:
+
+- Wer den Inhalt geschrieben hat und warum sich diese Person mit dem Thema auskennt.
+- Welches Unternehmen oder Projekt die Seite beschreibt.
+- Ob der Autor etwas Empfohlenes selbst besitzt oder verkauft.
+- Wo Leser offizielle Dokumentation, Support oder Kontaktdaten finden.
+
+Nutze korrekte strukturierte Daten, wenn sie passen. Prüfe bei einem Artikel `Article`- oder `BlogPosting`-Metadaten, einschließlich des tatsächlichen Autors, der Überschrift und der Veröffentlichungs- oder Änderungsdaten. Das Markup sollte die sichtbare Seite beschreiben. [Google: Strukturierte Daten für Artikel](https://developers.google.com/search/docs/appearance/structured-data/article)
+
+Google verlangt kein spezielles KI-Schema. Ich würde falsche Metadaten korrigieren, bevor ich weitere ergänze. [Google: Hinweise zur KI-Optimierung](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide)
+
+Wenn du auf Englisch und Deutsch veröffentlichst, gib jeder Version eine eigene zugängliche URL. Verwende passende Sprachauszeichnungen und eine kanonische URL für jede vorgesehene Sprachversion. Übersetze Beispiele und Einschränkungen sorgfältig. Eine veraltete Übersetzung kann dem Leser eine andere Antwort geben. [Google: Lokalisierte Versionen](https://developers.google.com/search/docs/specialty/international/localized-versions)
+
+## 8. Veröffentliche dort, wo die passende Zielgruppe deine Arbeit beurteilen kann
+
+Externe Berichterstattung kann nützlich sein, weil Menschen deine Inhalte dort entdecken, testen und diskutieren.
+
+Ich würde einen technischen Fix in einer passenden Issue-Diskussion teilen, einen Benchmark in einer Entwickler-Community erklären oder einer Fachpublikation eine hilfreiche Referenz anbieten. Der Beitrag sollte die Frage dieser Zielgruppe beantworten, ohne einen unnötigen Klick vorauszusetzen.
+
+Bei einem Softwareprojekt geben ein funktionierendes öffentliches Repository und eine klare Dokumentation anderen etwas zum Prüfen. Bei einem Unternehmen helfen korrekte Verzeichniseinträge und echte unabhängige Bewertungen dabei, die Leistung einzuschätzen.
+
+Ich würde diese Wege wegen ihres praktischen Nutzens wählen. Ich würde nicht versprechen, dass eine bestimmte Plattform, ein Backlink-Typ oder eine feste Zahl von Erwähnungen KI-Zitate erzeugt.
+
+Mein [Artikel über das Veröffentlichen auf anderen Plattformen](/blog/parasite-seo-explained/de) behandelt den Unterschied zwischen hilfreicher Sichtbarkeit und künstlich erzeugten Suchsignalen genauer.
+
+Ein sinnvoller Test: Würde dieser Beitrag auch dann Sinn ergeben, wenn ihn nie ein Assistent zitiert?
+
+## 9. Halte die Belege aktuell
+
+Lege fest, wer die Angaben pflegt, die veralten können: Preise, Tarifgrenzen, Versionen, Verfügbarkeit, Kompatibilität und Installationsbefehle.
+
+Bei jeder Aktualisierung:
+
+1. Prüfe, was sich inhaltlich geändert hat.
+2. Korrigiere die Antwort, Beispiele und zugehörigen Tabellen.
+3. Aktualisiere betroffene Übersetzungen.
+4. Erfasse das Datum der inhaltlich relevanten Änderung.
+5. Prüfe Links und benachrichtige die entsprechenden Systeme zur URL-Entdeckung, soweit unterstützt.
+
+Prüfe, ob die Sitemap die endgültige kanonische URL der Seite enthält, erfolgreich lädt und in den Suchmaschinen-Konsolen keine Verarbeitungsfehler zeigt. [Google: Sitemap-Bericht](https://support.google.com/webmasters/answer/7451001)
+
+Wenn dein CMS oder Veröffentlichungsprozess IndexNow unterstützt, melde teilnehmenden Suchmaschinen neue, geänderte oder gelöschte URLs. Eine erfolgreiche Meldung garantiert weder Crawling noch Indexierung. Sie bedeutet auch nicht, dass Google oder ChatGPT ein Zitat angenommen hat. [IndexNow FAQ](https://www.indexnow.org/faq)
+
+### Wo llms.txt hineinpasst
+
+`llms.txt` ist ein Vorschlag, kompatiblen Agenten einen Überblick und Links zu Website-Inhalten bereitzustellen. Für Dokumentation würde ich eine automatisch gepflegte Version erwägen, wenn die Werkzeuge der Leser sie verwenden. Sie ist eine optionale Navigationshilfe, keine Datei zur Zugriffskontrolle. [Der llms.txt-Vorschlag](https://llmstxt.org/)
+
+Google erklärt ausdrücklich, dass die Suche diese Dateien für Sichtbarkeit und Ranking ignoriert. Trenne das von ihrem möglichen Nutzen für andere Werkzeuge. [Google: Hinweise zur KI-Optimierung](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide)
+
+Ich würde einer korrekten öffentlichen Seite Vorrang geben, bevor ich eine zweite, widersprüchliche Beschreibung desselben Produkts pflege.
+
+<h2 id="measurement">10. Miss Zitate, Besuche und Ergebnisse getrennt</h2>
+
+Nutze drei Perspektiven: Anbieterberichte, wiederholbare Antwortstichproben und deine eigene Webanalyse.
+
+### Google Search Console
+
+Der **Generative AI performance report (Search)** zeigt Impressionen in AI Overviews und AI Mode, aufgeschlüsselt nach Seite, Land, Datum und Gerät. Google dokumentiert die weltweite Einführung ab dem 31. August 2026. Gleichzeitig nennt die Hilfeseite weiterhin die schrittweise Einführung und zu wenige Impressionen als mögliche Gründe für einen fehlenden Bericht. Verstehe diese Werte als Impressionen, nicht als vollständiges Protokoll aller Zitate oder Prompts. [Google: Generative AI performance report](https://support.google.com/webmasters/answer/16984139)
+
+Nutze den Bericht, um sichtbare Seiten und Veränderungen im Zeitverlauf zu erkennen. Fehlt er, prüfe die dokumentierten Bedingungen für Verfügbarkeit und Teilnahme, bevor du eine bestimmte Änderung als erfolglos bewertest.
+
+### Bing Webmaster Tools
+
+**AI Performance** zeigt Zitate und zitierte Seiten in Copilot, Bing-KI-Zusammenfassungen und ausgewählten Partnerangeboten. Grounding Queries sind Suchphrasen für den Quellenabruf, nicht zwingend die ursprüngliche Nutzerfrage. Der Bericht deckt nur die unterstützten Angebote ab. [Bing: AI Performance](https://blogs.bing.com/webmaster/2026/2/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview/)
+
+Bings Vorschau vom Juni 2026 ergänzt Intents, Topics, Citation Share und Compare. Citation Share beschreibt den Anteil an Zitaten für eine Grounding Query. Das ist weder ein Traffic-Anteil noch eine Rankingposition. Nutze die Kennzahl, falls verfügbar, als Hinweis auf die Entwicklung. [Bing: Neue Einblicke in die KI-Sichtbarkeit](https://blogs.bing.com/search/2026/6/New-AI-Visibility-Insights-in-Bing-Webmaster-Tools-Intents-Topics-Citation-Share-Compare/)
+
+### Deine eigene Fragenstichprobe
+
+Wiederhole die Fragen aus der Ausgangsmessung in einem festen Abstand. Halte Sprache, Produkt, Suchmodus und Testbedingungen dabei so konstant wie praktisch möglich.
+
+Bei einem kleinen Projekt würde ich wöchentlich mit zehn wichtigen Fragen und wenigen neuen Durchläufen pro Frage beginnen. Notiere sichtbare Änderungen am Produkt oder Modell. Werte die Sprachen getrennt aus.
+
+Nutze zwei unterschiedliche Tests:
+
+- **Auffindbarkeit:** Stelle die echte Frage ohne deine Domain.
+- **Zugriffsdiagnose:** Bitte den Assistenten ausdrücklich, deine Seite zu lesen und eine konkrete Information daraus wiederzugeben.
+
+Der zweite Test kann Abrufprobleme aufzeigen. Er belegt keine eigenständige Entdeckung der Seite.
+
+Eine Tabelle kann mit diesen Spalten beginnen:
+
+~~~csv
+date,platform,mode,language,test_type,prompt_id,run_id,question,search_used,brand_mentioned,own_site_cited,cited_urls,citation_supports_claim,answer_record,notes
+~~~
+
+Halte den Wortlaut der Fragen in einer festen Referenztabelle fest. Speichere den Antworttext oder einen Screenshot, damit du später prüfen kannst, welche Aussage das Zitat tatsächlich stützte.
+
+Ich würde so rechnen:
+
+**Beobachtete Zitierrate in Tests zur Auffindbarkeit = gültige Antworten aus Tests zur Auffindbarkeit mit einem Zitat deiner Domain ÷ alle gültigen Antworten aus Tests zur Auffindbarkeit.**
+
+Lass Zugriffstests mit direkt vorgegebener URL aus dieser Berechnung heraus.
+
+Nenne neben dem Prozentwert auch die absoluten Zahlen. Fünf Zitate in zwanzig gültigen Durchläufen ergeben 25 Prozent in dieser Stichprobe. Diese Zahlen dienen der Veranschaulichung und sind kein Richtwert für deine Website.
+
+Zähle jede Antwort für diese Kennzahl einmal, auch wenn sie drei deiner Seiten zitiert. Nimm erfolgreiche Antworten ohne Websuche in den Nenner auf, wenn sie unter denselben geplanten Testbedingungen entstanden sind. Erfasse technische Fehler gesondert und lege Wiederholungsversuche offen. Zusätzlich kannst du eine Rate nur für Antworten mit Websuche ausweisen, wenn du den abweichenden Nenner klar benennst.
+
+Das ist deine beobachtete Stichprobe, keine Schätzung aller Antworten der Plattform. Sie unterscheidet sich auch von Bings Citation Share.
+
+### Webanalyse und Geschäftsergebnisse
+
+Erstelle einen Bericht für erkennbare KI-Verweise, Zielseiten und sinnvolle Aktionen. Erfasse Quellenimpressionen und Zitate gesondert.
+
+Referrer-Informationen können fehlen. Bezeichne die Zahlen deshalb als erkennbare Verweise. Ordne unerklärten direkten Traffic nicht einfach KI zu.
+
+Prüfe anschließend, ob die Besucher finden, was sie brauchen. Ein korrektes technisches Zitat mit wenigen nützlichen Besuchen kann für dein Projekt wertvoller sein als viele irrelevante Markenerwähnungen.
+
+Wenn Zitate nach einer Aktualisierung zunehmen, notiere diesen Zusammenhang. Um die Ursache zu untersuchen, lass nach Möglichkeit vergleichbare Seiten unverändert und wiederhole die Beobachtung. Veränderte Nachfrage, konkurrierende Seiten und das Verhalten des Produkts können Ergebnisse ebenfalls beeinflussen.
+
+<h2 id="plan">Ein 30-Tage-Plan zur Umsetzung</h2>
+
+Das ist ein Arbeitsplan. Er verspricht nicht, dass innerhalb von dreißig Tagen Zitate entstehen.
+
+| Zeitraum | Arbeit | Konkretes Ergebnis |
+| --- | --- | --- |
+| Tage 1–3 | Thema wählen, echte Fragen sammeln und Stichproben für die Ausgangsmessung durchführen. | Fragenliste und gespeicherte Antworten |
+| Tage 4–7 | Wichtige URLs, Crawler-Regeln, Header, Indexierung und Firewall-Ereignisse prüfen. | Dokumentierte Hindernisse und überprüfte Korrekturen |
+| Tage 8–14 | Eine starke Seite mit direkter Antwort, Belegen und brauchbaren Beispielen verbessern. | Veröffentlichte Referenz und Quellenverzeichnis |
+| Tage 15–21 | Passende interne Links ergänzen, Metadaten und Übersetzungen prüfen und die Seite dort teilen, wo sie nützt. | Verknüpfte, geprüfte Seite |
+| Tage 22–30 | Stichproben wiederholen und Anbieterberichte sowie Webanalyse auswerten. | Erkenntnisse und die nächste konkrete Verbesserung |
+
+Hätte ich nur einen Nachmittag, würde ich eine wichtige Frage und eine Seite auswählen. Zugriff prüfen, Antwort verbessern, Belege ergänzen, aus passenden Inhalten verlinken und den Ausgangszustand festhalten.
+
+Das reicht, um erste Erkenntnisse zu gewinnen.
+
+<h2 id="troubleshooting">Warum deine Seite noch immer nicht zitiert wird</h2>
+
+| Beobachtung | Nächste Prüfung |
+| --- | --- |
+| Eine direkte URL-Anfrage schlägt fehl. | Antwortstatus, Authentifizierung, Firewall, robots-Regeln und Darstellung der Inhalte |
+| Der direkte Zugriff funktioniert, die Entdeckung ohne Markenbezug scheitert. | Indexierung, interne Links, Relevanz und fehlende Belege |
+| Deine Seite ist indexiert, taucht in den Stichproben aber nie als Quelle auf. | Was die vorhandenen Quellen besser beantworten; ob deine Stichprobe echte Nachfrage abbildet |
+| Deine Marke erscheint mit einem Link zu jemand anderem. | Berichterstattung Dritter gesondert erfassen und auf Richtigkeit prüfen. |
+| Ein Quellenlink belegt die danebenstehende Aussage nicht. | Den Zuordnungsfehler erfassen; prüfen, ob Formulierungen oder Einschränkungen der Seite mehrdeutig sind. |
+| Zitate erscheinen, Besuche bleiben aus. | Ob die Antwort die Aufgabe bereits erfüllt; ob ein Besuch einen nützlichen nächsten Schritt bietet |
+| Ergebnisse unterscheiden sich zwischen Englisch und Deutsch. | Frageformulierung, übersetzte Belege, Wettbewerb in der jeweiligen Sprache und Auffindbarkeit |
+| Die Sichtbarkeit sinkt nach einer Website-Änderung. | Weiterleitungen, Canonicals, neue einschränkende Regeln, fehlende Inhalte und das letzte überprüfte Crawling |
+
+Schreib nicht wegen einer einzigen Antwort die ganze Website um. Finde den Fehler, den du tatsächlich belegen kannst.
+
+<h2 id="faq">Häufige Fragen</h2>
+
+### Kann eine kleine Website zitiert werden?
+
+Bei einer kleinen Website würde ich mich auf eine eng umrissene Frage konzentrieren, die sie besonders gut beantworten kann. Allein aus der Website-Größe lässt sich keine sinnvolle Garantie ableiten. Beginne mit Belegen, Zugänglichkeit und einer realistischen Messstichprobe.
+
+### Muss ich KI-Unternehmen erlauben, mit meinen Inhalten zu trainieren?
+
+Such- und Trainingsberechtigungen können getrennt sein, wie die Crawler-Tabelle zeigt. Prüfe die Einstellungen des jeweiligen Anbieters, statt anzunehmen, dass Trainingszugriff Sichtbarkeit erkauft.
+
+### Sollte ich FAQ-Schema ergänzen?
+
+Ergänze hilfreiche Antworten, wenn Leser sie brauchen. Wähle strukturierte Daten, die den Seiteninhalt wahrheitsgemäß beschreiben. Es gibt keine dokumentierte allgemeingültige FAQ-Markup-Pflicht für KI-Zitate.
+
+### Sollte ich „Zitiere diese Seite“-Anweisungen in meine Website schreiben?
+
+Ich würde Titel, Autor, Datum und eine stabile URL klar angeben, damit sich die Quelle leicht identifizieren lässt. Befehle, die einen Assistenten manipulieren sollen, ersetzen keine nützlichen Belege.
+
+### Wird ein KI-geschriebener Artikel zitiert?
+
+Die praktische Frage ist, ob die fertige Seite korrekt, nützlich und belegt ist. Prüfe jede Aussage und ergänze einen Beitrag, hinter dem du stehen kannst. Einen Entwurf zu automatisieren belegt keine dieser Eigenschaften.
+
+### Wie lange dauert es?
+
+Es gibt keinen verlässlichen Zeitplan, der Crawling, Indexierung und Quellenauswahl über all diese Dienste hinweg abdeckt. Verfolge die einzelnen Schritte und verbessere den Teil, den du überprüfen kannst.
+
+## Was ich als Nächstes tun würde
+
+Nimm eine Frage, die deine Leser bereits stellen. Veröffentliche die klarste Antwort, die du belegen kannst, einschließlich der unbequemen Ausnahmen. Mach die Seite leicht erreichbar und gut pflegbar.
+
+Prüfe anschließend, ob die für dich wichtigen Systeme tatsächlich darauf verweisen und ob die daraus entstehende Aufmerksamkeit deinen Lesern oder deinem Unternehmen hilft.
+
+So entsteht ein Verbesserungsprozess mit beobachtbaren Ergebnissen.
