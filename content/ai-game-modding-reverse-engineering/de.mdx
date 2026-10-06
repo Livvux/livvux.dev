@@ -1,0 +1,114 @@
+---
+title: "KI-Modding: Warum mich diese Spiele-Mashups so umhauen"
+publishedAt: "2026-10-06"
+author: "Livvux"
+summary: "Minecraft in GTA, Parkour in Skyrim und ein Skateboard in WoW: Warum ich KI-Modding und Reverse Engineering gerade ziemlich crazy finde."
+---
+
+**Im Video wird Minecraft mit GTA verbunden, Parkour aus Mirror’s Edge landet in Skyrim und in World of Warcraft wird geskatet. Ich finde das ehrlich gesagt ziemlich crazy.**
+
+Das klingt nach Ideen, die man nachts mit Freunden zusammenspinnt: „Stell dir mal vor, dieses Spiel hätte die Bewegungen aus dem anderen.“ Genau solche Kombinationen stellt [dieses Video über KI-Modding und Reverse Engineering](https://www.youtube.com/watch?v=h5zkzon0gM4) vor.
+
+Was mich daran so umhaut, ist nicht allein der absurde Anblick. Es ist die Aussicht, dass aus so einer Idee tatsächlich ein Experiment werden kann, das man spielt, verändert und weiterentwickelt. Nicht nur ein Bild davon, wie es aussehen könnte.
+
+Ich will hier erklären, was das Video beschreibt und warum ich die Richtung so bemerkenswert finde. Die vorgestellten Mods habe ich nicht selbst nachgebaut oder getestet.
+
+## Schau dir die Idee hinter den Mashups an
+
+Der [Einstieg ab 00:00](https://www.youtube.com/watch?v=h5zkzon0gM4&t=0s) nennt die Kombinationen, um die es geht. Neben Minecraft und GTA gehören dazu Spider-Man in einem Batman-Spiel, das Bewegungssystem von Mirror’s Edge in Skyrim und Skateboard-Mechaniken in völlig anderen Spielwelten.
+
+Bei einem ausgetauschten Charaktermodell würde ich denken: cool, eine Mod. Aber eine Mechanik mitzunehmen, die beeinflusst, **wie sich ein Spiel anfühlt**, ist für mich noch einmal eine andere Nummer.
+
+Wie beschleunigt eine Figur? Wie landet sie? Wie reagiert ein Skateboard auf den Boden? Was passiert, wenn eine Aktion aus Spiel A in Spiel B eine Konsequenz hat? Genau diese Fragen machen die Beispiele für mich interessanter als einen reinen Kostümwechsel.
+
+Ich finde schon den Gedanken krass, solche Kombinationen gezielt ausprobieren zu können. Ob sie am Ende ein gutes Spiel ergeben, ist eine zweite Frage. Aber endlich herausfinden zu können, ob eine verrückte Idee Spaß macht, wäre bereits ziemlich viel wert.
+
+## Reverse Engineering, ohne das Fachchinesisch
+
+Das Video erklärt [ab 01:16](https://www.youtube.com/watch?v=h5zkzon0gM4&t=76s) den Unterschied zwischen Quellcode und einer fertigen Programmdatei anhand eines Kuchens: Der Quellcode ist das Rezept, das Kompilieren der Backvorgang und die ausführbare Datei der fertige Kuchen.
+
+Beim Reverse Engineering untersucht man das fertige Produkt, um nachzuvollziehen, wie es funktioniert. Die im Video beschriebene Rolle der KI besteht darin, mit Analysewerkzeugen diese Arbeit zu unterstützen und daraus Änderungen oder neue Implementierungen zu entwickeln.
+
+Für mich steckt die spannende Frage darin: Kann ein Agent nicht nur neuen Code schreiben, sondern sich auch in ein bestehendes System einarbeiten, dessen ursprünglicher Bauplan nicht offen vor ihm liegt?
+
+Das Kuchenbild hat allerdings eine Grenze. Ein nachvollzogener Ablauf oder ein funktionierender Nachbau ist noch kein Beleg dafür, dass das ursprüngliche Rezept vollständig zurückgewonnen wurde. Ich würde daher nicht jede Mod als „KI hat das komplette Spiel entschlüsselt“ beschreiben. Schon die drei Ansätze im Video unterscheiden sich deutlich.
+
+## Drei Wege, die man nicht verwechseln sollte
+
+### 1. Zwei laufende Spiele über eine Brücke verbinden
+
+[Ab 03:28](https://www.youtube.com/watch?v=h5zkzon0gM4&t=208s) geht es um sogenannte **Passthrough-Mods**. Beim beschriebenen Minecraft-GTA-Beispiel werden nicht beide Spiele von Grund auf neu geschrieben. Stattdessen verbindet eine zusätzliche Schicht ihre Aktionen.
+
+Das Beispiel im Video: In Minecraft wird TNT platziert. Die Verbindung übersetzt dessen Position und das spätere Explosionsereignis in eine entsprechende Aktion in GTA. Beide Spiele bleiben beteiligt; die Mod vermittelt zwischen ihnen.
+
+Mich begeistert daran, dass nicht erst eine vollständig neue Spielwelt entstehen muss, bevor man mit der Kombination experimentieren kann. Gleichzeitig nennt das Video die Grenzen dieser Brücke: Die ursprünglichen Engines bleiben bestehen, und Kollisionen oder Physik können Probleme machen.
+
+**Eine solche Verbindung ist also nicht dasselbe wie ein vollständig neu gebautes Spiel. Interessant ist sie trotzdem.**
+
+### 2. Die Software hinter dem Spiel neu implementieren
+
+Der zweite Ansatz wird [ab 05:36](https://www.youtube.com/watch?v=h5zkzon0gM4&t=336s) beschrieben. Hier soll die KI helfen, ein Spiel zu untersuchen und die Software, die es ausführt, neu zu schreiben. Im Video ist mehrfach Rust als mögliche Sprache dafür Thema.
+
+Der Unterschied zur Brücke: Man versucht, eine eigene technische Grundlage zu schaffen, statt nur zwei bestehende Systeme miteinander sprechen zu lassen. Das Video verbindet diesen Ansatz mit weitergehenden Anpassungen und nennt unter anderem World of Warcraft mit einem Skateboard sowie später eine Kombination aus Call of Duty und einer Minecraft-Welt.
+
+Das ist der wesentlich größere Anspruch. „Neu implementiert“ sagt für sich genommen aber noch nicht, ob sämtliche Inhalte, Eigenheiten und Spielabläufe abgedeckt sind. Die Beispiele behandle ich als die im Video vorgestellten Projekte, nicht als von mir bestätigte vollständige Neuauflagen.
+
+### 3. Eine bestimmte Mechanik in eine andere Welt übertragen
+
+[Ab 09:55](https://www.youtube.com/watch?v=h5zkzon0gM4&t=595s) kommt der Teil, der mich am meisten beschäftigt: nicht gleich ein ganzes Spiel übernehmen, sondern ein bestimmtes System daraus in einem anderen Kontext einsetzen.
+
+Im Video sind das unter anderem Parkour aus Mirror’s Edge in Skyrim und Skate-3-artige Trickphysik in anderen Spielen. Es geht damit nicht nur darum, etwas anders aussehen zu lassen, sondern Bewegungen und Interaktionen zu verändern.
+
+Für mich ist das die spannendste Perspektive für eigene Spielideen. Ich würde viel lieber früh ausprobieren, ob sich eine bestimmte Bewegung in meiner Welt gut anfühlt, als nur darüber zu diskutieren. Wenn KI solche Versuche zugänglicher macht, verändert das, welche Ideen ich überhaupt in Angriff nehmen würde.
+
+Die Vorstellung, vertraute Spielgefühle auf diese Weise neu zu kombinieren, finde ich wirklich bemerkenswert. Eine gute Kombination muss anschließend immer noch gestaltet, abgestimmt und getestet werden. Aber die Möglichkeit, sie überhaupt auszuprobieren, begeistert mich.
+
+## Es geht auch um neue Wege, alte Spiele zu erleben
+
+Das Video spricht [ab 09:02](https://www.youtube.com/watch?v=h5zkzon0gM4&t=542s) außerdem über Plattformwechsel und Virtual Reality. Als Beispiele werden unter anderem Super Mario Galaxy und Mario Kart im Zusammenhang mit VR genannt.
+
+Ich lese das nicht als Zusage, dass sich jetzt jedes Spiel problemlos auf jedes Gerät übertragen lässt. Spannend finde ich die Idee dahinter: Ein vorhandenes Spiel könnte auf eine Weise erlebbar werden, die ursprünglich gar nicht vorgesehen war.
+
+Genau deshalb interessieren mich diese Experimente auch jenseits der besonders absurden Mashups. Eine neue Perspektive auf eine vertraute Welt kann für mich schon ein guter Grund sein, mich wieder mit ihr zu beschäftigen.
+
+## Welche Werkzeuge im Video eine Rolle spielen
+
+Das Video nennt [ab 04:49](https://www.youtube.com/watch?v=h5zkzon0gM4&t=289s) vorbereitete Werkzeuge und Agent-Anleitungen. Ergänzend dazu habe ich die Original-Projektseiten herausgesucht:
+
+[Universal Modder](https://github.com/rehan-remade/universal-modder) bündelt Modding-Workflows und Werkzeuge für Coding-Agenten. Der dort beschriebene Skill `mashup-mods` umfasst unter anderem Passthrough-Mods und Neuimplementierungen. [REA – Reverse Engineer Anything](https://github.com/morluto/rea) beschreibt einen Workflow zum Untersuchen, Verstehen und Nachbauen von Softwarefunktionen.
+
+[Ghidra](https://github.com/NationalSecurityAgency/ghidra) ist ein Reverse-Engineering-Framework; [ILSpy](https://github.com/icsharpcode/ILSpy) ein Decompiler für .NET. Die Schreibweise „Gedra“ im Transkript habe ich anhand der Ghidra-Projektseite zugeordnet. Das sind ergänzende Dokumentationslinks, keine Bestätigung, dass damit jeder im Video genannte Umbau reproduzierbar ist.
+
+Was mir am [Abschnitt über das Prompting ab 11:57](https://www.youtube.com/watch?v=h5zkzon0gM4&t=717s) gefällt: Es wird ausdrücklich kein magischer Prompt versprochen. Die Idee ist, dem Agenten ein verständliches Ziel und passende Werkzeuge zu geben. Das wirkt auf mich erheblich interessanter als die Suche nach einem vermeintlichen Zaubersatz.
+
+## Warum ich dabei auch an Software außerhalb von Games denke
+
+[Ab 12:25](https://www.youtube.com/watch?v=h5zkzon0gM4&t=745s) weitet das Video die These auf andere Software aus. Mich interessiert daran weniger die zugespitzte Vorstellung, nun einfach jedes kommerzielle Programm zu kopieren. Spannender finde ich die Frage, wie sich das Entwickeln eigener Funktionen verändert, wenn bestehendes Verhalten leichter untersucht und verstanden werden kann.
+
+Meine Hoffnung wäre: mehr Möglichkeiten, eigene Ideen umzusetzen, und weniger Fälle, in denen man bereits vor dem ersten Versuch aufgibt. Das ist meine Schlussfolgerung aus dem Video, keine darin nachgewiesene Prognose für die gesamte Softwarebranche.
+
+Ähnlich ging es mir bei [KI und Motion Design](/blog/ai-motion-design/de). Mich begeistert nicht die Aussage, dass plötzlich alles mühelos wird. Mich begeistert, wenn zwischen einer Idee und einem Ergebnis, auf das ich reagieren kann, weniger Hürden liegen.
+
+Bei Games ist das besonders unmittelbar. Ich will nicht nur lesen, wie sich eine Mechanik anfühlen könnte. Ich will sie ausprobieren.
+
+## Begeistert sein heißt nicht, jede Behauptung zu übernehmen
+
+Eine Aussage im Video würde ich ausdrücklich nicht verallgemeinern: [Ab 00:59](https://www.youtube.com/watch?v=h5zkzon0gM4&t=59s) wird für einen Reverse-Engineering-Benchmark eine Erfolgsquote von **über 99 Prozent nach vier Versuchen** genannt. Daraus wird später eine sehr weitreichende Aussage über nahezu beliebige Spiele und Programme abgeleitet.
+
+Die zugrunde liegende Benchmark-Primärquelle und ihre genaue Auswertung habe ich für diesen Beitrag nicht unabhängig verifiziert. Ich übernehme die Zahl deshalb **nicht als Beleg dafür, dass KI 99 Prozent aller Spiele oder Programme vollständig rekonstruieren kann**. Die Bedingungen eines Tests und die Anforderungen an einen vollständigen Nachbau sind nicht automatisch dasselbe.
+
+Auch ein überzeugendes Beispiel verrät nicht, wie viele Anläufe, manuelle Eingriffe oder ungelöste Probleme dahinterstehen. Das nimmt meiner Begeisterung nichts. Ich muss nicht behaupten, dass schon alles funktioniert, um die vorgestellte Richtung beeindruckend zu finden.
+
+Für eigene Experimente würde ich mit eigenem oder passend lizenziertem Material arbeiten und vor einer Veröffentlichung die Rechte prüfen. Mich interessieren kreative Mods und eigene Entwicklungen, nicht das Umgehen von Kopierschutz oder Cheats gegen andere Spieler.
+
+## Genau diese Art von KI-Entwicklung finde ich crazy
+
+Was bei mir hängen bleibt, ist eine sehr konkrete Vorstellung: Jemand hat eine schräge Spielidee und kann näher daran kommen, sie tatsächlich spielbar zu machen.
+
+Vielleicht ist die Kombination am Ende großartig. Vielleicht merkt man nach fünf Minuten, dass sie überhaupt keinen Spaß macht. Beides ist interessanter, als nie über die Idee hinauszukommen.
+
+Ich finde die im Video beschriebenen Mashups deshalb nicht bloß witzig. Sie machen eine Möglichkeit greifbar, die mich als Entwickler wirklich begeistert: Vertraute Systeme verstehen, mit ihnen experimentieren und daraus etwas Eigenes entwickeln.
+
+**Ich möchte nicht vorschnell verkünden, dass damit die gesamte Gaming-Branche auf den Kopf gestellt ist. Aber ich finde es schon ziemlich krass, worüber wir hier überhaupt reden. Genau deshalb wollte ich etwas dazu schreiben.**
+
+*Grundlage dieses Beitrags ist das bereitgestellte Transkript des verlinkten Videos. Die Zeitmarken führen zu den besprochenen Abschnitten. Die verlinkten Werkzeug-Projektseiten wurden am 6. Oktober 2026 ergänzend zur Begriffsklärung herangezogen. Dieser Beitrag ist eine persönliche Einordnung, kein eigener Modding-Test oder Benchmark.*
