@@ -61,6 +61,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="describedby" href={new URL("/llms.txt", DATA.url).href} type="text/plain" title="Site guide for AI assistants" />
+      </head>
       <body className={cn("min-h-screen bg-background font-sans antialiased relative", geist.variable, geistMono.variable)}>
         <StructuredData data={siteStructuredData()} />
         <ThemeProvider attribute="class" defaultTheme="light">
