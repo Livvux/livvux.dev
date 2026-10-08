@@ -2,12 +2,14 @@
 "use client";
 
 import { ContentLink } from "@/components/content-link";
+import SpotlightCard from "@/components/react-bits/spotlight-card";
 import { getExternalLinkProps } from "@/lib/external-links";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useTheme } from "next-themes";
+import { useState, type CSSProperties } from "react";
 import Markdown from "react-markdown";
 
 function ProjectImage({ src, alt }: { src: string; alt: string }) {
@@ -56,10 +58,25 @@ export function ProjectCard({
   links,
   className,
 }: Props) {
+  const { resolvedTheme } = useTheme();
+
   return (
-    <div
+    <SpotlightCard
+      theme={resolvedTheme === "dark" ? "dark" : "light"}
+      spotlightColor="var(--foreground)"
+      intensity={0.08}
+      borderGlow={0.4}
+      softness={0.85}
+      smoothing={0.18}
+      proximity={0}
+      flare={false}
+      style={{
+        "--spotlight-card-surface": "var(--background)",
+        "--spotlight-card-border": "transparent",
+        "--spotlight-card-shadow": "none",
+      } as CSSProperties}
       className={cn(
-        "flex flex-col h-full border border-border rounded-xl overflow-hidden hover:ring-2 cursor-pointer hover:ring-muted transition-all duration-200",
+        "flex flex-col h-full border border-border rounded-xl overflow-hidden p-0",
         className
       )}
     >
@@ -67,7 +84,7 @@ export function ProjectCard({
         <Link
           href={href || "#"}
           {...getExternalLinkProps(href)}
-          className="block"
+          className="block focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
         >
           {video ? (
             <video
@@ -92,6 +109,7 @@ export function ProjectCard({
                 key={idx}
                 {...getExternalLinkProps(link.href)}
                 onClick={(e) => e.stopPropagation()}
+                className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 <Badge
                   className="flex items-center gap-1.5 text-xs bg-black text-white hover:bg-black/90"
@@ -137,6 +155,6 @@ export function ProjectCard({
           </div>
         )}
       </div>
-    </div>
+    </SpotlightCard>
   );
 }
