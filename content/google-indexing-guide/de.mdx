@@ -1,0 +1,188 @@
+---
+title: "Website bei Google indexieren: 7 praktische Tipps"
+publishedAt: "2026-10-10"
+author: "Livvux"
+summary: "Bereite deine Seiten auf die Google-Indexierung vor: mit URL-Prüfung, internen Links, Sitemaps und technischen Checks. Inklusive Search-Console-Fehlersuche."
+---
+
+**Wenn eine wichtige Seite bei Google fehlt, beginne mit der Diagnose: Kann Google sie finden, abrufen und erkennen, warum sie in den Suchergebnissen erscheinen sollte?**
+
+So würde ich die sieben Tipps zur Indexierung aus [Hridoy Rehs Thread auf X](https://x.com/hridoyreh/status/2108854047528923331) angehen. Er berichtet, mehr als 4.000 URLs in den Index gebracht zu haben. Diese Zahl stammt von ihm; ich habe das Ergebnis nicht unabhängig überprüft.
+
+Die Checkliste ist ein sinnvoller Ausgangspunkt. Die Empfehlung zur API würde ich vor der Umsetzung besonders genau prüfen.
+
+So würde ich die Tipps auf einer echten Website anwenden. Grundlage ist die Google-Dokumentation, geprüft am **10. Oktober 2026**.
+
+<TweetEmbed id="2108854047528923331" lang="de" />
+
+## Kläre zuerst, an welcher Stelle es hakt
+
+Google muss eine URL entdecken, ihren Inhalt crawlen, ihn für die Indexierung verarbeiten und entscheiden, für welche Suchanfragen die Seite nützlich ist. Das sind getrennte Entscheidungen. [Google: So funktioniert die Suche](https://developers.google.com/search/docs/fundamentals/how-search-works)
+
+| Phase | Die entscheidende Frage |
+| --- | --- |
+| Entdeckung | Weiß Google, dass die URL existiert? |
+| Crawling | Kann der Googlebot die Seite und ihre wichtigen Ressourcen abrufen? |
+| Indexierung | Hat Google die Seite in den Index aufgenommen, und unter welcher kanonischen URL? |
+| Sichtbarkeit in der Suche | Erscheint die indexierte Seite bei relevanten Suchanfragen? |
+
+Ein bereits von Google abgerufener Artikel erfordert eine andere Untersuchung als eine Seite hinter einer Anmeldung. Ist ein Artikel indexiert, erhält aber keine Klicks, solltest du seine Leistung in der Suche prüfen.
+
+Meine Priorität wären die wichtigen Seiten, die Menschen tatsächlich finden sollen: ein hilfreicher Leitfaden, eine Produktseite oder die Erklärung einer Dienstleistung. Filterkombinationen, doppelte URLs und bewusst private Seiten brauchen eine andere Behandlung.
+
+## 1. Nutze die URL-Prüfung für einzelne wichtige Seiten
+
+Öffne die passende Property in der Google Search Console und prüfe genau die URL, die indexiert werden soll.
+
+1. Prüfe den gespeicherten Indexierungsstatus und den letzten Crawl.
+2. Vergleiche die kanonischen URLs, sofern sie angezeigt werden.
+3. Nutze nach einer Korrektur **Live-URL testen**.
+4. Beantrage die Indexierung, sobald die Seite bereit ist.
+
+Ein erfolgreicher Live-Test prüft die aktuelle Erreichbarkeit. Er bestätigt keine Indexierung und klärt nicht jedes Problem mit der kanonischen URL. [Google: URL-Prüftool](https://support.google.com/webmasters/answer/9012289?hl=en)
+
+Google empfiehlt diesen Weg für wenige URLs und Sitemaps für größere Mengen. Anträge erfordern Zugriff als Inhaber oder als Nutzer mit uneingeschränktem Zugriff. Crawling kann Tage bis Wochen dauern. Dieselbe URL mehrfach einzureichen beschleunigt es nicht. Die Aufnahme in den Index ist nie garantiert. [Google: Erneutes Crawlen beantragen](https://developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl)
+
+Ich würde einen Antrag stellen, nachdem ich eine wichtige Seite veröffentlicht oder ein konkretes Problem behoben habe. Die Änderung würde ich dokumentieren, damit es bei der nächsten Prüfung eine nachvollziehbare Vergleichsbasis gibt.
+
+## 2. Setze interne Links dort, wo sie Lesern helfen
+
+Beginne bei einer bestehenden Seite zum selben Thema. Suche eine Stelle, an der dein neuer Artikel eine naheliegende Anschlussfrage beantwortet, und verlinke ihn dort.
+
+In einer Anleitung zum Deployment könnte das so aussehen:
+
+```html
+<a href="/blog/google-indexing-guide/de">
+  Prüfe, warum deine neue Seite bei Google fehlt
+</a>
+```
+
+Google empfiehlt, jede wichtige Seite von einer anderen Seite deiner Website aus zu verlinken. Nutze aussagekräftige Linktexte und normale Links mit einem `href`. Es gibt keine Google-Regel, die genau drei bis fünf eingehende interne Links verlangt. [Google: Best Practices für Links](https://developers.google.com/search/docs/crawling-indexing/links-crawlable)
+
+Die „3–5“ aus dem Thread sind eine sinnvolle Anzahl bestehender Artikel, die du auf passende Verlinkungen prüfen kannst. Ich würde nur Links setzen, die inhaltlich passen. Derselbe themenfremde Absatz in fünf Beiträgen würde deren Lesbarkeit verschlechtern.
+
+Prüfe auch den Weg über dein Blogarchiv, Kategorieseiten und die Navigation. Leser sollten den Artikel erreichen können, ohne seine Adresse zu kennen. Mit dem [Prüftool für interne Links](/tools/internal-links) auf dieser Website lässt sich die Struktur untersuchen; den Indexierungsstatus bei Google prüfst du weiterhin in der Search Console.
+
+## 3. Teile die Seite mit Menschen, die sie brauchen
+
+Das Teilen in sozialen Medien kann Menschen auf deine Arbeit aufmerksam machen. Google nennt Beiträge in sozialen Medien und den Austausch in Communities als Möglichkeiten, eine Website bekannt zu machen. Einen besonderen Vorteil von Pinterest für die Indexierung belegt der Leitfaden nicht. [Google: Website bekannt machen](https://developers.google.com/search/docs/fundamentals/seo-starter-guide)
+
+Für eine technische Anleitung würde ich ein konkretes Beispiel teilen: den Fehler, den sie behebt, einen hilfreichen Screenshot und den Link zur vollständigen Erklärung. Eine visuelle Anleitung könnte zu Pinterest passen; für einen Artikel zur Fehlersuche bei einer API wäre eine Entwickler-Community vielleicht die passendere Zielgruppe.
+
+Wähle zuerst die Zielgruppe. Miss anschließend, ob jemand die Seite besucht, nutzt oder darauf verweist. Wie oft ein Link geteilt wurde, belegt nicht, dass die Zielseite im Google-Index steht.
+
+Wenn du auch auf externen Plattformen veröffentlichst, erklärt mein [Leitfaden zu Parasite SEO](/blog/parasite-seo-explained/de) den Unterschied zwischen der Sichtbarkeit eines externen Artikels und der Sichtbarkeit deiner eigenen Website.
+
+## 4. Halte die XML-Sitemap aktuell und korrekt
+
+Eine Sitemap informiert Suchmaschinen über die URLs, die sie entdecken sollen. Sie kann besonders hilfreich sein, wenn eine Website neu, groß oder über Links nur schwer zu erschließen ist. Eine Indexierung kann sie dennoch nicht garantieren. [Google: Grundlagen zu Sitemaps](https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview)
+
+Prüfe vier Dinge:
+
+1. Trage die bevorzugten URLs, die in der Suche erscheinen sollen, als absolute Adressen ein.
+2. Lass Weiterleitungen, nicht vorhandene Seiten und bewusst ausgeschlossene URLs weg.
+3. Pflege einen korrekten `lastmod`-Wert für wesentliche Änderungen am Inhalt.
+4. Reiche die Sitemap in der Search Console ein und prüfe sie auf Verarbeitungsfehler.
+
+Eine Sitemap darf bis zu **50.000 URLs und unkomprimiert 50 MB** enthalten. 4.000 URLs liegen unter der URL-Grenze; die Datei muss zusätzlich die Größenbegrenzung einhalten. [Google: Sitemap erstellen und einreichen](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap)
+
+Für Entwickler ist die wichtige Frage, ob die veröffentlichte Sitemap zur veröffentlichten Website passt. Prüfe nach dem Deployment die URL auf der produktiven Website. Eine Datei, die im Repository existiert, auf der Website aber einen Fehler zurückgibt, hilft Google nicht beim Entdecken der Seiten.
+
+Ich würde die Sitemap beim Veröffentlichen oder Entfernen von Inhalten automatisch aktualisieren und vermeiden, bei jedem Build das Änderungsdatum aller Seiten neu zu setzen.
+
+## 5. Prüfe technische Hindernisse und widersprüchliche Signale
+
+Zu Googles technischen Mindestanforderungen gehören Zugriff für den Googlebot, eine Antwort mit `HTTP 200` und indexierbare Inhalte. Damit kommt die Seite grundsätzlich für die Indexierung infrage; ihre Aufnahme ist nicht garantiert. [Google: Technische Anforderungen](https://developers.google.com/search/docs/essentials/technical)
+
+Bei einem Artikel, der öffentlich sein soll, würde ich Folgendes prüfen:
+
+| Prüfung | Worauf du achten solltest |
+| --- | --- |
+| HTTP-Antwort | Der tatsächliche Artikel unter der endgültigen URL, ohne Anmeldepflicht oder Serverfehler. |
+| Indexierungsanweisungen | Ein versehentlich gesetztes `noindex` im HTML oder im HTTP-Antwortheader `X-Robots-Tag`. |
+| Crawling-Zugriff | Eine Einschränkung in `robots.txt`, die den Googlebot am Abrufen des Artikels hindert. |
+| Kanonische URL | Eine bevorzugte URL, die auf die gewünschte Seite und Sprachversion verweist. |
+| Gerenderter Inhalt | Der eigentliche Artikeltext statt eines leeren Seitengerüsts oder einer Fehlermeldung. |
+
+**`robots.txt` und `noindex` erfüllen unterschiedliche Aufgaben.** Eine Regel in `robots.txt` beschränkt das Crawling. Eine gesperrte URL kann anhand von Informationen aus anderen Quellen trotzdem in Suchergebnissen erscheinen. [Google: robots.txt](https://developers.google.com/search/docs/crawling-indexing/robots/intro)
+
+Google muss eine Seite crawlen können, um ihr `noindex` zu lesen. Prüfe sowohl das Meta-Tag im HTML als auch den HTTP-Header. Ein `noindex` in `robots.txt` wird nicht unterstützt. [Google: Indexierung verhindern](https://developers.google.com/search/docs/crawling-indexing/block-indexing)
+
+Eine kanonische URL kennzeichnet die bevorzugte Version doppelter oder sehr ähnlicher Inhalte. Stimme Canonical-Angabe, Sitemap und interne Links aufeinander ab. Verwende für entsprechende Artikel auf Englisch und Deutsch jeweils eine passende kanonische URL in derselben Sprache. [Google: Kanonische URLs](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls)
+
+Eine `200`-Antwort allein reicht nicht, wenn die Seite einen Fehler anzeigt oder ihr Hauptinhalt fehlt. Google kann sie als Soft 404 einstufen. [Google: HTTP-Statuscodes](https://developers.google.com/crawling/docs/troubleshooting/http-status-codes)
+
+Prüfe bei JavaScript-Anwendungen das gerenderte HTML mit der URL-Prüfung. Kontrolliere, ob der Artikel und seine Links nach dem Rendering tatsächlich erscheinen. [Google: JavaScript-SEO](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics)
+
+Entferne nur versehentliche Einschränkungen. Kontoseiten und andere bewusst ausgeschlossene Inhalte sollten ihre vorgesehenen Zugriffsbeschränkungen behalten.
+
+## 6. Gib der Seite einen konkreten Nutzen
+
+Wenn der Zugriff funktioniert, lies die Seite aus Sicht einer Person, die das beschriebene Problem lösen möchte.
+
+Google empfiehlt eigenständige Informationen, nützliche Analysen und nachvollziehbare Quellen. Die Vorstellung, Google bevorzuge eine bestimmte Wortanzahl, weist der Leitfaden ausdrücklich zurück. [Google: Hilfreiche Inhalte](https://developers.google.com/search/docs/fundamentals/creating-helpful-content)
+
+Bei einer Software-Anleitung würde ich nach etwas Konkretem suchen:
+
+- Einem funktionierenden Beispiel mit Versionsangabe und Voraussetzungen.
+- Einer Erklärung für einen Fehler, auf den Leser wahrscheinlich stoßen.
+- Belegen für einen Vergleich oder eine Aussage zur Leistung.
+- Einer hilfreichen Entscheidung, die Leser nach der Lektüre treffen können.
+
+Nimm einen fiktiven Artikel über die Bildkonvertierung. Bei „WebP macht Websites schneller“ müssen Leser erst einmal weiterrecherchieren. Eine Anleitung, die zeigt, wie du die Bilder eines Ordners konvertierst, Originale behältst, Transparenz berücksichtigst und die Ergebnisdateien vergleichst, lässt sich direkt nutzen. Messwerte sollten aus einem echten Test mit beschriebener Methode stammen.
+
+Mehr Absätze machen einen Text nicht automatisch besser. Ich würde Wiederholungen streichen, unbelegte Aussagen prüfen und sich überschneidende Artikel zusammenführen, wenn ein gründlicherer Beitrag die Frage besser beantworten würde. Das ist eine redaktionelle Entscheidung und kein Versprechen, dass Google das Ergebnis indexiert.
+
+## 7. Nutze die Indexing API nur für unterstützte Seiten
+
+Diesen Teil des Threads würde ich korrigieren, bevor jemand ihn umsetzt.
+
+| Seitentyp | Google Indexing API |
+| --- | --- |
+| Stellenanzeige mit `JobPosting`, die die Voraussetzungen erfüllt | Unterstützt. |
+| Livestream-Seite mit `BroadcastEvent` innerhalb von `VideoObject`, die die Voraussetzungen erfüllt | Unterstützt. |
+| Gewöhnlicher Nachrichtenartikel, Blogbeitrag oder Produktseite | Kein unterstützter Anwendungsfall. |
+
+Die Voraussetzungen gelten für die einzelne Seite. Eine Nachrichtenwebsite zu betreiben macht nicht automatisch jeden Artikel für die API geeignet. Googles [Schnelleinstieg zur Indexing API](https://developers.google.com/search/apis/indexing-api/v3/quickstart) beschreibt die unterstützten Typen und die Einrichtung.
+
+Ein erfolgreicher API-Aufruf bedeutet, dass Google die Benachrichtigung erhalten hat und die URL möglicherweise erneut crawlt. Er bestätigt **keine Indexierung**. Auch der Endpunkt für den Benachrichtigungsstatus liefert keinen Indexierungsstatus der Seite. [Google: Bedeutung der API-Antworten](https://developers.google.com/search/apis/indexing-api/v3/using-api)
+
+Nutze für gewöhnliche Artikel den oben beschriebenen Ablauf mit URL-Prüfung und Sitemap. Nachrichtenanbieter können zusätzlich Googles [Dokumentation zu News-Sitemaps](https://developers.google.com/search/docs/crawling-indexing/sitemaps/news-sitemap) lesen.
+
+Bei einem Tool, das eine angenommene Übermittlung als „indexiert“ bezeichnet, wäre ich vorsichtig. Das sind unterschiedliche Ergebnisse. Diese Unterscheidung ist entscheidend, wenn du den Erfolg der Arbeit bewertest.
+
+## Wenn die Search Console weiterhin „nicht indexiert“ meldet
+
+Öffne **Indexierung → Seiten**, um Muster auf der Website zu erkennen, und prüfe anschließend eine betroffene URL. Die drei Statusbeschreibungen folgen Googles [Bericht zur Seitenindexierung](https://support.google.com/webmasters/answer/7440203?hl=en); die nächsten Prüfschritte sind meine Vorschläge für die Fehlersuche.
+
+| Status in der Search Console | Bedeutung | Was ich als Nächstes prüfen würde |
+| --- | --- | --- |
+| Gefunden – zurzeit nicht indexiert | Google kennt die URL, hat sie aber noch nicht gecrawlt. | Die Erreichbarkeit der Website, interne Verlinkungen und ob die Website viele unnötige URLs auffindbar macht. |
+| Gecrawlt – zurzeit nicht indexiert | Google hat die Seite abgerufen, aber nicht indexiert. | Den abgerufenen Inhalt, Überschneidungen mit anderen Seiten und die Signale zur kanonischen URL. Der Status allein erklärt die Ursache nicht. |
+| Alternative Seite mit richtigem kanonischen Tag | Google verwendet eine andere kanonische Version. | Ob die ausgewählte Version der beabsichtigten entspricht. Bei einer beabsichtigten Alternativversion kann der Status korrekt sein. |
+
+Für bereits gecrawlte, aber nicht indexierte Seiten ist laut Google kein erneutes Einreichen nötig. Prüfe, ob es etwas Wesentliches zu beheben gibt. [Google: Erklärungen zur Seitenindexierung](https://support.google.com/webmasters/answer/7440203?hl=en)
+
+Ein gesetztes `noindex`, Einschränkungen durch `robots.txt` und HTTP-Fehler führen dich zurück zu den technischen Prüfungen oben.
+
+## So würde ich bei 4.000 URLs vorgehen
+
+Bei einer größeren Website würde ich die Arbeit nach Seitentyp und Ausschlussgrund ordnen. Der folgende Ablauf ist mein Vorschlag. Gemessene Ergebnisse von der Website des Thread-Autors liegen ihm nicht zugrunde.
+
+1. **Lege fest, welche Seiten in den Index sollen.** Erstelle eine Liste wichtiger kanonischer URLs. Trenne Artikel und Produktseiten von Filtern, Weiterleitungen und bewussten Ausschlüssen.
+2. **Gruppiere fehlende Seiten.** Kombiniere Seitentyp und gemeldeten Status: etwa Tutorials, die noch auf einen Crawl warten, oder Produktseiten mit widersprüchlichen Canonical-Angaben.
+3. **Prüfe repräsentative URLs.** Beginne mit wenigen Beispielen pro Gruppe und erweitere die Auswahl bei unterschiedlichen Ergebnissen. Einen gemeinsamen Fehler in der Seitenvorlage solltest du zentral beheben.
+4. **Korrigiere, veröffentliche und prüfe.** Kontrolliere das tatsächliche Ergebnis, relevante interne Links und die Sitemap. Beantrage die Indexierung einzelner URLs gezielt.
+5. **Verfolge Änderungen in festen Abständen.** Ich würde wöchentlich prüfen und das Datum der Korrektur, den letzten Crawl, die gewählte kanonische URL und den aktuellen Status festhalten. Das ist ein Prüfrhythmus, keine Frist für die Indexierung.
+
+Zum Start reicht eine kleine Tabelle:
+
+```csv
+url,page_type,reported_status,checked_at,change_made,change_date,last_crawl,google_canonical,next_review
+```
+
+Ich würde messen, wie viele der vorgesehenen Seiten indexiert werden, und anschließend relevante Impressionen und Besuche untersuchen. Die Zahl erfolgreicher Übermittlungen würde mir deutlich weniger darüber sagen, ob Leser die Inhalte finden können.
+
+Mein [Leitfaden dazu, wie du von KI zitiert wirst](/blog/how-to-get-cited-by-ai/de) behandelt den nächsten Schritt: Crawler-Zugriff, Belege und die Messung von Quellenverweisen in verschiedenen Suchassistenten.
+
+**Beginne mit einer wichtigen Seite, die bei Google fehlt. Prüfe ihren Status, behebe das konkrete Problem, das du belegen kannst, und kontrolliere das veröffentlichte Ergebnis. Entscheide anhand deiner Erkenntnisse, ob dasselbe Problem eine größere Gruppe betrifft.**
