@@ -1,5 +1,5 @@
-// Remains disabled until the existing account supplies this portfolio's own ID.
-export const UMAMI_WEBSITE_ID = "";
+// This portfolio's verified existing-account ID; empty disables the integration.
+export const UMAMI_WEBSITE_ID = "28ddc8ae-3338-4f25-9e98-99a1df18ad0d";
 export const UMAMI_SCRIPT_URL = "https://rpcrate.com/_sr/s.js";
 const HOSTS = new Set(["livvux.dev", "www.livvux.dev"]);
 const PRIVATE_PATH = /\/(?:api|admin|auth|account|login|checkout|reset|password|token|session|tools|opengraph-image|twitter-image)(?:\/|$)/i;
