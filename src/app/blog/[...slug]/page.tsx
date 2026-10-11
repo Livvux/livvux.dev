@@ -9,6 +9,7 @@ import { findPost, getPosts, getRelatedPosts, hrefFor, postId, postLang, transla
 import { postAuthor, postDates, postMetadata, postStructuredData } from "@/lib/seo";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { StructuredData } from "@/components/structured-data";
+import { UmamiPageview } from "@/components/umami-pageview";
 
 // Unknown and malformed article URLs are real 404s, not empty indexable pages.
 export const dynamicParams = false;
@@ -48,6 +49,7 @@ export default async function Blog({ params }: BlogProps) {
 
   return (
     <main id="blog" lang={lang}>
+      <UmamiPageview path={hrefFor(post)} title={post.title} />
       <StructuredData data={postStructuredData(post)} />
       <Breadcrumbs label={de ? "Brotkrumennavigation" : "Breadcrumb"} items={[
         { name: de ? "Startseite" : "Home", href: "/" },

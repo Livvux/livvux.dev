@@ -7,6 +7,7 @@ import { BLOG_PAGE_SIZE, blogPageHref, parseBlogPage } from "@/lib/blog-paginati
 import { absoluteUrl, pageMetadata, postUrl } from "@/lib/seo";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { StructuredData } from "@/components/structured-data";
+import { UmamiPageview } from "@/components/umami-pageview";
 
 type BlogPageProps = { searchParams: Promise<{ page?: string | string[] }> };
 
@@ -38,6 +39,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const path = blogPageHref(page);
   return (
     <main id="blog">
+      <UmamiPageview path="/blog" title="Blog: AI, Development & Open Source" ownerKey={`blog:${page}`} />
       <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Blog", href: "/blog" }, ...(page > 1 ? [{ name: `Page ${page}`, href: path }] : [])]} />
       <StructuredData data={{
         "@context": "https://schema.org",

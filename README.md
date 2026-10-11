@@ -31,3 +31,11 @@ pnpm build    # production build
 ## Deployment
 
 Deploys via Dokploy from this private GitHub repository.
+
+## Public page statistics
+
+Umami remains disabled while `UMAMI_WEBSITE_ID` in `src/lib/umami.ts` is empty. Activate it only with this portfolio's verified website ID from the existing account and through the normal review/release process.
+
+Rendered portfolio and published blog page owners opt in to manual pageviews. Automatic tracking is disabled; tools, APIs, private/unknown paths and `/privacy` have no pageview owner. Query strings, fragments and referrer contents are omitted; sensitive URL parameters, DNT/GPC and the existing preview/noindex flag prevent loading. Blog archive pagination counts each rendered page while reporting the public `/blog` path. Keep the privacy notice in `/privacy` consistent with the self-hosted collector.
+
+Focused checks: `node --test tests/umami.test.mjs tests/seo.test.mjs tests/sitemap.test.mjs`. `tests/umami.browser.cjs` uses Playwright and a local fixture-ID build; supply `UMAMI_FIXTURE_SCRIPT` with the real reviewed Umami script. All public-looking URLs are intercepted and application requests are forwarded only to the loopback server. Never deploy the fixture ID.
