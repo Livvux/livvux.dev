@@ -54,6 +54,7 @@ function routeModules(documents) {
     "@/mdx-components": { mdxComponents: {} },
     "@/components/breadcrumbs": { Breadcrumbs: () => {} },
     "@/components/structured-data": { StructuredData: () => {} },
+    "@/components/umami-pageview": { UmamiPageview: () => {} },
     "@/lib/blog-pagination": pagination,
     "@/lib/pagination": {},
   });

@@ -9,6 +9,8 @@ import "./globals.css";
 import { FlickeringGrid } from "@/components/magicui/flickering-grid";
 import { StructuredData } from "@/components/structured-data";
 import { siteStructuredData } from "@/lib/seo";
+import { UmamiProvider } from "@/components/umami-pageview";
+import Link from "next/link";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -76,7 +78,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 style={{ maskImage: "linear-gradient(to bottom, black, transparent)", WebkitMaskImage: "linear-gradient(to bottom, black, transparent)" }}
               />
             </div>
-            <div className="relative z-10 max-w-2xl mx-auto py-12 pb-24 sm:py-24 px-6">{children}</div>
+            <UmamiProvider enabled={indexable}>
+              <div className="relative z-10 max-w-2xl mx-auto py-12 pb-24 sm:py-24 px-6">
+                {children}
+                <footer className="mt-12 text-xs text-muted-foreground"><Link href="/privacy" className="underline underline-offset-4">Privacy</Link></footer>
+              </div>
+            </UmamiProvider>
             <Navbar />
           </TooltipProvider>
         </ThemeProvider>
