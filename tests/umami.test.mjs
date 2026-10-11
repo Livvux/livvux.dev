@@ -11,6 +11,8 @@ function fixture(url = "https://livvux.dev/", privacy = {}) {
   const window = { location: new URL(url) };
   const document = {
     visibilityState: "visible",
+    querySelector: () => scripts.find((script) => script.dataset.websiteId) ?? null,
+    querySelectorAll: () => scripts.filter((script) => script.dataset.websiteId),
     createElement: () => {
       const events = {};
       return { dataset: {}, addEventListener: (name, fn) => { events[name] = fn; }, events };
@@ -25,7 +27,7 @@ function fixture(url = "https://livvux.dev/", privacy = {}) {
   return {
     api: loaded.exports, calls, scripts, window, document,
     loaded: async () => {
-      window.umami = { track: async (payload) => { calls.push(payload); } };
+      window.umami = { track: async (payload) => { calls.push(payload); }, getSession: () => ({ website: scripts[0].dataset.websiteId }) };
       scripts[0].events.load();
       await Promise.resolve(); await Promise.resolve();
     },
@@ -173,4 +175,33 @@ test("tracker failure is contained and never causes application errors", async (
   f.scripts[0].events.error();
   await Promise.resolve(); await Promise.resolve();
   assert.equal(f.calls.length, 0);
+});
+
+test("preexisting SDKs and declared website scripts fail closed without a second loader", () => {
+  for (const kind of ["sdk", "script"]) {
+    const f = fixture();
+    if (kind === "sdk") f.window.umami = { track: async () => assert.fail("Must not reuse an unknown SDK"), getSession: () => ({ website: id }) };
+    else f.scripts.push({ dataset: { websiteId: id } });
+    assert.equal(f.api.startUmamiPage(id, "/", "Portfolio"), undefined);
+    assert.equal(f.scripts.length, kind === "script" ? 1 : 0);
+  }
+});
+
+test("a delayed old SDK cannot bind the new loader to a different header ID", async () => {
+  const f = fixture();
+  f.api.startUmamiPage(id, "/", "Portfolio");
+  f.window.umami = { track: async () => assert.fail("Mismatched SDK must not send"), getSession: () => ({ website: "b2222222-2222-4222-8222-222222222222" }) };
+  f.scripts[0].events.load();
+  await Promise.resolve(); await Promise.resolve();
+  assert.deepEqual(f.calls, []);
+  assert.equal(f.scripts.length, 1);
+});
+
+test("SDK replacement after a successful pageview cannot send on a later SPA route", async () => {
+  const f = fixture();
+  f.api.startUmamiPage(id, "/", "Portfolio"); await f.loaded();
+  f.window.umami = { track: async () => assert.fail("Replaced SDK must not send"), getSession: () => ({ website: id }) };
+  f.window.location = new URL("https://livvux.dev/blog");
+  f.api.startUmamiPage(id, "/blog", "Blog"); await Promise.resolve();
+  assert.equal(f.calls.length, 1); assert.equal(f.scripts.length, 1);
 });

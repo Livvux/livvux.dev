@@ -37,11 +37,28 @@ export function umamiPageAllowed(id: string, expectedPath: string, url: URL, pri
 }
 
 interface Payload { website: string; hostname: string; url: string; title: string; referrer: string; }
-declare global { interface Window { umami?: { track: (payload: Payload) => Promise<unknown> }; } }
+interface UmamiSdk {
+  track: (payload: Payload) => Promise<unknown>;
+  getSession: () => { website: string };
+}
+declare global { interface Window { umami?: UmamiSdk; } }
 let navigationPath: string | null = null;
 let lastSentOwner: string | null = null;
 let activeOwner: symbol | null = null;
 let loader: Promise<void> | null = null;
+let loaderWebsite: string | null = null;
+let loaderScript: HTMLScriptElement | null = null;
+let ownedSdk: UmamiSdk | null = null;
+
+/** The SDK's closure supplies request headers; payload.website cannot override it. */
+function ownsSdk(id: string): boolean {
+  try {
+    const scripts = document.querySelectorAll<HTMLScriptElement>('script[data-website-id]');
+    return loaderWebsite === id && ownedSdk !== null && window.umami === ownedSdk &&
+      scripts.length === 1 && scripts[0] === loaderScript &&
+      loaderScript.dataset.websiteId === id && ownedSdk.getSession().website === id;
+  } catch { return false; }
+}
 
 /** Observes committed route changes, including unmeasured pages; sends no request. */
 export function observeUmamiNavigation(pathname: string): void {
@@ -52,16 +69,25 @@ export function observeUmamiNavigation(pathname: string): void {
 }
 
 function loadTracker(id: string): Promise<void> {
-  if (loader) return loader;
+  if (loader) return loaderWebsite === id ? loader : Promise.reject(new Error("Tracker ID conflict"));
+  if (window.umami || document.querySelector('script[data-website-id]')) {
+    return Promise.reject(new Error("An existing tracker owns this document"));
+  }
+  loaderWebsite = id;
   loader = new Promise((resolve, reject) => {
     const script = document.createElement("script");
+    loaderScript = script;
     script.id = "livvux-dev-umami-script";
     script.src = UMAMI_SCRIPT_URL;
     script.defer = true;
     script.referrerPolicy = "no-referrer";
     Object.assign(script.dataset, { websiteId: id, autoTrack: "false", doNotTrack: "true",
       excludeSearch: "true", excludeHash: "true", fetchCredentials: "omit", domains: [...HOSTS].join(",") });
-    script.addEventListener("load", () => resolve(), { once: true });
+    script.addEventListener("load", () => {
+      ownedSdk = window.umami ?? null;
+      if (ownsSdk(id)) resolve();
+      else { ownedSdk = null; reject(new Error("Tracker SDK binding conflict")); }
+    }, { once: true });
     script.addEventListener("error", () => reject(new Error("Tracker unavailable")), { once: true });
     document.head.append(script);
   });
@@ -72,15 +98,15 @@ function loadTracker(id: string): Promise<void> {
 export function startUmamiPage(id: string, path: string, title: string, ownerKey = path): (() => void) | undefined {
   const allowed = () => umamiPageAllowed(id, path, new URL(window.location.href),
     navigator as Navigator & PrivacySignals, (window as Window & { doNotTrack?: string | number }).doNotTrack);
-  if (!allowed()) return;
+  if (!allowed() || (!loader && (window.umami || document.querySelector('script[data-website-id]')))) return;
   observeUmamiNavigation(window.location.pathname);
   const owner = Symbol();
   activeOwner = owner;
   const send = () => {
-    if (activeOwner !== owner || lastSentOwner === ownerKey || document.visibilityState !== "visible" || !allowed() || !window.umami) return;
+    if (activeOwner !== owner || lastSentOwner === ownerKey || document.visibilityState !== "visible" || !allowed() || !ownsSdk(id) || !ownedSdk) return;
     lastSentOwner = ownerKey;
     document.removeEventListener("visibilitychange", send);
-    void window.umami.track({ website: id, hostname: window.location.hostname,
+    void ownedSdk.track({ website: id, hostname: window.location.hostname,
       url: publicUmamiPath(path) ?? "/", title, referrer: "" }).catch(() => {});
   };
   void loadTracker(id).then(() => {

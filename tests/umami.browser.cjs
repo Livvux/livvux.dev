@@ -14,7 +14,7 @@ async function run() {
   const tracker = await fs.readFile(process.env.UMAMI_FIXTURE_SCRIPT, 'utf8');
   const browser = await chromium.launch({ headless: true });
   const checks = [];
-  async function fixture(path = '/', privacy, hostname = 'livvux.dev') {
+  async function fixture(path = '/', privacy, hostname = 'livvux.dev', preexisting = false) {
     const context = await browser.newContext({ serviceWorkers: 'block' });
     if (privacy) await context.addInitScript((signal) => {
       Object.defineProperty(navigator, signal === 'DNT' ? 'doNotTrack' : 'globalPrivacyControl', {
@@ -38,7 +38,10 @@ async function run() {
       } else if (url.hostname === hostname) {
         // Forward only to the loopback Next server, including real RSC requests.
         const response = await route.fetch({ url: new URL(url.pathname + url.search, local).href, maxRedirects: 0 });
-        await route.fulfill({ response });
+        if (preexisting && request.resourceType() === 'document') {
+          const old = `<script src="${scriptUrl}" data-website-id="b2222222-2222-4222-8222-222222222222" data-auto-track="false"></script>`;
+          await route.fulfill({ response, body: (await response.text()).replace('<head>', '<head>' + old) });
+        } else await route.fulfill({ response });
       } else await route.abort();
     });
     await page.goto(`https://${hostname}${path}`, { referer: 'https://source.example/?email=PRIVATE_REFERRER#PRIVATE' });
@@ -97,6 +100,11 @@ async function run() {
     const alias = await fixture('/', undefined, 'www.livvux.dev');
     await count(alias, 1); assert.equal(alias.posts[0].payload.hostname, 'www.livvux.dev');
     await alias.context.close(); checks.push('explicit own-domain www host gate (live alias state unverified)');
+    const conflict = await fixture('/', undefined, 'livvux.dev', true);
+    assert.equal(conflict.loads(), 1, 'Preserve the preexisting SDK without adding a second loader');
+    assert.deepEqual(conflict.posts, []);
+    assert.equal(await conflict.page.evaluate(() => window.umami.getSession().website), 'b2222222-2222-4222-8222-222222222222');
+    await conflict.context.close(); checks.push('preexisting real SDK fails closed with one retained loader and no new request');
     const result = { status: 'passed', mode: 'loopback Next 16.1.1 fixture build; intercepted real Umami 3.4.0 script/collect; no public network', timestamp: new Date().toISOString(), checks };
     if (process.env.UMAMI_TEST_RESULT) await fs.writeFile(process.env.UMAMI_TEST_RESULT, JSON.stringify(result, null, 2));
     console.log(JSON.stringify(result, null, 2));

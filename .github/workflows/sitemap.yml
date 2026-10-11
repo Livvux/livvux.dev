@@ -16,6 +16,7 @@ on:
       - 'tests/sitemap.*'
       - 'tests/seo.*'
       - 'tests/umami.test.mjs'
+      - 'tests/umami-sdk.test.mjs'
       - '.github/workflows/sitemap.yml'
   push:
     branches: [main]
@@ -33,6 +34,7 @@ on:
       - 'tests/sitemap.*'
       - 'tests/seo.*'
       - 'tests/umami.test.mjs'
+      - 'tests/umami-sdk.test.mjs'
       - '.github/workflows/sitemap.yml'
 
 permissions:
@@ -55,7 +57,7 @@ jobs:
       - name: Install existing dependencies
         run: pnpm install --frozen-lockfile
       - name: Test sitemap, SEO, and pageview privacy
-        run: node --test tests/sitemap.test.mjs tests/seo.test.mjs tests/umami.test.mjs
+        run: node --test tests/sitemap.test.mjs tests/seo.test.mjs tests/umami.test.mjs tests/umami-sdk.test.mjs
       - name: Lint SEO and pageview changes
         run: >-
           pnpm exec eslint src/app/sitemap.ts src/app/robots.ts
@@ -66,7 +68,7 @@ jobs:
           src/lib/posts.ts src/lib/blog-pagination.ts
           src/components/breadcrumbs.tsx src/components/structured-data.tsx
           src/components/umami-pageview.tsx src/lib/umami.ts src/app/privacy/page.tsx
-          next.config.mjs tests/sitemap.test.mjs tests/seo.test.mjs tests/umami.test.mjs
+          next.config.mjs tests/sitemap.test.mjs tests/seo.test.mjs tests/umami.test.mjs tests/umami-sdk.test.mjs
       - name: Build the complete site
         run: pnpm build
       - name: Check types
