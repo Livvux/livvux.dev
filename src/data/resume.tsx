@@ -74,6 +74,34 @@ export const DATA = {
   education: [],
   projects: [
     {
+      title: "How Its Built",
+      href: "https://howitsbuilt.fyi/",
+      dates: "2026 - Present",
+      active: true,
+      description:
+        "An open-source, privacy-conscious Chrome extension that identifies a website's frameworks, CMS, analytics and other technologies on demand. Free local scans, with optional deeper analysis on the web.",
+      technologies: ["TypeScript", "WXT", "Chrome Extension", "Open Source"],
+      links: [
+        {
+          type: "Website",
+          href: "https://howitsbuilt.fyi/",
+          icon: <Icons.globe className="size-3" />,
+        },
+        {
+          type: "Source",
+          href: "https://github.com/Livvux/howitsbuilt-extension",
+          icon: <Icons.github className="size-3" />,
+        },
+        {
+          type: "Article",
+          href: "/blog/how-its-built-browser-extension",
+          icon: <NotebookIcon className="size-3" />,
+        },
+      ],
+      image: "/images/blog/how-its-built/overview.svg",
+      video: "",
+    },
+    {
       title: "StreamerLoft",
       href: "https://streamerloft.com",
       dates: "",
