@@ -1,0 +1,154 @@
+---
+title: "How Its Built: Meine Open-Source-Extension für Website-Tech-Stacks"
+publishedAt: "2026-10-12"
+author: "Livvux"
+summary: "Meine Chrome-Extension How Its Built erkennt Frameworks, CMS, Analytics und mehr lokal im Browser. Alle Funktionen, Technik, Datenschutz und Installation."
+image: "/images/blog/how-its-built/overview.svg"
+---
+
+**Jede Website hat ein technisches Rezept. Ich habe [How Its Built](https://howitsbuilt.fyi/) gebaut, weil ich dessen Zutaten sehen möchte, ohne jedes Mal eine halbe Stunde in den DevTools zu verbringen.**
+
+Website öffnen, Extension anklicken, Tech-Stack ansehen: Frameworks, Content-Management-Systeme, E-Commerce-Plattformen, Analytics-Dienste, CDNs, Zahlungsanbieter und weitere Integrationen werden nach Kategorien aufgelistet. Für den kostenlosen Scan brauchst Du keinen Account.
+
+Mir war dabei besonders wichtig, *wie* die Erkennung funktioniert. Der [Quellcode der Browser-Erweiterung ist öffentlich](https://github.com/Livvux/howitsbuilt-extension), die kostenlose Erkennung läuft lokal und die Seite wird erst untersucht, wenn Du es ausdrücklich auslöst. Ergänzend gibt es eine [Website-Suche](https://howitsbuilt.fyi/) und optionale Pro-Funktionen für detailliertere Ergebnisse.
+
+<figure className="my-8">
+  <img src="/images/blog/how-its-built/overview.svg" alt="How Its Built: Website öffnen, Extension für einen lokalen Scan anklicken und erkannte Technologien nach Kategorien ansehen." width={1200} height={630} loading="lazy" className="h-auto w-full rounded-xl" />
+  <figcaption>Vom Aufruf einer Website zu einem übersichtlichen Tech-Stack. Kostenlos und nur auf Deinen Klick hin.</figcaption>
+</figure>
+
+## Warum ich How Its Built gebaut habe
+
+Ich schaue mir ständig Websites an und frage mich: Ist das Next.js? Läuft dort WordPress? Welches Analytics-Tool ist eingebunden? Wie wird der Checkout umgesetzt? Welche Bibliotheken und Drittanbieter werden verwendet?
+
+Natürlich kann ich das alles manuell herausfinden: Quelltext durchsuchen, Script-URLs prüfen, HTML-Attribute vergleichen, JavaScript-Objekte untersuchen und Netzwerkaufrufe analysieren. Nur wiederholt sich dieser Ablauf bei jeder neuen Website.
+
+**How Its Built macht aus solchen Hinweisen eine lesbare Übersicht.** Die Extension soll Technologien identifizieren – nicht fremden Quellcode herunterladen oder verborgene Backend-Systeme rekonstruieren.
+
+## Was die Erweiterung anzeigt
+
+Im Popup erscheinen erkannte Technologien gruppiert nach Kategorie, mit Namen und Icons. Falls hinterlegt, führt ein Klick auf den Technologienamen zur zugehörigen Website. Nach einem Scan zeigt ein kleines **Badge** am Erweiterungsicon die Anzahl der Treffer. Mit **Copy** lässt sich die gesamte kategorisierte Liste als Text kopieren.
+
+Die zugrunde liegende Fingerprint-Datenbank umfasst Tausende Technologien. Die folgenden Bereiche verdeutlichen, wonach die Erkennung suchen kann:
+
+| Bereich | Beispiele für Technologiefamilien | Warum mich das interessiert |
+| --- | --- | --- |
+| Frontend | React, Vue, Next.js, Angular | Rendering und UI-Ökosystem verstehen |
+| CMS | WordPress und andere CMS | Veröffentlichungsplattform erkennen |
+| Shops und Payments | Shopsysteme und Zahlungsanbieter | Checkout und Commerce-Stack einordnen |
+| Analytics und Marketing | Tracking, Tag-Manager, Pixel | Eingesetzte Messwerkzeuge identifizieren |
+| Infrastruktur | CDN- und Hosting-Fingerprints | Hinweise auf die Auslieferung erhalten |
+| Weitere Integrationen | Widgets, Chats, externe Bibliotheken | Leicht übersehene Abhängigkeiten finden |
+
+Das sind Beispiele für erkennbare Technologietypen, keine Garantie, dass jede Installation erkannt wird. Ausschlaggebend sind die sichtbaren Fingerprints und die Informationen, auf die der Browser tatsächlich zugreifen kann.
+
+## So funktioniert ein Scan technisch
+
+Die aktuelle Version untersucht nicht automatisch alle Websites, die Du besuchst.
+
+1. **Öffne eine normale HTTP- oder HTTPS-Website.** Allein beim Navigieren startet kein Scan.
+2. **Klicke auf das How-Its-Built-Icon.** Über Chromes Berechtigung `activeTab` erhält die Extension temporär Zugriff auf den aktiven Tab.
+3. **Sammle lokale Signale.** Dazu gehören URL, HTML, Meta-Tags, Script-URLs, Inline-Skripte, sichtbarer Text, ausgewählte JavaScript-Globals, DOM-Elemente und für JavaScript lesbare Cookies.
+4. **Vergleiche die Fingerprints lokal.** Die Engine wertet die mitgelieferten Signaturen aus, berücksichtigt technische Zusammenhänge und gruppiert passende Technologien.
+5. **Lies oder kopiere das Ergebnis.** Das Badge zeigt die Trefferzahl für diesen Tab und wird bei einer Navigation wieder gelöscht.
+
+Ein Detail finde ich besonders sinnvoll: Bleibt das Popup geöffnet, kann nach **ungefähr drei Sekunden ein zweiter Scan** folgen. Damit lassen sich Frameworks erkennen, die erst beim Hydratisieren einer Anwendung sichtbar werden. Das ist kein permanentes Monitoring im Hintergrund.
+
+Beim Einsammeln der Signale begrenzt die Implementierung die Menge an HTML, Text und Skriptinhalten. Auch einzelne Werte werden gekappt. Die Erkennungsregeln sind Bestandteil des Extension-Builds; es wird dafür kein ausführbarer Code zur Laufzeit nachgeladen.
+
+**Im Quellcode:** [Signale einsammeln](https://github.com/Livvux/howitsbuilt-extension/blob/main/apps/extension/lib/collect.ts), [aktiven Tab analysieren](https://github.com/Livvux/howitsbuilt-extension/blob/main/apps/extension/lib/analyze.ts), [Popup-Logik](https://github.com/Livvux/howitsbuilt-extension/blob/main/apps/extension/entrypoints/popup/main.ts).
+
+## Datenschutz: Was bedeutet „lokal“ konkret?
+
+Der kostenlose Scan läuft auf Deinem Gerät. Dabei werden **weder die untersuchten Seiteninhalte noch die Scan-Ergebnisse an How Its Built übertragen**. Du brauchst dafür weder ein Konto noch eine dauerhaft gespeicherte Browser-Historie. Die Extension fordert auch keine permanente Berechtigung für sämtliche Websites an.
+
+Die Berechtigungen sind entsprechend eingeschränkt:
+
+- `activeTab` und `scripting`: Zugriff auf den aktiven Tab, nachdem Du das Popup geöffnet hast.
+- `storage`: lokale Speicherung eines optionalen Login-Tokens, wenn Du Deinen Account verbindest.
+- Dauerhafte Host-Berechtigung ausschließlich für `https://howitsbuilt.fyi/*`: Anmeldung und freiwillig angeforderte Pro-Abfragen.
+- Kein `<all_urls>` und kein `webRequest` für eine laufende Überwachung aller Seiten.
+
+Ein technisches Detail möchte ich nicht verschweigen: Die Erkennung kann lokal auch **Namen und Werte von JavaScript-lesbaren Cookies** auswerten. Das ist eine mögliche Quelle für Fingerprints. Cookies mit `HttpOnly` sind über `document.cookie` nicht zugänglich. Auch wenn Free diese Inhalte nicht an einen Server sendet, sollte man bewusst entscheiden, welcher Erweiterung man Zugriff auf eine Seite gewährt.
+
+Bei einer ausdrücklich angeforderten **Pro-Abfrage** wird die ausgewählte Domain an den Dienst übertragen. Das ist ein anderer Datenfluss als beim lokalen Free-Scan. Die [Store- und Berechtigungsdokumentation](https://github.com/Livvux/howitsbuilt-extension/blob/main/apps/extension/store/SUBMISSION.md) beschreibt diese Trennung.
+
+## Free vs. Pro: Was funktioniert bereits?
+
+Ich wollte die eigentliche Technologieerkennung kostenlos anbieten. Kostenpflichtig sind zusätzliche Details für Nutzer, die Ergebnisse genauer untersuchen möchten.
+
+| Funktion | Free | Pro |
+| --- | --- | --- |
+| Lokaler Scan auf Klick | Ja | Ja |
+| Technologien mit Namen, Icons und Kategorien | Ja | Ja |
+| Tech-Stack als Text kopieren | Ja | Ja |
+| Versionsangaben, soweit ermittelbar | — | Ja |
+| Confidence-Werte und konkrete Erkennungshinweise | — | Ja |
+| Export als JSON oder CSV über die Website | — | Ja |
+| Hosting, DNS, Mailprovider, Tracking-IDs, Mehrseiten-Scan | — | **Geplant, noch nicht verfügbar** |
+| Serverseitiges JavaScript-Rendering und Security-Header-Check | — | **Geplant, noch nicht verfügbar** |
+
+Im Pro-Popup gibt es **Stack** und **Details**. Unter Details können Versionsangaben, ein Confidence-Wert und die Grundlage eines Treffers erscheinen – sofern diese Informationen ermittelt werden konnten. Statt nur „React erkannt“ zu lesen, lässt sich damit nachvollziehen, *welcher Hinweis* zur Erkennung geführt hat.
+
+Stand **12. Oktober 2026** kostet Pro laut Website **4,99 US-Dollar pro Monat**. Angeboten werden **sieben kostenlose Testtage**, für deren Start eine Zahlungskarte benötigt wird. Du kannst vor Ablauf kündigen. Aktuelle Angaben findest Du unter [Preise](https://howitsbuilt.fyi/pricing).
+
+**Wichtig:** Funktionen wie DNS-Analyse, Mailprovider, TLS-Daten, Tracking-IDs oder Scans mehrerer Unterseiten sind derzeit angekündigt. Ich möchte sie nicht so darstellen, als wären sie schon Bestandteil des fertigen Produkts.
+
+## Warum Website und Extension verschiedene Ergebnisse liefern können
+
+Auf [howitsbuilt.fyi](https://howitsbuilt.fyi/) kannst Du eine Domain auch ohne Erweiterung prüfen lassen. Die serverseitige Abfrage untersucht öffentlich verfügbare Daten wie das zurückgegebene HTML und HTTP-Response-Header.
+
+Die Extension sieht dagegen zusätzlich den **bereits durch JavaScript aufgebauten Seitenzustand**: DOM-Strukturen, JavaScript-Globals und dynamisch hinzugefügte Elemente. Gerade bei modernen Single-Page-Applications kann das einen Unterschied machen.
+
+Umgekehrt gilt: Die aktuelle kostenlose Extension liest **keine HTTP-Response-Header** aus. Eine Technologie, die ausschließlich daran zu erkennen ist, kann deshalb im Website-Lookup auftauchen, nicht aber im kostenlosen Browser-Scan.
+
+Beide Wege liefern Hinweise – keinen vollständigen Architekturplan. Interne APIs, Backends, Datenbanken und bewusst versteckte Dienste lassen sich von außen oft überhaupt nicht zuverlässig erkennen.
+
+## Installation: So bekommst Du die aktuelle Version
+
+How Its Built ist für **Chrome und Chromium-basierte Browser** entwickelt. Der aktuelle öffentliche Quellcode hat die Versionsnummer **0.2.1**.
+
+**Wichtiger Versionshinweis (12. Oktober 2026):** Als neuester GitHub-Release steht noch **v0.2.0** zum Download. Dessen ZIP verwendet das ältere, weitreichendere Berechtigungsmodell. Der Quellcode von v0.2.1 verzichtet darauf; die Store-Dokumentation warnt ausdrücklich vor dem alten ZIP. **Wenn Du das hier beschriebene On-Demand-Berechtigungsmodell möchtest, baue die aktuelle Version aus dem Quellcode, statt das alte v0.2.0-Archiv zu installieren.**
+
+### Aktuelle Version selbst bauen
+
+Klone das [öffentliche GitHub-Repository](https://github.com/Livvux/howitsbuilt-extension) und führe folgende Befehle aus:
+
+```bash
+git clone https://github.com/Livvux/howitsbuilt-extension.git
+cd howitsbuilt-extension
+corepack enable
+pnpm install --frozen-lockfile
+pnpm --filter extension build
+```
+
+Öffne anschließend `chrome://extensions`, aktiviere den **Entwicklermodus**, klicke auf **Entpackte Erweiterung laden** und wähle `apps/extension/.output/chrome-mv3`. Danach das Icon in der Toolbar anheften, eine normale Website öffnen und die Extension anklicken.
+
+Für ein selbst erstelltes ZIP gibt es außerdem `pnpm --filter extension zip`. Eine neuere veröffentlichte Version findest Du künftig unter [GitHub Releases](https://github.com/Livvux/howitsbuilt-extension/releases) oder über die [Projektwebsite](https://howitsbuilt.fyi/). Prüfe die Versionsnummer, bevor Du ein älteres Archiv verwendest.
+
+Auf internen Chrome-Seiten, im Chrome Web Store und bei manchen Dokumenten verhindert Chrome das Ausführen einer Extension. Die Meldung „Can't inspect this page“ ist dort normal.
+
+## Tatsächlich Open Source – inklusive Lizenz
+
+**Der Quellcode der Browser-Erweiterung steht unter GPL-3.0-only.** Grundlage für die Fingerprints ist unter anderem die ebenfalls GPL-3.0-lizenzierte Community-Datenbank [enthec/webappanalyzer](https://github.com/enthec/webappanalyzer). Technisch nutzt das Projekt **TypeScript**, **WXT** und eine gemeinsam verwendete Detection-Engine.
+
+Das ist nützlich, wenn Du selbst überprüfen möchtest, welche Informationen die Extension liest, wie das Matching funktioniert, wie sie gebaut und getestet wird oder wenn Du Erkennungsregeln verbessern möchtest.
+
+Dabei ist mir eine klare Trennung wichtig: **Das öffentliche Extension-Repository ist Open Source. Der separate Webdienst ist damit nicht automatisch Open Source.** Die kostenlose Browser-Erkennung benötigt kein Pro-Konto, die Website und Pro-APIs sind eigenständige Dienste.
+
+Der Einstieg für Entwickler:
+
+- [Öffentliches Extension-Repository](https://github.com/Livvux/howitsbuilt-extension)
+- [Erkennungs-Engine](https://github.com/Livvux/howitsbuilt-extension/tree/main/packages/engine/src)
+- [Manifest und Berechtigungen](https://github.com/Livvux/howitsbuilt-extension/blob/main/apps/extension/wxt.config.ts)
+- [Issues und Feedback](https://github.com/Livvux/howitsbuilt-extension/issues)
+
+## Wann ich How Its Built einsetze – und wo Grenzen liegen
+
+Ich sehe vor allem drei praktische Einsatzzwecke: **technische Inspiration**, **Tech-Stack-Recherche bei Wettbewerbern** und **die erste Einschätzung einer unbekannten Website**. Statt wild zu raten, welche Plattform dahintersteckt, beginne ich mit den sichtbaren Signalen und prüfe anschließend gezielt die interessanten Punkte.
+
+Aber Fingerprinting ist nicht unfehlbar. Ein Treffer kann falsch sein, eine Versionsnummer fehlen und eine nicht erkannte Technologie trotzdem auf dem Server laufen. How Its Built ist weder ein Security-Audit noch ein Source-Code-Extractor oder ein Beweis für die tatsächliche Backend-Architektur. Für wichtige technische Entscheidungen sollte man die Ergebnisse unabhängig überprüfen.
+
+**Mein Ziel ist bewusst einfach: den sichtbaren Tech-Stack einer Website schneller verständlich machen – ohne dafür das Surfverhalten an einen Server schicken zu müssen.**
+
+Teste die [Domain-Abfrage](https://howitsbuilt.fyi/), sieh Dir den [öffentlichen Quellcode](https://github.com/Livvux/howitsbuilt-extension) an und behalte die [Releases](https://github.com/Livvux/howitsbuilt-extension/releases) für einen Build mit dem aktualisierten Berechtigungsmodell im Blick.
