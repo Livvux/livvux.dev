@@ -1,0 +1,216 @@
+---
+title: "Claude Opus 5.5 vs. GPT-6.1 Sol: Welches KI-Modell macht die besseren Videos?"
+publishedAt: "2026-10-14"
+author: "Livvux"
+summary: "Opus 5.5 bei Storytelling, GPT-6.1 Sol bei Animations-Nachbau und API-Preis: fundierter Vergleich mit Remotion-Beispielen, Diagrammen und Quellen."
+---
+
+**Für kreative, KI-gestützte Videoproduktion würde ich derzeit Claude Opus 5.5 wählen.** Seine interessanteste Stärke ist nicht, dass es bessere FFmpeg-Befehle schreibt. Es geht um das kreative Gesamtkonzept: Welche Bilder erzählen die Geschichte? Warum folgt eine Szene auf die andere? Wie entsteht ein Übergang, der inhaltlich etwas vermittelt?
+
+**Für effiziente technische Umsetzung spricht dagegen viel für GPT-6.1 Sol.** Bei normalen API-Anfragen liegen die veröffentlichten Tokenpreise bei der Hälfte von Opus 5.5. Und in einem Benchmark mit 48 Aufgaben schneidet Sol beim *Nachbauen vorhandener Webanimationen* besser ab. Beides widerspricht sich nicht: Ein originelles Video konzipieren und eine bestehende Animation möglichst exakt rekonstruieren sind unterschiedliche Fähigkeiten. [1](https://www.anthropic.com/claude-opus-5-5)[2](https://openai.com/index/introducing-gpt-6-1-sol/)[3](https://huggingface.co/blog/BreadStudio/opus-5-5-video-field-notes)[5](https://www.physera.ai/research/animation)
+
+Für eine skalierbare Videopipeline würde ich beide kombinieren: **Opus plant. Sol baut. Opus prüft den fertigen Schnitt.**
+
+> **Wichtige Einordnung:** Wir vergleichen hier **KI-gestützte Konzeption, programmierte Motion Graphics und automatisierte Videoproduktion**. Es ist **kein** sauberer Vergleich der Schnittarbeit mit echten Kameraaufnahmen in Premiere Pro, DaVinci Resolve oder Final Cut Pro. Auch klassische Text-zu-Video-Generatoren sind nicht Gegenstand des Tests. Die öffentliche Evidenz ist noch begrenzt.
+
+Weitere Einordnung: Meine Artikel zu [Claude Opus 5.5](/blog/claude-opus-5-5/de) und [KI-Motion-Design](/blog/ai-motion-design/de).
+
+## Der Vergleich auf einen Blick
+
+| Disziplin | Aktueller Favorit | Begründung |
+| --- | --- | --- |
+| Kreative Regie und Storytelling | **Claude Opus 5.5** (vorläufig) | Stärkere Gesamtplanung in einem kleinen Studio-Experiment. [3](https://huggingface.co/blog/BreadStudio/opus-5-5-video-field-notes) |
+| Originelle Motion-Graphics-Konzepte | **Eher Opus 5.5** | Gute Bildideen in einzelnen Tests, aber kein allgemeiner Sieg. [3](https://huggingface.co/blog/BreadStudio/opus-5-5-video-field-notes)[4](https://voyager.so/blog/motion-model-revision) |
+| Übergänge und Rhythmus einer ganzen Geschichte | **Eher Opus 5.5** | Stärke laut BreadStudio vor allem auf der Ebene der Erzählung. [3](https://huggingface.co/blog/BreadStudio/opus-5-5-video-field-notes) |
+| Vorhandene Webanimationen exakt nachbauen | **GPT-6.1 Sol** | Im Animation Bench 0,606 gegenüber 0,507 Punkten. [5](https://www.physera.ai/research/animation) |
+| Umsetzung mit Remotion / React | **Beide** | Beide lieferten funktionsfähige Filme und korrekte Überarbeitungen. [4](https://voyager.so/blog/motion-model-revision) |
+| FFmpeg, Python und automatisierte Render-Pipelines | **Aufgabenabhängig** | Für einen eindeutigen allgemeinen Sieger fehlen passende Direktvergleiche. |
+| Standard-API-Preis | **GPT-6.1 Sol** | $2/$10 statt $4/$20 pro Million Eingabe-/Ausgabe-Tokens. [1](https://www.anthropic.com/claude-opus-5-5)[2](https://openai.com/index/introducing-gpt-6-1-sol/) |
+| Geschwindigkeit der kompletten Videoproduktion | **Nicht ausreichend belegt** | Hardware, Renderkomplexität, Reasoning-Einstellung und Korrekturschleifen beeinflussen die Laufzeit. |
+| Kreative Produktionsqualität insgesamt | **Opus 5.5 – mit Vorbehalt** | Meine aktuelle Wahl, wenn Story und visuelle Regie wichtiger als Stückkosten sind. |
+
+Ein kreativer Favorit ist noch kein belastbarer wissenschaftlicher Gesamtsieger. Das ist bei diesem Vergleich entscheidend.
+
+## 1. Warum guter Code noch kein gutes Video ergibt
+
+Ein Modell kann korrekten React-Code erzeugen, Frames rendern und eine einwandfreie MP4 ausgeben – und trotzdem ein belangloses Video produzieren. Technische Funktionalität beantwortet nämlich nicht die kreativen Fragen: Was muss der Zuschauer nach drei Sekunden verstanden haben? Wie erklärt eine Bewegung einen Zusammenhang? Wo braucht es bewusst Ruhe statt Animation?
+
+Genau das macht einen [Produktionsbericht von BreadStudio auf Hugging Face vom 7. Oktober 2026](https://huggingface.co/blog/BreadStudio/opus-5-5-video-field-notes) interessant. Das Team trennt den Prozess in zwei Ebenen:
+
+1. **Konzept und visuelle Regie:** Skript, Shotlist, Bildsprache, Bewegungen und Sounddesign ergeben einen detaillierten kreativen Bauplan.
+2. **Programmierung und Rendering:** Ein Modell setzt diesen Bauplan technisch um und exportiert das Video.
+
+Bei den drei fertiggestellten Episoden nutzte das Studio **Opus 5.5 für den kreativen Bauplan** und **GPT-6.1 für Code und Rendering**. [3](https://huggingface.co/blog/BreadStudio/opus-5-5-video-field-notes)
+
+### Praxisbeispiel A: Wie eine Sonnenblume die Geschichte erzählt
+
+In einer Episode ging es um **Phyllotaxis**, also die Anordnung von Blättern und Samen nach bestimmten mathematischen Mustern. Zunächst ließ das Studio GPT-6.1 die gesamte zehnstufige Produktionskette übernehmen. Das Ergebnis war technisch vorhanden, überzeugte die Macher erzählerisch aber nicht.
+
+Der Unterschied zeigte sich schon in der Eröffnung:
+
+- **Konzept von GPT-6.1:** Einzelne Punkte erscheinen und bilden nach und nach den Kopf einer Sonnenblume.
+- **Konzept von Opus 5.5:** Ein junger Trieb wächst ins Licht. Die Kamera steigt nach oben; die Blätter werden zum visuellen Übergang in das Samenmuster der Sonnenblume.
+
+Der entscheidende Punkt: **Beide Varianten wurden von GPT-6.1 programmiert.** Unterschiedlich war die kreative Vorlage. Opus erfand einen visuellen Erzählbogen, obwohl das Briefing diese konkrete Szene gar nicht verlangt hatte. [3](https://huggingface.co/blog/BreadStudio/opus-5-5-video-field-notes)
+
+Das ist für mich der Unterschied zwischen **Animation als Dekoration** und **Animation, die etwas erklärt**.
+
+**Original ansehen:** [BreadStudios Vergleich mit Videoausschnitten](https://huggingface.co/blog/BreadStudio/opus-5-5-video-field-notes).
+
+### Was dieser Versuch ausdrücklich nicht beweist
+
+BreadStudio ließ außerdem zwei erfahrene Videoprofis kurze Ausschnitte blind vergleichen. Bei einem Clip entschieden sich **beide für das von GPT-6.1 entworfene Design**. In einem zweiten Vergleich bevorzugte ein Reviewer Opus, während der andere die Qualität ungefähr gleich einschätzte. Die Stichprobe umfasste nur **zwei Personen** und wenige Ausschnitte. [3](https://huggingface.co/blog/BreadStudio/opus-5-5-video-field-notes)
+
+Daraus folgt nicht, dass Opus jede Szene besser animiert. Plausibler ist: **Opus kann bei der Dramaturgie eines gesamten Films stärker sein, während Sol durchaus einzelne starke Shots entwirft.** Das ist eine nützliche Arbeitshypothese, aber kein allgemeingültiger Benchmark.
+
+## 2. Ein unabhängiger Benchmark, in dem GPT-6.1 Sol gewinnt
+
+Wer einen glaubwürdigen Vergleich schreiben will, muss auch Daten berücksichtigen, die dem eigenen Favoriten widersprechen.
+
+[Physeras Animation Bench](https://www.physera.ai/research/animation), aktualisiert am 1. Oktober, prüfte **48 Animationen von 32 echten Websites**. Die Agenten bekamen Referenzbilder und Netzwerkaufzeichnungen und sollten daraus jeweils eine eigenständige HTML-Animation rekonstruieren. Anschließend wurden die Ergebnisse im Browser abgespielt und nach visueller Ähnlichkeit, Bewegung und Layout bewertet. Veröffentlicht wurde pro Modell und Aufgabe ein ausgewählter Lauf. [5](https://www.physera.ai/research/animation)
+
+![Säulendiagramm mit den Ergebnissen von GPT-6.1 Sol und Claude Opus 5.5 beim Nachbau von 48 Webanimationen](/images/blog/claude-opus-5-5-vs-gpt-6-1-sol-video-editing/animation-benchmark-de.svg)
+
+| Messwert (Skala 0–1, höher ist besser) | GPT-6.1 Sol | Opus 5.5 |
+| --- | ---: | ---: |
+| Gesamtscore beim Nachbau | **0,606** | 0,507 |
+| Visuelle Ähnlichkeit | **0,704** | 0,631 |
+| Bewegungstreue | **0,512** | 0,383 |
+| Layout-Korrektheit | **0,624** | 0,517 |
+| Durchschnittliche Modellkosten pro Aufgabe | **0,46 $** | 1,12 $ |
+
+In diesem Test liegt Sol bei sämtlichen veröffentlichten Teilwerten vorne. Das ist relevant für die Aufgabe: „Baue diese vorhandene Website-Animation möglichst exakt nach.“ **Gemessen wird die Ähnlichkeit zum Original** – nicht Kreativität, Dramaturgie oder der Schnitt von echtem Videomaterial. Sol wurde zudem in einem späteren Bewertungsdurchlauf ergänzt, wodurch kleinere Unterschiede bei den Aufnahmebedingungen berücksichtigt werden müssen. [5](https://www.physera.ai/research/animation)
+
+**Meine Einordnung:** „Opus gewinnt Motion Graphics“ wäre zu pauschal. **Kreative Neugestaltung** und **präziser Nachbau** gehören getrennt bewertet. Für Letzteres gibt es derzeit einen recht klaren Datenpunkt zugunsten von GPT-6.1 Sol.
+
+## 3. Gleiche Aufgabe in Remotion: Zwei gute, aber unterschiedliche Ergebnisse
+
+Der [direkte Vergleich von Voyager vom 1. Oktober](https://voyager.so/blog/motion-model-revision) ist besonders aussagekräftig für programmierte Kurzvideos. Beide Modelle sollten mit identischem Ausgangsprojekt, denselben lokalen Schriften und hoher Reasoning-Einstellung einen **15-sekündigen Teaser mit 1280 × 720 Pixeln bei 30 FPS** für das fiktive Kreativevent **OFFLINE** bauen. Umgesetzt wurde mit React, SVG, CSS und Remotion. [4](https://voyager.so/blog/motion-model-revision)
+
+### Praxisbeispiel B: Bildidee gegen Markenpräsenz
+
+**Opus 5.5** entwickelt eine orangefarbene Linie über eine Ideenskizze zu einem Papierflieger und schließlich zu einem Element des abschließenden Terminbildes. Das ergibt einen sichtbaren Wandel von der Idee zum Produkt. Schwächen: Der Eventname verschwindet nach dem Anfang; manche Buchstabenanimationen dauern zu lange.
+
+**GPT-6.1 Sol** entwickelt ein gefaltetes Papierband zu mehreren zusammengehörigen Formen. Die Marke bleibt sichtbar, die Texte erhalten ausreichend Standzeit. Schwäche: Die Anordnung wiederholt sich relativ häufig.
+
+Voyager bevorzugte **Opus für den Social-Media-Teaser** und **Sol als Hero-Animation einer Veranstaltungsseite**. Das ist ein differenziertes Urteil statt eines künstlich erzwungenen Siegers. [4](https://voyager.so/blog/motion-model-revision)
+
+Dann kam die eigentliche Produktionsprobe: Öffnungszeiten ändern, eine zusätzliche Textzeile ergänzen, den Anfang unangetastet lassen. **Beide Modelle erhielten die ersten 270 Frames (neun Sekunden) pixelgenau.** Beide machten den neuen Text allerdings zu klein für die mobile Darstellung. [4](https://voyager.so/blog/motion-model-revision)
+
+Die Lehre: **Eine korrekte technische Änderung ist noch keine visuell abgenommene Änderung.**
+
+**Beide Originalvideos, Überarbeitungen und Quellprojekte:** [Voyagers Vergleich](https://voyager.so/blog/motion-model-revision).
+
+### Praxisbeispiel C: 3D-Rendering ist kein Geschwindigkeitstest für Sprachmodelle
+
+[Nowrap ließ beide Modelle eine 30-sekündige Blender-Animation](https://nowrap.ai/news/clockwork-macro-opus-5-5-vs-gpt-6-1-sol) eines Uhrwerks erstellen. Opus entschied sich für extreme Makroaufnahmen mit geringer Schärfentiefe. Sol zeigte größere Teile des Mechanismus und machte dessen Aufbau leichter erkennbar. Die angegebenen Renderzeiten betrugen ungefähr **12 beziehungsweise 7,5 Stunden**. Allerdings liefen die Jobs gleichzeitig auf derselben GPU, und beide Szenen hatten unterschiedliche Komplexität. [6](https://nowrap.ai/news/clockwork-macro-opus-5-5-vs-gpt-6-1-sol)
+
+Damit lässt sich **nicht** belegen, welches KI-Modell schneller arbeitet. Gemessen wurde primär, wie aufwendig die jeweils erzeugte Szene unter diesen Bedingungen zu rendern war. Für einen Vergleich der visuellen Gestaltung ist das Material dennoch interessant.
+
+## 4. Preisvergleich: GPT-6.1 Sol ist bei Standardanfragen klar günstiger
+
+Die offiziellen Preise pro **eine Million Tokens** sind eindeutig. [OpenAI verlangt für Sol $2 Eingabe, $10 Ausgabe und $0,10 für Cache-Lesezugriffe](https://openai.com/index/introducing-gpt-6-1-sol/). [Anthropic nennt für Opus $4, $20 und $0,20](https://www.anthropic.com/claude-opus-5-5). [1](https://www.anthropic.com/claude-opus-5-5)[2](https://openai.com/index/introducing-gpt-6-1-sol/)
+
+![API-Preisdiagramme für Eingabe, Ausgabe und Cache-Lesezugriffe von GPT-6.1 Sol und Claude Opus 5.5](/images/blog/claude-opus-5-5-vs-gpt-6-1-sol-video-editing/api-pricing-de.svg)
+
+Eine **beispielhafte** Verarbeitung mit 100.000 Eingabe-Tokens und 20.000 Ausgabe-Tokens kostet zu den normalen veröffentlichten Tarifen nominell:
+
+- **GPT-6.1 Sol: 0,40 $** (0,20 $ Eingabe + 0,20 $ Ausgabe).
+- **Claude Opus 5.5: 0,80 $** (0,40 $ Eingabe + 0,40 $ Ausgabe).
+
+Das ist **keine Rechnung für ein vollständig gerendertes Video**. Tokenisierung, Caching, Reasoning, Fehlversuche, Rendering und Plattformgebühren beeinflussen die tatsächlichen Ausgaben. Bei sehr großen Kontexten gelten außerdem spezielle Aufschläge, sodass „immer 50 % günstiger“ nicht korrekt wäre. [1](https://www.anthropic.com/claude-opus-5-5)[2](https://openai.com/index/introducing-gpt-6-1-sol/)
+
+Für einen einzelnen hochwertigen Film sind diese Unterschiede womöglich nebensächlich. Bei hunderten Videos am Tag zählen sie massiv – solange Qualität und Anzahl der Nachbesserungen vergleichbar bleiben.
+
+## 5. Mein bevorzugter Workflow: Kreativität und Umsetzung trennen
+
+![Vierstufiger Workflow: Opus 5.5 für Konzept, GPT-6.1 Sol für Umsetzung, Opus 5.5 für Review und abschließende Qualitätssicherung](/images/blog/claude-opus-5-5-vs-gpt-6-1-sol-video-editing/workflow-de.svg)
+
+**Schritt 1 – Opus 5.5: Kreativkonzept.** Definiere Zielgruppe, Kernbotschaft, Hook, Shotlist, exakte Bildschirmtexte, Bildsprache, Rhythmus, Übergänge und Sound. Jede Szene bekommt eine Start- und Endzeit. Erst wenn die Geschichte überzeugt, geht es an den Code.
+
+**Schritt 2 – GPT-6.1 Sol: Technische Umsetzung.** Übertrage das freigegebene Storyboard in eine deterministische Remotion-Komposition. FFmpeg übernimmt bei Bedarf Trimmen, Zusammenfügen, Audiomischung oder Encoding; Python eignet sich für Vorverarbeitung und Prüfungen. Code, Assets und Renderbefehl bleiben reproduzierbar. Remotion unterstützt feste Auflösungen, FPS und Framelängen. [7](https://www.remotion.dev/docs/composition)
+
+**Schritt 3 – Opus 5.5: Kreatives Review.** Prüfe das Video direkt, sofern das verwendete Tool Videozugriff ermöglicht, andernfalls über extrahierte Frames samt Zeitstempeln, Skript und Übergangsliste. Suche nach überflüssigen Effekten, unklaren Aussagen, schlechten Übergängen und zu kurzen Lesezeiten. Formuliere konkrete Korrekturen mit Zeitangaben.
+
+**Schritt 4 – Automatische und manuelle Qualitätsprüfung.** Stimmen Dauer, Auflösung, FPS, Ton, Untertitel, Abstände, Lesbarkeit auf Smartphones und Markendarstellung? Wurden freigegebene Frames unbeabsichtigt verändert? Erst nach technischer und visueller Prüfung erfolgt die Veröffentlichung.
+
+### Beispielprojekt: 15 Sekunden für einen Produkt-Launch
+
+Das folgende Storyboard ist **mein illustratives Beispiel** und kein zusätzliches Testergebnis:
+
+| Zeit | Inhalt | Wirkung |
+| --- | --- | --- |
+| 0–3 s | Im Terminal wiederholen sich Fehlermeldungen. Ein kurzer Satz erscheint darüber. | Problem und Hook. |
+| 3–7 s | Das Chaos wird zu einem klaren Dashboard. | Veränderung sichtbar machen. |
+| 7–11 s | Aus der realen Oberfläche wächst eine passende Kennzahlengrafik. | Nutzen statt beliebiger Effekte zeigen. |
+| 11–15 s | Ruhiges Endbild mit Produktname und einer eindeutigen Handlungsaufforderung. | Wiedererkennung und Abschluss. |
+
+Opus sollte zuerst jede Entscheidung begründen: *Warum genau dieser Übergang? Was versteht der Zuschauer danach besser?* Sobald der Bauplan freigegeben ist, kann Sol ihn technisch umsetzen.
+
+### Prompt 1: Opus 5.5 als Creative Director
+
+```text
+Du bist Senior Motion Designer und Video-Editor. Entwickle ein
+15-sekündiges Produktvideo mit 30 FPS für [PRODUKT] und [ZIELGRUPPE].
+Kernaussage: [BOTSCHAFT]. Branding: [FARBEN/SCHRIFTEN/TONALITÄT].
+
+Erstelle ein sekundengenaues Storyboard mit dem Zweck jeder Szene,
+exaktem Bildschirmtext, Kamerabewegungen, Übergängen, Easing,
+Sound-Hinweisen, Lesezeiten und Safe Areas. Nutze ein durchgängiges
+visuelles Motiv. Verständlichkeit ist wichtiger als Dekoration.
+Noch keinen Code schreiben. Schwache Stellen offen benennen.
+```
+
+### Prompt 2: GPT-6.1 Sol als Entwickler
+
+```text
+Implementiere das FREIGEGEBENE Storyboard mit React, TypeScript und
+Remotion. Ausgabe: 1920x1080, 30 FPS, exakt 450 Frames (15 Sekunden).
+Alle Animationen müssen deterministisch und framegenau sein.
+Übernimm Texte, Timings, visuelle Hierarchie und Markenassets exakt.
+Verwende nur lizenzierte oder lokale Assets. Liefere editierbaren Code,
+Renderbefehl und MP4. Das Konzept darf nicht eigenmächtig verändert
+werden. Rendere das Video und prüfe Dauer, FPS, Auflösung und Assets.
+Abweichungen dokumentieren, bevor du Änderungen vorschlägst.
+
+[HIER DAS FREIGEGEBENE STORYBOARD EINFÜGEN]
+```
+
+### Prompt 3: Opus 5.5 als Reviewer
+
+```text
+Prüfe das gerenderte Video gegen das freigegebene Storyboard.
+Falls keine direkte Videoanalyse möglich ist, nutze extrahierte
+Frames mit Zeitstempeln, das Skript und die Übergangsliste.
+Melde ausschließlich konkrete Verbesserungen mit Zeitcode,
+Schweregrad, Begründung und exakter Änderung. Berücksichtige
+Storytelling, Rhythmus, Übergänge, Untertitel, Branding,
+Lesbarkeit auf Smartphones und unnötige Bewegung.
+Bereits funktionierende Stellen unverändert lassen.
+```
+
+## 6. Was für einen fairen Benchmark noch fehlt
+
+Ein echter Vergleich müsste beide Modelle in mehreren **vollständigen** Produktionsaufgaben testen: Werbeclips, Erklärvideos, Produktdemos, Highlights aus realem Videomaterial und das Nachbauen vorhandener Motion Graphics. Assets und Briefings müssten identisch sein, ebenso Werkzeugzugriff und vergleichbare Rechenbudgets. Sinnvoll wären mehrere Durchläufe pro Aufgabe und eine blinde Beurteilung **ganzer Videos**, nicht nur ausgewählter Highlights.
+
+Bewerten würde ich: **Verständlichkeit der Geschichte, visuelle Qualität, Timing, Markentreue, Editierbarkeit, Änderungsgenauigkeit, mobile Lesbarkeit, gesamte Produktionszeit und Gesamtkosten einschließlich Fehlversuchen**. Außerdem müssten alle Ergebnisse veröffentlicht werden, nicht nur die besten. Die bisher verfügbaren Tests decken jeweils nur Ausschnitte davon ab.
+
+## Fazit: Wer gewinnt?
+
+**Claude Opus 5.5 gewinnt für mich vorläufig bei kreativer Videoproduktion.** Wenn der Engpass Storytelling, Art Direction und der Aufbau eines durchdachten Gesamtfilms ist, zeigen die vorhandenen Praxisberichte eine überzeugende Richtung. Das ist allerdings kein Beweis, dass Opus jede Motion Graphic besser hinbekommt. [3](https://huggingface.co/blog/BreadStudio/opus-5-5-video-field-notes)[4](https://voyager.so/blog/motion-model-revision)
+
+**GPT-6.1 Sol gewinnt bei den veröffentlichten API-Stückpreisen und im gezielten Animations-Nachbau.** Wer Remotion-Projekte automatisiert umsetzt, Referenzbewegungen möglichst genau rekonstruiert oder in großen Mengen produziert, sollte Sol besonders ernst nehmen. [1](https://www.anthropic.com/claude-opus-5-5)[2](https://openai.com/index/introducing-gpt-6-1-sol/)[5](https://www.physera.ai/research/animation)
+
+**Die beste Kombination:** **Opus legt fest, was der Zuschauer sehen und verstehen soll. Sol setzt es technisch um. Opus kontrolliert den fertigen Film. Eine abschließende QA entscheidet über die Veröffentlichung.**
+
+### Quellen und Methodik
+
+1. [Anthropic – Claude Opus 5.5 (22. September 2026)](https://www.anthropic.com/claude-opus-5-5). Offizielle Modell- und Preisangaben.
+2. [OpenAI – GPT-6.1 Sol (29. September 2026)](https://openai.com/index/introducing-gpt-6-1-sol/). Offizielle Preise und Leistungsangaben.
+3. [BreadStudio / Hugging Face – Where Is Opus 5.5 Strong in Making Video? (7. Oktober 2026)](https://huggingface.co/blog/BreadStudio/opus-5-5-video-field-notes). Kleines Produktionsbeispiel mit eingeschränktem Blindvergleich; kein peer-reviewter Benchmark.
+4. [Voyager – GPT-6.1 Sol vs Claude Opus 5.5 for Remotion animation (1. Oktober 2026)](https://voyager.so/blog/motion-model-revision). Vergleich mit gleichem Briefing, Videos, Überarbeitungen und Quellprojekten.
+5. [Physera – Animation Bench (aktualisiert am 1. Oktober 2026)](https://www.physera.ai/research/animation). Je 48 Aufgaben zum **Nachbau von Webanimationen**, kein klassischer Videoschnitt-Test.
+6. [Nowrap – Same Blender prompt, two animations (2. Oktober 2026)](https://nowrap.ai/news/clockwork-macro-opus-5-5-vs-gpt-6-1-sol). Zwei gerenderte 3D-Szenen mit nicht direkt vergleichbaren Renderzeiten.
+7. [Remotion-Dokumentation – Compositions](https://www.remotion.dev/docs/composition). Framebasierte Videoproduktion mit React.
+
+*Transparenz: Dieser Artikel wertet veröffentlichte Praxisberichte und offizielle Dokumentation aus. Ich behaupte nicht, die genannten Modelltests selbst erneut durchgeführt zu haben. Die Sieger-Einschätzungen sind redaktionelle Urteile, keine erfundenen Benchmark-Scores. Die Diagramme verwenden die veröffentlichten Originalzahlen.*
