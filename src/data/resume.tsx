@@ -74,6 +74,34 @@ export const DATA = {
   education: [],
   projects: [
     {
+      title: "openDiscord",
+      href: "https://opendiscord.app/",
+      dates: "2026 - Present",
+      active: true,
+      description:
+        "An AGPL-3.0 open-source, self-hostable Discord alternative. Independent community instances, realtime chat, roles, moderation and optional voice/video. Currently in closed alpha.",
+      technologies: ["Next.js", "TypeScript", "PostgreSQL", "Open Source"],
+      links: [
+        {
+          type: "Website",
+          href: "https://opendiscord.app/",
+          icon: <Icons.globe className="size-3" />,
+        },
+        {
+          type: "Source",
+          href: "https://github.com/Livvux/openDiscord",
+          icon: <Icons.github className="size-3" />,
+        },
+        {
+          type: "Article",
+          href: "/blog/opendiscord-open-source-discord-alternative",
+          icon: <NotebookIcon className="size-3" />,
+        },
+      ],
+      image: "/images/blog/opendiscord/cover.webp",
+      video: "",
+    },
+    {
       title: "How Its Built",
       href: "https://howitsbuilt.fyi/",
       dates: "2026 - Present",

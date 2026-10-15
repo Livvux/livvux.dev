@@ -1,0 +1,135 @@
+---
+title: "Warum ich openDiscord baue: Eine Open-Source-Alternative zu Discord zum Selbsthosten"
+publishedAt: "2026-10-15"
+author: "Livvux"
+summary: "openDiscord ist meine quelloffene Discord-Alternative mit eigenem Hosting. Was in der Closed Alpha bereits funktioniert, wie die Technik aufgebaut ist und was noch fehlt."
+image: "/images/blog/opendiscord/cover.webp"
+---
+
+**Ich baue [openDiscord](https://opendiscord.app/), weil Communities nicht von einem einzigen Unternehmen abhängig sein sollten.** Discord hat Community-Chat einfach gemacht. Ich möchte die nützlichen Dinge behalten – Kanäle, Rollen, schnelle Unterhaltungen, Voice – und verändern, wer die Kontrolle über die Plattform hat.
+
+Die Grundidee: **Ein Open-Source-Produkt mit einer offiziellen Instanz und der Möglichkeit, dieselbe Software auf dem eigenen Server zu betreiben.** Kein proprietäres Cloud-Produkt mit künstlich eingeschränkter „Community Edition“. Keine exklusiven Funktionen, die nur auf der von mir betriebenen Instanz verfügbar sind.
+
+Das ist nicht nur ein Konzept. Der [Quellcode liegt auf GitHub](https://github.com/Livvux/openDiscord). Gleichzeitig will ich den Entwicklungsstand nicht schönreden: **openDiscord befindet sich in der Closed Alpha** und ersetzt Discord noch nicht vollständig.
+
+## openDiscord im Video
+
+<figure className="my-8">
+  <video controls playsInline preload="none" poster="/images/blog/opendiscord/cover.webp" width="1200" height="675" aria-label="openDiscord Vorstellungsvideo mit Branding, Community-Chat und Self-Hosting" className="w-full h-auto rounded-xl border border-border bg-black">
+    <source src="/videos/opendiscord-introduction.mp4" type="video/mp4" />
+    Dein Browser unterstützt dieses Video nicht. <a href="/videos/opendiscord-introduction.mp4">Vorstellungsvideo herunterladen.</a>
+  </video>
+  <figcaption>20 Sekunden openDiscord: das Design, ein Ausblick auf die Community-Oberfläche und die Grundidee – Communities gehören allen.</figcaption>
+</figure>
+
+## Was mich an geschlossenen Community-Plattformen stört
+
+Mein Problem ist nicht, dass Discord schlechte Funktionen hätte. Im Gegenteil: Discord hat Server, Kanäle, Rollen und Sprachchat so zugänglich gemacht, dass Communities sich organisieren konnten, ohne eigene Infrastruktur aufzubauen.
+
+Aber wenn die gesamte Plattform proprietär ist und nur von einem Anbieter betrieben wird, bestimmt dieser auch die Spielregeln. Einen unabhängigen Discord-Server mit der eigentlichen Discord-Software kannst Du nicht selbst hosten. Du kannst die vollständige Implementierung nicht prüfen und hast keine Garantie, dass spätere Produktentscheidungen zu Deiner Community passen. Jahre an Nachrichten, Kontakten und Community-Wissen umzuziehen, ist kein einfacher Schalter.
+
+Genau diesen Abhängigkeiten möchte ich mit openDiscord entgegenwirken. Die Software soll auch dann nützlich bleiben, wenn die offizielle Instanz irgendwann nicht mehr existiert. Wer eine Instanz betreibt, soll sie selbst bereitstellen, sichern, aktualisieren und verantworten können.
+
+**Quelloffener Code allein reicht mir dabei nicht. Selbsthostbarkeit und gute Bedienbarkeit gehören genauso dazu.**
+
+## Was funktioniert in der Closed Alpha bereits?
+
+Ich habe den aktuellen Quellcode, die [Roadmap](https://github.com/Livvux/openDiscord/blob/main/docs/ROADMAP.md) und die Tests mit Stand vom 15. Oktober 2026 geprüft. Die folgenden Punkte sind im Repository implementiert – es ist keine Wunschliste.
+
+| Bereich | Aktueller Funktionsumfang |
+| --- | --- |
+| Communities | Einladungslinks, Kanäle, Kategorien, Rollenhierarchie, Kanalberechtigungen und private Kanäle |
+| Textchat | Echtzeitnachrichten, Markdown, Antworten, Threads, Erwähnungen, Reaktionen, Pins, Ungelesen-Status und Suche |
+| Moderation | Kick/Ban, Audit-Logs, Meldungen, Blockieren, AutoMod und Anti-Raid-Schutz |
+| Voice und Video | Sprachkanäle, Kamera-Video und Bildschirmübertragung mit optionalem LiveKit |
+| Benachrichtigungen | In der App, optionale Desktop-Benachrichtigungen und optionales Web Push |
+| Konten | E-Mail/Passwort, Zwei-Faktor-Authentifizierung, Passkeys, Sitzungsverwaltung und Alpha-Freigabe |
+| Integrationen | Bots, eingehende Webhooks, Berechtigungstokens und dokumentierte API |
+| Datenhoheit | Export und Löschung von Kontodaten, Community-JSON-Export/Import sowie Backups und Wiederherstellung |
+
+Dafür gibt es automatisierte Unit-, Integrations- und Browser-Tests. Das bedeutet aber noch keine Produktionsfreigabe. Die Roadmap nennt ausdrücklich offene Praxistests für Audio/Video auf echten Geräten und für die Zustellung von Web-Push-Benachrichtigungen.
+
+Zwei Entscheidungen sind mir besonders wichtig: **Communities sind standardmäßig privat**, und Berechtigungen werden auf dem Server geprüft. Ein Nutzer ohne Zugriff soll einen privaten Kanal weder über die Oberfläche entdecken noch über APIs oder den Echtzeitstream Nachrichten daraus erhalten.
+
+Auch das Design halte ich bewusst reduziert. Nachrichten lesen, schreiben und wiederfinden muss erst einmal hervorragend funktionieren, bevor die Oberfläche mit Zusatzfunktionen überladen wird.
+
+## Eine Datenbank statt zwölf Microservices
+
+openDiscord basiert auf einem Stack, den ich nachvollziehen kann und den andere Entwickler selbst betreiben können:
+
+- **Next.js 16, React 19 und TypeScript** für Web-App und API.
+- **Tailwind CSS v4 und shadcn/ui** für das Interface.
+- **PostgreSQL 18 und Drizzle** für Datenhaltung und Migrationen.
+- **Better Auth** für Login, Passkeys und 2FA.
+- **Docker Compose und Caddy** für Deployment und automatisches HTTPS.
+- **Optional LiveKit** für Voice/Video und S3-kompatibler Objektspeicher für Dateien.
+
+Spannend ist die Echtzeitarchitektur. Eine Nachricht wird zuerst in PostgreSQL gespeichert. Anschließend informiert der Server über PostgreSQLs \`LISTEN/NOTIFY\` die verbundenen Clients. Im Browser kommen diese Updates über **Server-Sent Events (SSE)** an.
+
+Ich habe bewusst nicht sofort Redis oder eine separate WebSocket-Infrastruktur eingebaut, nur weil man das von Chat-Anwendungen gewohnt ist. Nach einem Verbindungsabbruch holt sich der Client den maßgeblichen Nachrichtenstand wieder aus der Datenbank. Dieses zuverlässige Wiederaufholen finde ich wichtiger als einen besonders umfangreichen Architekturplan.
+
+Natürlich gibt es Grenzen. SSE-Events allein sind keine dauerhafte Nachrichtenwarteschlange. Wenn Last und Nutzung es erfordern, muss sich die Architektur weiterentwickeln. Die Überlegungen stehen in der [Architekturdokumentation](https://github.com/Livvux/openDiscord/blob/main/docs/ARCHITECTURE.md) und den [technischen Entscheidungen](https://github.com/Livvux/openDiscord/blob/main/docs/DECISIONS.md).
+
+## Self-Hosting ist keine abgespeckte Version
+
+Die [offizielle Instanz](https://opendiscord.app/) und eine selbst gehostete Installation verwenden denselben veröffentlichten Code. Du brauchst weder ein Konto bei openDiscord noch einen zentralen Login-Dienst oder Cloudflare, um eine eigene Instanz zu starten.
+
+Die grundlegende Installation auf einem Linux-Server mit Docker sieht so aus:
+
+\`\`\`bash
+git clone https://github.com/Livvux/openDiscord.git
+cd openDiscord
+cp .env.example .env  # Danach DOMAIN, POSTGRES_PASSWORD und BETTER_AUTH_SECRET setzen
+docker compose up -d --build
+\`\`\`
+
+Danach zeigt Deine Domain auf den Server; Caddy übernimmt HTTPS. Für Voice/Video musst Du den optionalen LiveKit-Dienst einrichten und aktivieren. Datei-Uploads benötigen einen S3-kompatiblen Speicher wie MinIO oder Cloudflare R2. Bei einem ernsthaft betriebenen Server gehören Backups, sichere Zugangsdaten, Mail-Konfiguration und Updates dazu. Die vollständige Anleitung steht unter [Self-Hosting](https://github.com/Livvux/openDiscord/blob/main/docs/SELF-HOSTING.md).
+
+Auch beim Umzug von Community-Daten wollte ich einen Ausweg schaffen. Besitzer können Kanäle, Rollen, Einstellungen und Nachrichtenverläufe als JSON exportieren und wieder importieren. **Das ist noch kein vollständiger Community-Umzug:** Benutzerkonten und Anhänge werden nicht mit übertragen. Die Sicherung einer ganzen Instanz ist ein anderer Vorgang. Solche Grenzen möchte ich klar benennen, statt unvollständige Portabilität als nahtlos zu verkaufen.
+
+## Datenschutz: Was ich versprechen kann – und was nicht
+
+Datenschutz ist einer der Hauptgründe für openDiscord. Trotzdem ist das Projekt **aktuell kein Ende-zu-Ende-verschlüsselter Messenger**.
+
+Community-Nachrichten liegen lesbar in der PostgreSQL-Datenbank der jeweiligen Instanz. Bei der Übertragung schützt TLS, aber **der Betreiber einer Instanz kann Nachrichten technisch einsehen**. LiveKit schützt Audio und Video während der Übertragung, bietet in der aktuellen Integration aber keine Ende-zu-Ende-Verschlüsselung. Direktnachrichten mit unabhängig geprüfter E2EE sind geplant, nicht implementiert.
+
+Das ist ein wichtiger Unterschied: Self-Hosting gibt Dir Kontrolle darüber, wer die Infrastruktur betreibt. Es verwandelt serverseitig lesbare Nachrichten nicht automatisch in Ende-zu-Ende-verschlüsselte Kommunikation.
+
+Weitere Entscheidungen lassen sich im Code und in der [Datenschutzdokumentation](https://github.com/Livvux/openDiscord/blob/main/docs/PRIVACY.md) nachvollziehen: keine Werbe- oder Analytics-Tracker im Kernprodukt, Online-Status und Push optional, Datenexport und Kontolöschung sowie private Anhänge, die nur nach einer Berechtigungsprüfung ausgeliefert werden. Optionale Dienste wie Turnstile, Objektspeicher oder Browser-Push haben selbstverständlich eigene datenschutzrechtliche Auswirkungen.
+
+**Ein unabhängiges Sicherheitsaudit hat bisher nicht stattgefunden.** Tests und Bedrohungsmodell sind wichtig, ersetzen das aber nicht.
+
+## openDiscord und Discord: Wo liegen aktuell die Unterschiede?
+
+| Frage | Discord | openDiscord (Closed Alpha) |
+| --- | --- | --- |
+| Kann ich die Serversoftware unabhängig betreiben? | Nein | Ja, mit Docker Compose |
+| Kann ich den vollständigen Anwendungscode prüfen und verändern? | Nicht den proprietären Plattformcode | Ja, unter AGPL-3.0 |
+| Gibt es eine gehostete Variante? | Ja | Ja, auf opendiscord.app |
+| Sind Textnachrichten Ende-zu-Ende-verschlüsselt? | Nein | Nein |
+| Sind DMs, Clients und Integrationen ausgereift? | Ja | Noch nicht; DMs fehlen |
+| Können verschiedene unabhängige Instanzen miteinander kommunizieren? | Keine Self-Hosting-Instanzen | Heute keine Föderation |
+
+Das soll nicht heißen, dass openDiscord Discord bereits überlegen wäre. Discord hat ein ausgereiftes Ökosystem, etablierte Clients und eine operative Größenordnung, die ich noch nicht erreicht habe. **Worauf ich hinarbeite, ist Datenhoheit und Entscheidungsfreiheit**, nicht die längste Feature-Liste in der ersten Version.
+
+Wer bereits heute ein föderiertes Kommunikationsnetz benötigt, findet beispielsweise mit Matrix einen anderen Ausgangspunkt. openDiscord besteht derzeit aus **unabhängigen Instanzen** und ist noch kein föderiertes Protokoll.
+
+## Was kommt als Nächstes?
+
+Die [öffentliche Roadmap](https://github.com/Livvux/openDiscord/blob/main/docs/ROADMAP.md) zeigt auch, was noch fehlt.
+
+**Meine nächsten Prioritäten:** Direktnachrichten mit einem sorgfältig ausgewählten und geprüften E2EE-Konzept; die verbleibenden Sicherheits- und Datenschutzthemen; Voice-, Video- und Push-Tests auf echten Geräten; dazu eine bessere Administration und einfacheres Self-Hosting.
+
+Danach stehen unter anderem eigene Emoji, native Apps, besseres Onboarding und Community-Discovery auf dem Plan. Föderation ist ein späteres Forschungsthema, kein Feature mit einem versprochenen Erscheinungsdatum.
+
+Und die Finanzierung? Ich möchte Entwicklung und Betrieb der offiziellen Instanz langfristig durch freiwillige Unterstützung ermöglichen – **ohne Sonderrechte für Sponsoren bei der Moderation und ohne gesperrte Kernfunktionen für Selbsthoster**. Ein ausgearbeitetes Spenden- und Governance-Modell gehört noch zu den offenen Aufgaben.
+
+## Mach mit
+
+Ich möchte nicht einfach noch einen proprietären Discord-Klon bauen. Ich möchte eine Plattform, die eine Community wirklich selbst besitzen kann, deren Code Entwickler prüfen können und die trotzdem einfach zu benutzen ist.
+
+**openDiscord befindet sich noch in der Closed Alpha.** Wenn Dich die Idee interessiert, schau Dir den Code an, verfolge die Roadmap, eröffne ein Issue oder arbeite direkt mit. Besonders wertvoll ist Feedback dazu, welche Funktionen Communities tatsächlich benötigen – nicht nur, welche Discord-Funktionen man theoretisch kopieren könnte.
+
+[openDiscord besuchen](https://opendiscord.app/) · [Quellcode (AGPL-3.0)](https://github.com/Livvux/openDiscord) · [Roadmap](https://github.com/Livvux/openDiscord/blob/main/docs/ROADMAP.md) · [Mithelfen](https://github.com/Livvux/openDiscord/blob/main/CONTRIBUTING.md)
+
+*Stand der Funktionen und Implementierung: 15. Oktober 2026. Während der Alpha können sich Funktionsumfang und Verfügbarkeit ändern.*
