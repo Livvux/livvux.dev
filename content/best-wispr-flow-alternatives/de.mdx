@@ -1,0 +1,283 @@
+---
+title: "Die besten Wispr-Flow-Alternativen 2026: FluidVoice vs. VoiceInk"
+publishedAt: "2026-10-15"
+author: "Livvux"
+summary: "Wispr Flow Pro kostet 144 Dollar pro Jahr. Mein Favorit ist das kostenlose, lokal arbeitende FluidVoice; VoiceInk punktet mit Kontext und App-Modi. Ein detaillierter Vergleich zu Preis, Datenschutz, Modellen und Open Source."
+---
+
+**Meine #1-Alternative zu Wispr Flow ist [FluidVoice](https://fluidvoice.com/). Auf Platz #2 steht [VoiceInk](https://tryvoiceink.com/).** Beide zeigen, dass gute KI-Diktierfunktionen auf dem Mac kein weiteres Monatsabo brauchen.
+
+Die Grundidee von Wispr Flow gefällt mir: Tastenkürzel drücken, natürlich sprechen und einen Text bekommen, den man fast direkt abschicken kann. Was mir weniger gefällt: **15 US-Dollar im Monat beziehungsweise 144 Dollar pro Jahr bei jährlicher Abrechnung**, wenn vieles davon direkt auf meinem Mac laufen kann. Fairerweise hat [Wispr Flow auch einen kostenlosen Tarif](https://wisprflow.ai/pricing) und bietet als Bezahlprodukt echte Vorteile. Für alltägliche Diktate, Entwickler-Prompts und lokale KI-Textbereinigung würde ich trotzdem zuerst die Alternativen ausprobieren.
+
+**Meine Rangfolge bewertet Preis-Leistung und Workflow, nicht einen angeblich bewiesenen Geschwindigkeits- oder Genauigkeitssieg.** Stand **15. Oktober 2026** lässt sich eine klare persönliche Präferenz begründen – aber kein universeller Testsieger.
+
+## Mein Fazit vorab
+
+| Kategorie | FluidVoice — meine #1 | VoiceInk — meine #2 | Wispr Flow |
+| --- | --- | --- | --- |
+| Hauptargument | Kostenlose lokale Diktate mit KI-Bereinigung | Ausgefeilte App-Kontexte, Modi und Wörterbücher | Plattformübergreifende Nutzung, Teams, Meetings |
+| Preis | **Kostenlos**, keine beworbenen Bezahlstufen | **Einmalig 25–49 $** für die fertige Mac-App | Kostenloser Tarif; **15 $/Monat** oder **144 $/Jahr** Pro |
+| Desktop-Plattformen | Mac regulär; Windows-Beta | Mac | Mac und Windows |
+| Mobil | iPhone-Beta | Separate iOS-App verfügbar | iOS und Android |
+| Lokale/offline Spracherkennung | **Ja**, mit geladenem Modell | **Ja**, mit geladenem Modell | **Nein**, Diktate werden in der Cloud verarbeitet |
+| Live-Text beim Sprechen | Ja | Ja, mit unterstützten Modellen | Ja, cloudbasiert |
+| Lokale KI-Textbereinigung | Fluid-1-Familie über Fluid Intelligence | VoiceInk Refine; außerdem lokales Ollama | Cloudbasiert |
+| Automatische Anpassung an Apps | App-basierte Tonalität und vordefinierte Modi | **App-, Website- und Wort-Trigger sowie eigene Modi** | Kontextabhängige Formatierung |
+| Textauswahl/Bildschirminhalt als KI-Kontext | App-bezogene Prompts; nicht mit VoiceInks dokumentiertem OCR-System gleichzusetzen | **Markierter Text, Zwischenablage und Fenster-OCR** | Begrenzter Kontext des aktiven Fensters, konfigurierbar |
+| Fachbegriffe und Ersetzungen | Modell- und Prompt-abhängig | **Eigenes Vokabular und feste Wortersetzungen** | Wörterbuch und Textbausteine |
+| Aktionen per Sprache | **Command Mode** und Write Mode | Assistant und lokale Custom Commands | KI-Befehle und Personalisierung |
+| Open Source | GPLv3-App; **Fluid-Intelligence-Runtime separat/privat** | GPLv3-Anwendung; fertige App optional kostenpflichtig | Proprietär |
+| Ideal für | Lokale Diktate ohne Abo | Hochgradig angepasste Workflows | Mehrere Plattformen und Team-Nutzung |
+
+Quellen: [FluidVoice](https://fluidvoice.com/), [FluidVoice auf GitHub](https://github.com/altic-dev/FluidVoice), [VoiceInk-Dokumentation](https://tryvoiceink.com/docs/introduction), [VoiceInk-Preise](https://tryvoiceink.com/pricing), [Wispr-Flow-Preise](https://wisprflow.ai/pricing) und [Wisprs Dokumentation zur Cloud-Verarbeitung](https://docs.wisprflow.ai/articles/4048537120-what-to-expect-from-flow-accuracy-and-known-limitations).
+
+## #1 — FluidVoice: Das würde ich zuerst installieren
+
+**[FluidVoice](https://fluidvoice.com/) ist mein persönlicher Favorit, weil es eine schnelle Rückmeldung während des Sprechens, lokale Spracherkennung, lokale KI-Bereinigung und kostenlose Nutzung verbindet.** Ich brauche nicht noch ein SaaS-Abo, nur um einen vernünftig formatierten Prompt im Terminal oder Editor einzugeben.
+
+### 1. Live-Diktat: Der Text entsteht beim Sprechen
+
+FluidVoice zeigt eine Echtzeit-Vorschau der Transkription. Man muss also nicht erst einen ganzen Absatz sprechen und anschließend hoffen, dass alles erkannt wurde. Gerade bei längeren Prompts ist das praktisch: Ich sehe früh, ob der Satz richtig ankommt, und kann mich korrigieren, bevor ich den Gedanken verliere.
+
+FluidVoice unterstützt verschiedene Spracherkennungsmodelle, darunter **Fluid Speech Mini, Parakeet-Varianten, Nemotron Speech, Whisper und Apple Speech**. Die [offizielle Modellübersicht](https://fluidvoice.com/) sollte man sich ansehen, denn die Sprachunterstützung hängt vom Modell ab. Einige Parakeet-Varianten sind beispielsweise auf Englisch beschränkt, andere können mehrere Sprachen verarbeiten.
+
+Das macht die **Bedienung** attraktiv, ist aber kein nachgewiesener Latenzsieg: [Auch VoiceInk unterstützt Live-Transkription und Teil-Ergebnisse](https://tryvoiceink.com/docs/mode-settings). Wer behauptet, App A sei objektiv schneller als App B, müsste Mikrofon, Hardware, Sprache, Audiodateien und Messmethode konstant halten.
+
+### 2. Fluid Intelligence: Mehr als reine Spracherkennung
+
+Ein Spracherkennungsmodell beantwortet die Frage: *Was wurde gesagt?* Ein nachgelagertes Textmodell beantwortet eine andere: *Wie soll das Ergebnis sinnvoll formuliert und formatiert werden?*
+
+FluidVoice verwendet die **Fluid-1-Modellfamilie**, um Füllwörter zu entfernen, gesprochene Selbstkorrekturen aufzugreifen, Groß- und Kleinschreibung zu verbessern und Text zu strukturieren. Auf dem Mac gibt es inzwischen **Fluid-1, Fluid-1 Mini und Fluid-1 Pico**. Die kleineren Modelle sollen Downloadgröße und Hardwarebedarf reduzieren.
+
+Diese Verarbeitung läuft in der lokalen Standardkonfiguration direkt auf dem Gerät. Optional lassen sich auch OpenAI, Groq oder eigene externe Anbieter für die Nachbearbeitung verwenden. Dann ändern sich natürlich Datenschutz und gegebenenfalls Kosten. [Quelle](https://fluidvoice.com/)
+
+Ein Beispiel aus meinem Arbeitsalltag. Ein rohes Diktat könnte so aussehen:
+
+> okay also äh prüf mal die next js app und schau warum der cloudflare deploy gestern fehlgeschlagen ist, aber ändere auf production nichts bevor die tests grün sind, und gib mir danach eine kurze liste der probleme
+
+Was ich tatsächlich brauche, ist eher:
+
+> Untersuche den fehlgeschlagenen Cloudflare-Deploy der Next.js-App von gestern. Führe die relevanten Tests aus, bevor du Änderungen an der Produktion vornimmst. Nenne die Ursache und eine priorisierte Liste der notwendigen Korrekturen.
+
+Das ist ein **illustratives Vorher-Nachher-Beispiel**, kein gemessener Output einer bestimmten Fluid-1-Version. Die Funktion ist nützlich, aber bei technischen Anweisungen sollte man Bezeichner, Pfade, Befehle und Bedeutung kontrollieren. Eine Textbereinigung darf aus einer Sicherheitsbedingung nicht versehentlich eine optionale Empfehlung machen.
+
+### 3. Write Mode, Command Mode und normales Diktieren
+
+FluidVoice bietet drei besonders interessante Arbeitsweisen:
+
+- **Direct Dictation:** Das Gesprochene direkt in das aktive Textfeld einsetzen.
+- **Write Mode:** Text in einer App verfassen oder markierte Passagen per Sprache überarbeiten.
+- **Command Mode:** Unterstützte Aktionen auf dem Mac per Sprache auslösen, etwa Apps öffnen oder Kurzbefehle starten.
+
+Für Entwickler ist genau das interessant. Ich wechsle ständig zwischen KI-Chat, Terminal, Editor und GitHub. Spracheingabe sollte dabei kein separater Prozess sein, sondern einfach überall funktionieren. Das [GitHub-README beschreibt die Modi](https://github.com/altic-dev/FluidVoice#features); die Website erklärt außerdem App-abhängige Tonalitätsprofile.
+
+Bei Sprachbefehlen, die Shell-Skripte, produktive Systeme oder potenziell destruktive Aktionen auslösen, würde ich immer eine Kontrolle vor der Ausführung vorsehen.
+
+### 4. Kostenlos heißt: keine monatliche App-Rechnung
+
+FluidVoice wirbt auf seiner offiziellen Website mit **kostenloser Nutzung ohne Abo-Stufen**. Lokale Sprach- und Nachbearbeitungsmodelle können mehrere Gigabyte Speicherplatz benötigen, verursachen aber keine laufenden Transkriptionsgebühren. Wer freiwillig einen Cloud-Anbieter aktiviert, muss dessen mögliche API-Kosten separat betrachten.
+
+Auf dem Mac wird **macOS 15 oder neuer** benötigt. Apple Silicon eignet sich besonders für die beschleunigten lokalen Modelle; Intel-Macs werden über Whisper unterstützt. Die Website nennt auch **Windows- und iPhone-Betas**, deren Funktionsumfang aber nicht automatisch dem der regulären Mac-Version entspricht. [Quelle](https://fluidvoice.com/)
+
+### Der wichtige Open-Source-Haken
+
+Die [FluidVoice-Anwendung auf GitHub](https://github.com/altic-dev/FluidVoice) steht unter **GPLv3**. Die Entwickler weisen allerdings ausdrücklich darauf hin, dass **Fluid Intelligence eine separat gepflegte, private KI-Runtime** ist.
+
+Die Aussage „FluidVoice ist eine Open-Source-Anwendung“ ist daher korrekt. „Alle Modelle und Komponenten von FluidVoice sind vollständig Open Source“ wäre falsch.
+
+Auch bei der Privatsphäre lohnt sich die Unterscheidung. Laut README verlassen Audio, Transkripte und Prompt-Inhalte den Mac nicht, solange kein Cloud-Anbieter aktiviert wird. **Anonyme Nutzungsstatistiken werden jedoch separat gesammelt und gebündelt übertragen.** Detaillierte Analysen sind standardmäßig eingeschaltet und lassen sich reduzieren bzw. abschalten; ein wöchentliches Basissignal bleibt laut Dokumentation bestehen. Lokale Transkription bedeutet also nicht, dass die App überhaupt keine Netzwerkverbindungen aufbaut. Details stehen unter [Privacy & Analytics im Repository](https://github.com/altic-dev/FluidVoice#privacy--analytics).
+
+**Mein Urteil zu FluidVoice:** Für alltägliche Diktate und technisch bereinigte Prompts würde ich es zuerst ausprobieren. Kostenlos, local-first und mit direkter Live-Rückmeldung ist eine ausgesprochen starke Kombination.
+
+## #2 — VoiceInk: Die bessere Wahl für maximale Anpassbarkeit
+
+**[VoiceInk](https://tryvoiceink.com/) wäre mein nächster Kandidat, wenn ich laufend Fachbegriffe korrigieren oder sehr unterschiedliche Texte in verschiedenen Apps verfassen müsste.** Auch VoiceInk ist Open Source, unterstützt lokale Modelle und bietet detaillierte Kontextfunktionen, die deutlich über simples Diktieren hinausgehen.
+
+### 1. Modi nach App, Website oder gesprochenem Auslöser
+
+Mit VoiceInk lassen sich individuelle **Modes** anlegen. Jeder Modus kann ein anderes Transkriptionsmodell, eine andere Sprache, KI-Nachbearbeitung, einen eigenen Prompt, eine Ausgabeaktion und ein Tastenkürzel erhalten. Auslösen lassen sich die Modi unter anderem durch:
+
+- Die gerade aktive **App**, etwa Editor statt Mail-Client.
+- Die aktuelle **Website oder URL**.
+- Ein bestimmtes **gesprochenes Wort beziehungsweise eine Trigger-Phrase**.
+- Ein spezielles **Tastenkürzel**.
+
+So kann ein Modus im Terminal technische Ausdrücke möglichst wortgetreu behandeln, ein zweiter E-Mails ausformulieren und ein dritter aus gesprochenen Notizen einen strukturierten GitHub-Issue-Text machen. Genau diese Detailsteuerung ist für mich VoiceInks größte Stärke. Siehe [Modes](https://tryvoiceink.com/docs/modes) und [Mode Triggers](https://tryvoiceink.com/docs/mode-triggers).
+
+FluidVoice kann inzwischen ebenfalls App-spezifische Tonalitäten verwenden. Es geht also nicht darum, dass nur VoiceInk aktive Apps erkennen könnte. Der Unterschied liegt in den dokumentierten **URL-Regeln, Wort-Triggern, Kontextquellen und Ausgabeaktionen**.
+
+### 2. Bildschirmkontext, markierter Text und Zwischenablage
+
+Mit **Context Awareness** kann VoiceInk einer KI-Nachbearbeitung Informationen aus einer Textauswahl, der Zwischenablage oder dem aktiven Fenster mitgeben. Für den Bildschirminhalt verwendet die App lokale OCR. **Übergeben wird der erkannte Text, nicht das Screenshot-Bild selbst.**
+
+Damit werden Workflows möglich, die gewöhnliches Diktieren nicht abdeckt: „Formuliere diesen Absatz verständlicher“, während er markiert ist. Oder eine Antwort schreiben, die sich auf die sichtbare Fehlerbeschreibung bezieht.
+
+Wichtig ist die Datenschutzgrenze: Nutzt der gewählte KI-Anbieter eine Cloud, **kann auch dieser extrahierte Kontexttext dort landen**. Man sollte nicht pauschal alle Berechtigungen aktivieren. Ein normales Diktat benötigt beispielsweise keine OCR des Bildschirms. Die [Kontext-Dokumentation](https://tryvoiceink.com/docs/context-awareness) beschreibt die einzelnen Schalter und macOS-Rechte.
+
+### 3. Das Wörterbuch ist für Entwickler besonders interessant
+
+VoiceInk unterscheidet zwischen **Vocabulary** und **Word Replacements**. Ein persönliches Vokabular hilft beim Erkennen ungewöhnlicher Namen; feste Wortersetzungen korrigieren bekannte Fehler oder erweitern gesprochene Kurzformen.
+
+Ich würde dort direkt die Begriffe eintragen, die im Alltag vorkommen: **Next.js, TypeScript, QBCore, Cloudflare, GitHub, pnpm und shadcn/ui**. Wenn ein Modell einen Produktnamen konsequent falsch schreibt, ist eine deterministische Ersetzung oft verlässlicher, als jedes Mal auf die Vermutung eines allgemeinen KI-Modells zu vertrauen.
+
+VoiceInk kann außerdem Korrekturvorschläge aus nachträglichen Änderungen ableiten. Welche Daten dazu verarbeitet werden, hängt von der gewählten Auto-Learn-Konfiguration ab. Der [Leitfaden zu Word Replacements](https://tryvoiceink.com/docs/word-replacements) erklärt Regeln und Im-/Export.
+
+### 4. Auch VoiceInk hat Live-Transkription und lokale KI-Bereinigung
+
+Dieser Punkt wird in älteren Vergleichen gern übersehen. **VoiceInk muss nicht erst die gesamte Aufnahme abschließen, bevor Ergebnisse erscheinen.** Unterstützte Modelle können Audio während der Aufnahme verarbeiten und Zwischenergebnisse anzeigen. Die lokale Modellliste umfasst unter anderem **Parakeet, Nemotron, Whisper, Cohere Transcribe, SenseVoice und Apple Speech**. [Quelle](https://tryvoiceink.com/docs/ai-models)
+
+Für die Nachbearbeitung gibt es **VoiceInk Refine**. Das Modell läuft auf einem **Apple-Silicon-Mac mit mindestens 16 GB RAM** lokal und verbessert unter anderem Füllwörter, Wiederholungen, Zeichensetzung und Selbstkorrekturen.
+
+Refine hat allerdings eine wichtige Einschränkung: Es führt **eine feste Bereinigungsaufgabe** aus. Freie Prompts sowie die Einbindung von Textauswahl, Zwischenablage oder Bildschirmkontext werden damit nicht unterstützt. Wer umfangreiche, selbst definierte Kontextanweisungen lokal ausführen möchte, kann stattdessen **Ollama** oder einen entsprechend eingerichteten lokalen Befehl verwenden. [Quelle](https://tryvoiceink.com/docs/voiceink-refine)
+
+Man muss also drei Dinge unterscheiden: **lokale Spracherkennung**, **lokale Standardbereinigung** und **lokale, frei anpassbare Kontext-KI**. Nicht jede Anwendung beherrscht alle drei auf demselben Weg.
+
+### 5. Audio-Transkription, Verlauf und eigene Automatisierungen
+
+VoiceInk kann vorhandene **Audio- und Videodateien** in einer Warteschlange transkribieren, bietet einen durchsuchbaren lokalen Verlauf, einen Assistant-Modus und **Custom Commands**. Dabei wird der fertige Text an einen lokalen Shell-Befehl übergeben.
+
+So könnte man diktierte Aufgaben in eine Markdown-Datei schreiben, Notizen an eine Dokumentation anhängen oder eigene Node-/Python-Skripte ansteuern. Das macht VoiceInk interessant, wenn Spracherkennung Bestandteil eines technischen Workflows statt nur Tastaturersatz sein soll. [Funktionsübersicht](https://tryvoiceink.com/docs/introduction) · [Custom Commands](https://tryvoiceink.com/docs/custom-commands)
+
+### Was VoiceInk wirklich kostet
+
+Die **fertige, vom Anbieter vertriebene Mac-App ist nicht dauerhaft gratis**. Die [offizielle Preisliste](https://tryvoiceink.com/pricing) nennt zum Veröffentlichungsdatum:
+
+| VoiceInk-Lizenz für Mac | Einmaliger Preis |
+| --- | ---: |
+| Solo — 1 Mac | **25 $** |
+| Personal — 2 Macs | **39 $** |
+| Extended — 3 Macs | **49 $** |
+
+Dazu kommen eine **siebentägige Testphase**, beworbene lebenslange Updates für die gekaufte Mac-Lizenz und eine 14-tägige Erstattungsmöglichkeit. Der [GPLv3-Quellcode](https://github.com/beingpax/VoiceInk) ist frei verfügbar und kann selbst kompiliert werden. Für die gepflegte Fertigversion, Updates und Support zu bezahlen ist etwas anderes, als für den Zugriff auf Quellcode zu bezahlen.
+
+Es gibt außerdem eine **iOS-App**, die man nicht automatisch als Bestandteil einer Mac-Lizenz betrachten sollte. Bei den Systemanforderungen widersprechen sich aktuell zwei Anbieterseiten: Die Preisseite nennt macOS 14.4, die neuere [Installationsdokumentation](https://tryvoiceink.com/docs/installation) dagegen **macOS 15 oder neuer**. Vor dem Kauf würde ich die genaue Version prüfen.
+
+**Mein Urteil zu VoiceInk:** Sind App-/Website-Regeln, Bildschirmkontext und feste Fachbegriff-Korrekturen entscheidend, kann VoiceInk völlig berechtigt an deiner persönlichen Spitze stehen.
+
+## Wo Wispr Flow weiterhin besser ist
+
+Ich halte Wispr Flow nicht für ein schlechtes Produkt. Nur ist der **laufende Preis für einen Mac-only-Workflow mit lokaler Verarbeitung schwer zu rechtfertigen**.
+
+Es gibt echte Vorteile:
+
+- **Viele Plattformen:** Mac, Windows, iOS und Android sowie laut Anbieter mehr als 100 unterstützte Sprachen.
+- **Wenig lokale Einrichtung:** Die Spracherkennung läuft in der Cloud. Man muss keine Modelle herunterladen, vergleichen oder für seine Hardware optimieren.
+- **Meetings und Teams:** Notetaker, gemeinsame Wörterbücher und Textbausteine, Zusammenarbeit und Organisationsverwaltung gehen über den Kern einer kleinen lokalen Diktier-App hinaus.
+- **Ein nutzbarer Gratis-Tarif:** Laut [offizieller Preistabelle](https://wisprflow.ai/pricing) derzeit **2.000 Wörter pro Woche auf Desktop-Geräten** und **1.000 auf Mobilgeräten**.
+
+Der Nachteil ist nicht nur die Rechnung. Wispr selbst sagt: **Die Spracherkennung wird immer in der Cloud ausgeführt und benötigt eine Internetverbindung.** Es gibt Verschlüsselung, Opt-outs für Modelltraining und Kontrollen über die Datenspeicherung. Das ist aber etwas anderes als Offline-Verarbeitung.
+
+Laut aktueller Dokumentation sind bei Free/Pro **Modellverbesserung und Cloud-Speicherung standardmäßig aktiviert**, sofern keine Einschränkung greift. Wer sensible Texte diktiert, sollte beide Schalter getrennt prüfen. [Cloud-Voraussetzungen](https://docs.wisprflow.ai/articles/4048537120-what-to-expect-from-flow-accuracy-and-known-limitations) · [Datenschutz-Einstellungen, aktualisiert am 13. Oktober 2026](https://docs.wisprflow.ai/articles/9609615338-Private-Cloud-Sync-and-Data-Sharing-preferences-in-Wispr-Flow)
+
+Für Unternehmen sind außerdem die dokumentierten **SOC-2-Type-II- und ISO-27001-Zertifizierungen**, zentrale Verwaltungsfunktionen und Prozesse für HIPAA-BAAs relevant. Das kann für Organisationen mit Beschaffungsvorgaben ein starkes Argument sein. Eine lokale App ist nicht allein deshalb automatisch mit jeder internen Compliance-Richtlinie vereinbar. [Wispr Privacy & Security](https://wisprflow.ai/privacy)
+
+## Preisvergleich: Ein Jahr und drei Jahre
+
+Alle Beträge sind **US-Listenpreise am Veröffentlichungstag**, ohne Steuern, Rabatte, optionale Modell-/API-Kosten und Hardware.
+
+| Variante | Nach 1 Jahr | Nach 3 Jahren |
+| --- | ---: | ---: |
+| **FluidVoice mit lokalen Modellen** | **0 $** | **0 $** |
+| **VoiceInk Solo, fertige Mac-App** | **25 $** | **25 $** |
+| VoiceInk Personal, 2 Macs | 39 $ | 39 $ |
+| VoiceInk Extended, 3 Macs | 49 $ | 49 $ |
+| **Wispr Flow Free innerhalb der Limits** | **0 $** | **0 $** |
+| **Wispr Flow Pro, jährlich abgerechnet** | **144 $** | **432 $** |
+| Wispr Flow Pro, monatlich zu 15 $ | 180 $ | 540 $ |
+
+Bei VoiceInk setzt der Vergleich voraus, dass die beworbenen lebenslangen Updates gelten und keine weiteren Lizenzen benötigt werden. Bei Wispr ist für die Dreijahresrechnung ein unveränderter Preis angenommen. Das sind **Vergleichsrechnungen, keine Preisgarantien**.
+
+12 Dollar pro Monat ruinieren niemanden. Das ist auch nicht der Punkt. Die Frage ist, ob ein dauerhaft bezahlter Cloud-Dienst einen genügend großen Vorteil bringt, wenn der eigene Rechner die Kernaufgabe bereits erledigen kann.
+
+## Datenschutz: „Lokal“ ist eine Einstellung, kein Werbeslogan
+
+| Frage | FluidVoice | VoiceInk | Wispr Flow |
+| --- | --- | --- | --- |
+| Spracherkennung ohne Internet? | **Ja**, mit lokalem Modell | **Ja**, mit lokalem Modell | **Nein** |
+| KI-Bereinigung auf dem Gerät? | **Ja**, Fluid Intelligence | **Ja**, Refine oder lokales Ollama | **Nein**, regulärer Cloud-Workflow |
+| Können optionale Funktionen Daten versenden? | Ja, bei aktivierten Cloud-Anbietern | Ja, bei Cloud-Transkription, -Enhancement oder Auto Learn | Ja, Diktate werden ohnehin in der Cloud verarbeitet |
+| Verlauf/Telemetrie beachten? | Optionaler lokaler Audioverlauf; separate anonyme Nutzungsdaten | Lokaler Verlauf, optional gespeichertes Audio, Provider-Einstellungen | Cloud-Speicherung, Training und Geräteverlauf separat konfigurierbar |
+| Ist der komplette Software-Stack offen? | GPLv3-App, **private Fluid-Intelligence-Runtime ausgenommen** | GPLv3-App; Abhängigkeiten und Modelle gesondert prüfen | Nein |
+
+Wer möglichst privat diktieren will, wählt ein lokales Sprachmodell und lokale oder keine Nachbearbeitung, überprüft Verlauf und Telemetrie und schickt nicht versehentlich Zwischenablage oder Bildschirmtext an ein fremdes Modell. Aussagen wie „100 % privat“ ersetzen keine Prüfung der tatsächlichen Verarbeitungskette. Siehe [FluidVoice-README](https://github.com/altic-dev/FluidVoice), [VoiceInk Privacy and Data](https://tryvoiceink.com/docs/privacy-and-data) und [Wispr Data Controls](https://wisprflow.ai/data-controls).
+
+## Wie ich die drei Apps fair testen würde
+
+Einen Marketing-Demo-Clip halte ich nicht für einen belastbaren Benchmark. Ich würde **denselben Mac, dasselbe Mikrofon, denselben Aufnahmepegel und dieselben Sprachbeispiele** verwenden und Erkennung und KI-Bereinigung separat bewerten.
+
+1. **Deutsch:** Zwei Minuten natürliche Sprache mit Satzzeichen, Selbstkorrekturen und langen Sätzen.
+2. **Englische Entwickler-Prompts:** Begriffe wie Next.js, PostgreSQL, GitHub Actions, Cloudflare, R2, TypeScript und API-Endpunkte verwenden.
+3. **Deutsch-englischer Sprachmix:** Innerhalb eines Satzes wechseln, Eigennamen hinzufügen.
+4. **Längere Aufgabe:** Einen mehrteiligen Issue-Report mit Überschriften, To-dos sowie exakten Datei- und Befehlsnamen diktieren.
+5. **Zeit und Qualität:** Dauer bis zum ersten sichtbaren Wort und bis zum endgültigen Text messen; zunächst Wortfehler *vor* der KI-Bereinigung vergleichen, danach Bedeutungsänderungen durch die Bereinigung prüfen.
+
+Jeden Test mehrfach wiederholen. **Hardware, Mikrofon, Transkriptionsmodell, KI-Nachbearbeitungsmodell, Sprache und Online-/Offline-Zustand** mit dokumentieren. Wortfehlerrate, Qualität der Umformulierung und gefühlte Reaktionsgeschwindigkeit sind unterschiedliche Metriken.
+
+**Einen solchen kontrollierten Direktvergleich habe ich nicht durchgeführt.** Deshalb behaupte ich auch nicht, FluidVoice sei nachweislich schneller oder präziser als VoiceInk oder Wispr Flow. Mein erster Platz ist eine begründete redaktionelle Entscheidung.
+
+## Welche Anwendung solltest du installieren?
+
+| Dein wichtigster Anwendungsfall | Meine Wahl | Warum |
+| --- | --- | --- |
+| KI-Prompts und Nachrichten auf dem Mac diktieren | **FluidVoice** | Kostenlose lokale Aufnahme und Bereinigung |
+| Lange Prompts mit sofort sichtbarer Rückmeldung | **FluidVoice**, dann VoiceInk testen | Beide bieten Live-Text; Geschwindigkeit offen |
+| Zwischen Editor, Browser, Mail und Issue-Tracker wechseln | **VoiceInk** | Eigene Modi nach App, Website und Trigger |
+| Ungewöhnliche Fachbegriffe korrigieren | **VoiceInk** | Vokabular und feste Wortersetzungen |
+| Audio-/Videodateien transkribieren und Skripte ansteuern | **VoiceInk** | Dokumentierte Dateiwarteschlange und Custom Commands |
+| Möglichst komplett offline arbeiten | **FluidVoice oder VoiceInk** | Beide lokal konfigurierbar |
+| Android, Desktop und iPhone gemeinsam verwenden | **Wispr Flow** | Breite, reguläre Plattformunterstützung |
+| Teamverwaltung, gemeinsame Snippets und Meeting-Notizen | **Wispr Flow** | Mehr als reine Diktierfunktion |
+| Eine Open-Source-Mac-App verwenden | **Beide lokalen Kandidaten** | GPLv3-Apps; Modelle und Runtime getrennt prüfen |
+
+### So würde ich anfangen
+
+Zuerst FluidVoice von der [offiziellen Website](https://fluidvoice.com/) installieren. Alternativ geht das über **Homebrew: brew install --cask fluidvoice**. Danach ein **lokales, für die benötigten Sprachen geeignetes Transkriptionsmodell** und eine passende **Fluid-1-Variante** auswählen. Cloud-Nachbearbeitung zunächst ausgeschaltet lassen.
+
+Dann eine Woche in den echten Anwendungen diktieren. Ich würde mitzählen, wie oft ich Fachbegriffe korrigieren muss, wo Wartezeiten auftreten und ob die KI eine technische Anweisung inhaltlich verändert.
+
+Wenn App-abhängige Textstile und wiederkehrende Fachbegriffe zum Problem werden, würde ich die [VoiceInk-Testversion](https://tryvoiceink.com/pricing) verwenden, Wörterbuchregeln anlegen und getrennte Entwicklungs- und E-Mail-Modi erstellen.
+
+Mir geht es nicht darum, jedes Abo grundsätzlich abzulehnen. Ich möchte nur nicht jeden Monat für etwas zahlen, das mein eigener Rechner bereits gut erledigen kann.
+
+## Häufig gestellte Fragen
+
+### Ist FluidVoice wirklich kostenlos?
+
+**Ja.** Der Anbieter bewirbt die App derzeit ohne kostenpflichtige Abo-Stufen. Lokale Modelle verursachen keine regelmäßige App-Gebühr. Optional konfigurierte externe API-Anbieter können eigene Kosten haben. [Quelle](https://fluidvoice.com/)
+
+### Ist VoiceInk kostenlos oder kostenpflichtig?
+
+**Beides – je nachdem, was gemeint ist.** Der GPLv3-Quellcode kann selbst kompiliert werden. Die fertig bereitgestellte Mac-App kostet **einmalig 25–49 Dollar** und bietet eine Testversion. [Quellcode](https://github.com/beingpax/VoiceInk) · [Preise](https://tryvoiceink.com/pricing)
+
+### Ist FluidVoice vollständig Open Source?
+
+**Nicht jede Komponente.** Die macOS-Anwendung steht unter GPLv3, die Fluid-Intelligence-Runtime wird laut Entwicklern separat und privat gepflegt. [Quelle](https://github.com/altic-dev/FluidVoice#fluid-intelligence)
+
+### Bietet VoiceInk Echtzeit-Transkription und lokale KI-Bereinigung?
+
+**Ja.** Unterstützte Modelle können bereits während der Aufnahme Text anzeigen. VoiceInk Refine bereinigt Texte auf geeigneten Apple-Silicon-Macs lokal, kann aber keine frei formulierten, kontextabhängigen Prompts ausführen. Dafür benötigt man einen anderen passenden lokalen Anbieter. [Quelle](https://tryvoiceink.com/docs/voiceink-refine)
+
+### Ist Wispr Flow ohne Bezahlung nutzlos?
+
+**Nein.** Der Gratistarif bietet Diktate, Wörterbuchfunktionen und begrenzte Meeting-Funktionen. Wenn die wöchentlichen Wortkontingente reichen, musst du möglicherweise gar nicht upgraden. [Quelle](https://wisprflow.ai/pricing)
+
+## Mein abschließendes Fazit
+
+**Meine #1 bleibt FluidVoice.** Die Kombination ist für mich ausschlaggebend: **Live-Diktate mit direkter Rückmeldung, lokale KI-Bereinigung, sinnvolle Funktionen für Entwickler und keine laufenden App-Kosten.**
+
+**Meine #2 ist VoiceInk.** Nicht weil es nachweislich langsamer oder ungenauer wäre – das ist nicht belegt. Sondern weil ich FluidVoices kostenlose Standardnutzung höher gewichte als VoiceInks zusätzliche Konfigurierbarkeit. Wenn du häufig Website-spezifische Modi, markierten Text und eigene Fachbegriffe nutzt, kann die Reihenfolge für dich genau andersherum ausfallen.
+
+**Wispr Flow bleibt relevant** für die plattformübergreifende Nutzung, Meetings und Teams. Trotzdem würde ich die lokalen Alternativen ausführlich testen, bevor ich mich erneut auf 144 Dollar jährlich festlege.
+
+---
+
+## Quellen und weiterführende Links
+
+- [Offizielle FluidVoice-Website](https://fluidvoice.com/) – Funktionen, Modelle, Plattformen, Preis und Systemanforderungen.
+- [FluidVoice auf GitHub](https://github.com/altic-dev/FluidVoice) – GPLv3-Lizenz, Hinweis auf die private Fluid-Intelligence-Runtime und Nutzungsstatistiken.
+- [VoiceInk-Website](https://tryvoiceink.com/) und [Preise](https://tryvoiceink.com/pricing) – App und Einmalpreise für Mac-Lizenzen.
+- [VoiceInk auf GitHub](https://github.com/beingpax/VoiceInk) – GPLv3-Quellcode und Selbstkompilierung.
+- [VoiceInk: Modes](https://tryvoiceink.com/docs/modes), [Context Awareness](https://tryvoiceink.com/docs/context-awareness), [Refine](https://tryvoiceink.com/docs/voiceink-refine), [Privacy and Data](https://tryvoiceink.com/docs/privacy-and-data).
+- [Wispr Flow: Preise](https://wisprflow.ai/pricing), [Cloud-Transkription](https://docs.wisprflow.ai/articles/4048537120-what-to-expect-from-flow-accuracy-and-known-limitations), [Datenkontrollen](https://docs.wisprflow.ai/articles/9609615338-Private-Cloud-Sync-and-Data-Sharing-preferences-in-Wispr-Flow).
+
+*Preise, Verfügbarkeit und Anbieterangaben geprüft am 15. Oktober 2026. Die Funktionsangaben beruhen auf offiziellen Dokumentationen. Ein unabhängiger, kontrollierter Spracherkennungs-Benchmark wurde für diesen Artikel nicht durchgeführt.*
