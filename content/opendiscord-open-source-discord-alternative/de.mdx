@@ -79,8 +79,7 @@ Die grundlegende Installation auf einem Linux-Server mit Docker sieht so aus:
 \`\`\`bash
 git clone https://github.com/Livvux/openDiscord.git
 cd openDiscord
-cp .env.example .env
-# DOMAIN, POSTGRES_PASSWORD und BETTER_AUTH_SECRET in .env setzen
+cp .env.example .env  # Danach DOMAIN, POSTGRES_PASSWORD und BETTER_AUTH_SECRET setzen
 docker compose up -d --build
 \`\`\`
 
