@@ -1,0 +1,136 @@
+---
+title: "Why I'm Building openDiscord: An Open-Source, Self-Hosted Discord Alternative"
+publishedAt: "2026-10-15"
+author: "Livvux"
+summary: "Meet openDiscord, my AGPL-licensed Discord alternative. Why I'm building it, what already works in the closed alpha, how self-hosting works, and what's missing."
+image: "/images/blog/opendiscord/cover.webp"
+---
+
+**I'm building [openDiscord](https://opendiscord.app/) because communities should not have to depend on a single company to exist.** Discord made community chat convenient. I want to keep the things that make it useful—channels, roles, fast conversations, voice—and change who gets to control the platform.
+
+The idea is straightforward: **one open-source product, with an official hosted instance and the option to run the same software on your own server.** Not a proprietary cloud product with a limited “community edition.” No paid feature gate between the hosted version and the self-hosted one.
+
+This is a real project, not just a concept. You can inspect the [source code on GitHub](https://github.com/Livvux/openDiscord). It's also early: **openDiscord is in closed alpha**, and I don't want to pretend it has already caught up with Discord.
+
+## Watch the openDiscord introduction
+
+<figure className="my-8">
+  <video controls playsInline preload="none" poster="/images/blog/opendiscord/cover.webp" width="1200" height="675" aria-label="openDiscord introduction video showing the branding, a community chat preview, and self-hosting" className="w-full h-auto rounded-xl border border-border bg-black">
+    <source src="/videos/opendiscord-introduction.mp4" type="video/mp4" />
+    Your browser does not support HTML video. <a href="/videos/opendiscord-introduction.mp4">Download the introduction video.</a>
+  </video>
+  <figcaption>20-second introduction: the openDiscord identity, a community interface preview, and the central idea—communities belong to everyone.</figcaption>
+</figure>
+
+## What bothers me about closed community platforms
+
+My problem isn't that Discord has no good features. Quite the opposite: it made servers, channels, roles and voice chat easy enough that communities could organize themselves without running infrastructure.
+
+But when the entire product is proprietary and hosted by one provider, the provider sets the boundaries. You cannot deploy your own independent Discord server. You cannot audit the full implementation or guarantee that a future product decision will suit your community. Moving years of messages, people and culture elsewhere is not a simple switch.
+
+That is the trade-off I'm trying to reduce with openDiscord. The software should remain useful even if the official instance disappears. An operator should be able to deploy it, back it up, update it and make decisions for their own community.
+
+**Open source alone is not enough. Self-hosting and a usable product matter just as much.**
+
+## What's already implemented in the closed alpha?
+
+I checked the current application, [roadmap](https://github.com/Livvux/openDiscord/blob/main/docs/ROADMAP.md) and test structure as of October 15, 2026. This is what the repository implements—not a list of features I hope to ship someday.
+
+| Area | Current implementation |
+| --- | --- |
+| Communities | Invite links, channels, categories, role hierarchy, per-channel permissions and private channels |
+| Text chat | Real-time messages, Markdown, replies, threads, mentions, reactions, pins, unread state and search |
+| Moderation | Kick/ban, audit logs, reporting, blocking, AutoMod and anti-raid controls |
+| Voice and video | Voice channels, camera video and screen sharing through an optional LiveKit service |
+| Notifications | In-app notifications, optional desktop notifications and optional Web Push |
+| Accounts | Email/password, two-factor authentication, passkeys, sign-in management, closed-alpha approval |
+| Integrations | Bots, incoming webhooks, scoped tokens and a documented API |
+| Ownership | Account data export/deletion, community JSON export/import, instance backups and restores |
+
+There are automated unit, integration and browser tests for these flows. That is not the same as production certification: the roadmap explicitly calls out the need for manual real-device audio/video and Web Push tests.
+
+I especially like two decisions: **communities start private**, and permissions are checked on the server, not merely hidden in the interface. A person without access should not be able to enumerate a private channel or receive its messages through an API or live event stream.
+
+The interface is intentionally restrained. I'd rather make reading, posting and finding conversations effortless than cover every surface with extra features.
+
+## One database, not a dozen microservices
+
+openDiscord uses a stack I can reason about and that other developers can operate:
+
+- **Next.js 16, React 19 and TypeScript** for the web application and API.
+- **Tailwind CSS v4 and shadcn/ui** for the interface.
+- **PostgreSQL 18 and Drizzle** for persistent data and migrations.
+- **Better Auth** for authentication, passkeys and 2FA.
+- **Docker Compose and Caddy** for deployment and automatic HTTPS.
+- **Optional LiveKit** for voice/video, plus optional S3-compatible object storage for files.
+
+The real-time design is an interesting part of the project. Messages are committed to PostgreSQL first. The server then publishes lightweight events through PostgreSQL's \`LISTEN/NOTIFY\`, which reach browsers via **Server-Sent Events (SSE)**.
+
+I deliberately haven't introduced Redis or a separate WebSocket infrastructure just because chat apps often use them. When a browser disconnects, it can fetch authoritative messages from the database and catch up. That recovery behavior matters more to me than being able to name another service in the architecture diagram.
+
+It does have trade-offs. SSE delivery alone isn't a durable message queue, and the architecture will need to evolve if the traffic profile demands it. I've documented those choices in the [architecture](https://github.com/Livvux/openDiscord/blob/main/docs/ARCHITECTURE.md) and [decision records](https://github.com/Livvux/openDiscord/blob/main/docs/DECISIONS.md).
+
+## Self-hosting should be a first-class option
+
+The [official instance](https://opendiscord.app/) and an independent deployment use the same released code. Running your own instance does not require an openDiscord account, a central login service or Cloudflare.
+
+On a Linux machine with Docker, the basic installation is:
+
+\`\`\`bash
+git clone https://github.com/Livvux/openDiscord.git
+cd openDiscord
+cp .env.example .env
+# Configure DOMAIN, POSTGRES_PASSWORD and BETTER_AUTH_SECRET in .env
+docker compose up -d --build
+\`\`\`
+
+Point your domain at the server; Caddy handles HTTPS. For video and voice, configure and enable the optional LiveKit service. Attachments require an S3-compatible store such as MinIO or Cloudflare R2. Real deployments also need backups, sensible secrets, mail settings and ongoing updates; start with the [self-hosting guide](https://github.com/Livvux/openDiscord/blob/main/docs/SELF-HOSTING.md), not just the four commands above.
+
+I also wanted an escape hatch for community data. Owners can export and import channels, roles, settings and message history as JSON. **That is not a complete migration of a live community:** member accounts and attachments are not included. Whole-instance backups are a separate mechanism. I'd rather state that limitation now than market incomplete portability as seamless.
+
+## Privacy: what I can and cannot promise
+
+Privacy is a major reason I'm doing this, but openDiscord is **not an end-to-end encrypted chat app**.
+
+Community messages are stored as readable text in the instance's PostgreSQL database. They are protected in transit by TLS, but **the operator of an instance can technically read them**. Voice/video traffic is encrypted in transit through LiveKit, not end-to-end. Direct messages with independently reviewed end-to-end encryption are a priority, not a shipped feature.
+
+That distinction matters. Self-hosting lets you choose who operates the infrastructure; it does not magically make server-readable messages end-to-end encrypted.
+
+Other choices are already reflected in the code and [privacy documentation](https://github.com/Livvux/openDiscord/blob/main/docs/PRIVACY.md): no advertising or analytics trackers in the core product, opt-in presence and push notifications, account export and deletion, and private attachments served only after membership checks. Optional providers such as Turnstile, object storage and browser push services still have their own data implications.
+
+**There has been no independent security audit.** The tests and threat model are useful engineering work, but not a substitute for one.
+
+## How it compares with Discord today
+
+| Question | Discord | openDiscord (closed alpha) |
+| --- | --- | --- |
+| Can I run my own independent server software? | No | Yes, through Docker Compose |
+| Can I inspect and modify the application source? | Not the full proprietary platform | Yes, AGPL-3.0 |
+| Can I use a hosted instance instead? | Yes | Yes, at opendiscord.app |
+| Is text end-to-end encrypted? | No | No |
+| Does it have mature DMs, clients and integrations? | Yes | Not yet; DMs are missing |
+| Can separate instances communicate with each other? | Not applicable to self-hosted Discord | No federation today |
+
+This is not a declaration that openDiscord already beats Discord. Discord has a mature ecosystem, established clients and a level of operational scale I haven't reproduced. **The advantage I'm building toward is ownership and choice**, not a larger feature count in week one.
+
+For people who specifically need federation today, an existing federated network such as Matrix is a different starting point. openDiscord is currently a collection of **independent instances**, not a federated protocol.
+
+## What's next?
+
+The [public roadmap](https://github.com/Livvux/openDiscord/blob/main/docs/ROADMAP.md) is explicit about the gaps.
+
+**My near-term priorities** are direct messages with a carefully selected, audited E2EE design; the remaining security and privacy work; real-device verification of voice, video and push; and polishing administration and self-hosting.
+
+After that come things such as custom emoji, native clients, better onboarding and wider community discovery. Federation is research for later, not something I can promise on a date.
+
+There's also the question of sustainability. I want voluntary contributions to help pay for development and the official instance, **without giving sponsors moderation power or withholding core functionality from self-hosters**. A full donation and governance model is still part of the work ahead.
+
+## Build it with me
+
+I don't need another proprietary Discord clone. I want a product that a community can actually own, that a developer can inspect, and that remains approachable for somebody who just wants to talk to friends.
+
+**openDiscord is still in closed alpha.** If the direction resonates with you, follow the repository, read the roadmap, open an issue or contribute code. Feedback about the features people *actually* need will be more useful than a list of every Discord feature that exists.
+
+[Visit openDiscord](https://opendiscord.app/) · [Source code (AGPL-3.0)](https://github.com/Livvux/openDiscord) · [Roadmap](https://github.com/Livvux/openDiscord/blob/main/docs/ROADMAP.md) · [Contributing](https://github.com/Livvux/openDiscord/blob/main/CONTRIBUTING.md)
+
+*Project and implementation status checked on October 15, 2026. Features and availability can change during the alpha.*
