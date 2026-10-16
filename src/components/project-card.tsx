@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { ContentLink } from "@/components/content-link";
@@ -8,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useState, type CSSProperties } from "react";
 import Markdown from "react-markdown";
@@ -20,9 +20,13 @@ function ProjectImage({ src, alt }: { src: string; alt: string }) {
   }
 
   return (
-    <img
-      src={src}
+    <Image
+      src={src.startsWith("/") ? src : `/${src}`}
       alt={alt}
+      width={640}
+      height={384}
+      sizes="(max-width: 639px) calc(100vw - 3rem), 320px"
+      loading="lazy"
       className="w-full h-48 object-cover"
       onError={() => setImageError(true)}
     />
@@ -89,6 +93,9 @@ export function ProjectCard({
           {video ? (
             <video
               src={video}
+              poster={image ? (image.startsWith("/") ? image : `/${image}`) : undefined}
+              preload="none"
+              aria-label={`${title} preview`}
               autoPlay
               loop
               muted

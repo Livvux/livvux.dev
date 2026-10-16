@@ -34,7 +34,7 @@ Deploys via Dokploy from this private GitHub repository.
 
 ## Public page statistics
 
-Umami remains disabled while `UMAMI_WEBSITE_ID` in `src/lib/umami.ts` is empty. Activate it only with this portfolio's verified website ID from the existing account and through the normal review/release process.
+Umami is configured with the verified website ID in `src/lib/umami.ts`, and the collector is self-hosted at `rpcrate.com`. The loader is limited to public portfolio and blog pages; update the ID only through the reviewed release process. Keep the privacy notice in sync with any changes.
 
 Rendered portfolio and published blog page owners opt in to manual pageviews. Automatic tracking is disabled; tools, APIs, private/unknown paths and `/privacy` have no pageview owner. Query strings, fragments and referrer contents are omitted; sensitive URL parameters, DNT/GPC and the existing preview/noindex flag prevent loading. Blog archive pagination counts each rendered page while reporting the public `/blog` path. Keep the privacy notice in `/privacy` consistent with the self-hosted collector.
 

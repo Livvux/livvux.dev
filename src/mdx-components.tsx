@@ -23,7 +23,7 @@ export const mdxComponents = {
   ),
   table: (props: ComponentProps<"table">) => (
     <div className="my-6 border border-border rounded-xl overflow-hidden">
-      <div className="w-full overflow-x-auto">
+      <div className="w-full overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable article table">
         <table className="m-0! w-full min-w-full border-separate border-spacing-0" {...props} />
       </div>
     </div>
