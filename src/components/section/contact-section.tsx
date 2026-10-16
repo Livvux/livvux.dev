@@ -24,17 +24,17 @@ export default function ContactSection() {
           Get in Touch
         </h2>
         <p className="mx-auto max-w-lg text-muted-foreground text-balance">
-          Want to chat? Just shoot me a dm{" "}
-          <Link
-            href={DATA.contact.social.X.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
-          >
-            with a direct question on X
-          </Link>{" "}
-          and I&apos;ll respond whenever I can. I will ignore all
-          soliciting.
+          Building a product or need help with a web application? Tell me what
+          you are working on and what you need.
+        </p>
+        <Link
+          href="mailto:lucas@lkmedia.net?subject=Project%20inquiry"
+          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          Email me about your project
+        </Link>
+        <p className="text-sm text-muted-foreground">
+          Prefer social? <Link href={DATA.contact.social.X.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Message me on X</Link>.
         </p>
       </div>
     </div>

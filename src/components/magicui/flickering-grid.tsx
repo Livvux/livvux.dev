@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useReducedMotion } from "motion/react"
 
 import { cn } from "@/lib/utils"
 
@@ -26,6 +27,7 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
   maxOpacity = 0.3,
   ...props
 }) => {
+  const reducedMotion = useReducedMotion()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [isInView, setIsInView] = useState(false)
@@ -171,13 +173,16 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
       const newHeight = height || container.clientHeight
       setCanvasSize({ width: newWidth, height: newHeight })
       gridParams = setupCanvas(canvas, newWidth, newHeight)
+      if (reducedMotion) {
+        drawGrid(ctx, canvas.width, canvas.height, gridParams.cols, gridParams.rows, gridParams.squares, gridParams.dpr)
+      }
     }
 
     updateCanvasSize()
 
     let lastTime = 0
     const animate = (time: number) => {
-      if (!isInView) return
+      if (!isInView || reducedMotion) return
 
       const deltaTime = (time - lastTime) / 1000
       lastTime = time
@@ -210,7 +215,7 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
 
     intersectionObserver.observe(canvas)
 
-    if (isInView) {
+    if (isInView && !reducedMotion) {
       animationFrameId = requestAnimationFrame(animate)
     }
 
@@ -219,7 +224,7 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
       resizeObserver.disconnect()
       intersectionObserver.disconnect()
     }
-  }, [setupCanvas, updateSquares, drawGrid, width, height, isInView])
+  }, [setupCanvas, updateSquares, drawGrid, width, height, isInView, reducedMotion])
 
   return (
     <div

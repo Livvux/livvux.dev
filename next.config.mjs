@@ -5,6 +5,13 @@ const nextConfig = {
   reactStrictMode: true,
   async redirects() {
     return [
+      // Consolidate www and apex before canonical/analytics handling.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.livvux.dev" }],
+        destination: "https://livvux.dev/:path*",
+        permanent: true,
+      },
       { source: "/blog/ki-adhs-unterstuetzung-2026", destination: "/blog/ai-adhd-support-2026/de", permanent: true },
       { source: "/blog/ki-musik-kreativitaet-2026", destination: "/blog/ai-music-creativity-2026/de", permanent: true },
       { source: "/blog/ki-musik-ethik-2026", destination: "/blog/ai-music-ethics-2026/de", permanent: true },
