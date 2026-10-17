@@ -3804,7 +3804,7 @@ snapshots:
     dependencies:
       '@content-collections/core': 0.13.1(typescript@5.9.3)
       '@content-collections/integrations': 0.4.0(@content-collections/core@0.13.1(typescript@5.9.3))
-      next: 16.1.1(@babel/core@7.28.5)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+      next: 16.4.2(@babel/core@7.28.5)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
 
   '@emnapi/core@1.8.1':
     dependencies:
