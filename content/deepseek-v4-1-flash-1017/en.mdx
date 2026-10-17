@@ -1,0 +1,144 @@
+---
+title: "DeepSeek-V4.1-Flash-1017: Better Agents, Same API Prices"
+publishedAt: "2026-10-17"
+author: "Livvux"
+summary: "DeepSeek's October 17 update promises faster agents and shorter outputs. The benchmark gains, unchanged API prices, MIT weights and a practical API example."
+---
+
+**Better results, less waiting and shorter outputs. That is the kind of model update I want for coding agents.**
+
+DeepSeek announced [DeepSeek-V4.1-Flash-1017 on October 17, 2026](https://x.com/deepseek_ai/status/2111375640717033777), with stronger benchmark results and shorter task runtimes and outputs. The [official changelog](https://api-docs.deepseek.com/updates/) confirms that the update is live on its website, app and API. Existing integrations keep using `deepseek-flash`, at the same token prices.
+
+The [model card](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017) calls this a minor update to V4.1 Flash. Some of the published gains are substantial, especially on terminal and programming tasks. I like the combination of useful agent improvements and downloadable weights.
+
+This is my assessment of the release materials. **The benchmark and efficiency claims below are DeepSeek's; I have not run an independent model evaluation.**
+
+## What changed in the October 17 update?
+
+DeepSeek's announcement focuses on three improvements: stronger results across its benchmark selection, faster task completion and shorter outputs. It also names optimizations for **DeepSeek Harness, Tencent CodeBuddy and WorkBuddy**. Harness users should upgrade to **0.2.1-rc.1 or later**, according to the [release notes](https://api-docs.deepseek.com/updates/).
+
+For developers, the immediate change is simple: the hosted `deepseek-flash` alias now serves the new release. You can keep the same API model name. Record the date and served version when comparing runs, because a moving alias can change the model behind an unchanged configuration.
+
+<figure>
+  <a href="https://x.com/deepseek_ai/status/2111375640717033777">
+    <img
+      src="/images/blog/deepseek-v4-1-flash-1017/announcement.png"
+      alt="DeepSeek's October 17 announcement with a benchmark comparison of V4.1 Flash 1017, the previous Flash release, Kimi K3, GLM 5.3, GPT 5.6 Sol and Claude Opus 5."
+      width={608}
+      height={797}
+      loading="lazy"
+      decoding="async"
+      style={{ width: "100%", maxWidth: "608px", height: "auto", margin: "0 auto" }}
+    />
+  </a>
+  <figcaption>
+    DeepSeek's launch announcement and benchmark table. The complete values relevant to the update are transcribed below; the cost chart at the right is cropped in this screenshot.
+  </figcaption>
+</figure>
+
+## Benchmarks: the biggest gains over V4.1 Flash
+
+These are **DeepSeek's published before-and-after scores**, reproduced from the announcement above and its [1017 model card](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017). The change column is my subtraction in score points.
+
+| Benchmark | Previous V4.1 Flash | Flash 1017 | Change |
+| --- | ---: | ---: | ---: |
+| HLE, without tools | 36.8 | 42.6 | +5.8 |
+| HLE, text-only subset, without tools | 39.1 | 44.0 | +4.9 |
+| Terminal-Bench 4.0 | 31.2 | 42.3 | +11.1 |
+| DeepSWE v1.1 | 74.2 | 77.0 | +2.8 |
+| ProgramBench | 20.3 | 29.1 | +8.8 |
+| NL2Repo-Bench | 65.4 | 68.2 | +2.8 |
+| Automation-Bench v1.0.6 | 54.8 | 60.5 | +5.7 |
+| Agents' Last Exam | 31.8 | 35.4 | +3.6 |
+| Apex Bench v1.1 | 64.6 | 72.1 | +7.5 |
+| Chartography, with tools | 78.9 | 83.0 | +4.1 |
+| BabyVision, with tools | 89.6 | 92.5 | +2.9 |
+| ZeroBench-main, with tools, Pass@5 | 49.0 | 51.0 | +2.0 |
+
+**Terminal-Bench's +11.1 points and ProgramBench's +8.8 points stand out.** They make this release interesting for the kind of work where an agent has to complete a programming task across several steps.
+
+The footnotes matter. Terminal-Bench 4.0 used **Claude Code** as its harness; DeepSWE used **Mini-SWE-V2**. ZeroBench-main uses **Pass@5**, which allows multiple attempts. HLE's **44.0** belongs to the text-only subset; the separately reported without-tools score is **42.6**. These conditions are documented in the [changelog](https://api-docs.deepseek.com/updates/).
+
+The [previous model card](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash) describes a different harness for its original terminal evaluation. The new announcement does not explain whether that baseline was rerun. Read the table as a comparison published by DeepSeek, with evaluation setup as a possible influence on the gains.
+
+### How does it compare with GPT and Claude?
+
+In the launch chart, Flash 1017 leads the listed models on **DeepSWE, Automation-Bench, Agents' Last Exam and Apex Bench**. That is a strong showing for agent tasks.
+
+The same chart puts **Claude Opus 5** ahead on HLE without tools, at 56.3 versus 42.6, and Terminal-Bench 4.0, at 51.8 versus 42.3. **GPT-5.6 Sol** has the highest listed ZeroBench-main score, 53.0 versus DeepSeek's 51.0.
+
+Those comparisons apply to the exact model versions and evaluations in the announcement. My takeaway is that Flash 1017 deserves a place in an agent evaluation, with the choice depending on the task.
+
+## Why shorter outputs could matter more than another high score
+
+A coding agent might inspect files, propose a change, run tests and revise its patch. Every extra attempt can add model usage, tool time and review work. When I evaluate one, I care about **the total cost and time needed to get an acceptable result**.
+
+DeepSeek describes this update as a performance–cost Pareto improvement: better results together with lower task cost in its evaluations. The announcement also claims shorter task runtimes. It does not give one universal percentage saving that I can apply to every project.
+
+The practical question is whether the model reaches the same acceptance criteria with fewer billed tokens and less elapsed time. A shorter response helps when it completes the job clearly. It helps much less if I have to ask three follow-up questions to recover missing details.
+
+I would measure successful completions, total tokens, tool calls and review time together. That turns an efficiency claim into something useful for choosing a model.
+
+## API pricing: unchanged, with peak and off-peak rates
+
+[DeepSeek's USD rates](https://api-docs.deepseek.com/quick_start/pricing/), checked **October 17, 2026**, per **million tokens**:
+
+| Token category | Off-peak | Peak |
+| --- | ---: | ---: |
+| Input, cache hit | $0.003 | $0.006 |
+| Input, cache miss | $0.15 | $0.30 |
+| Output | $0.60 | $1.20 |
+
+Peak: **01:00–04:00 and 06:00–10:00 UTC, Monday–Friday**, excluding Chinese public holidays. All other times are off-peak.
+
+Example: **100,000 uncached input + 10,000 output tokens = $0.021 off-peak or $0.042 peak**. This calculation excludes additional requests and tool charges.
+
+## Open source: MIT code, open weights and self-hosting
+
+The [1017 model card](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017) explicitly places the repository and model weights under MIT. Its [license file](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017/blob/main/LICENSE) permits use, modification and distribution, including commercial use, subject to retaining the required notices.
+
+**That freedom is a major reason I care about this release.** Developers can inspect the supplied implementation, evaluate the weights independently and choose their own infrastructure. I have written more about that in [why open source matters to me](/blog/code-must-be-free).
+
+For precision, this is an **open-weight model with MIT-licensed code**. The license and weight download alone do not establish that the complete training data and training pipeline have been published.
+
+Self-hosting also needs planning. The [official file repository](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017/tree/main) lists around **510 GB** and includes Safetensors weights, configuration, encoding and inference code. That figure describes repository storage. Serving memory and hardware requirements depend on the implementation and workload. Start with the supplied inference instructions before committing to a deployment.
+
+## How to try Flash 1017 through the API
+
+For a first check, I would use a short text request. With a DeepSeek API key already stored in `DEEPSEEK_API_KEY`, this adapts the [official API example](https://api-docs.deepseek.com/):
+
+```bash
+curl --fail-with-body https://api.deepseek.com/chat/completions \
+  -H "Authorization: Bearer ${DEEPSEEK_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "deepseek-flash",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain one common React hydration error in three sentences."
+      }
+    ],
+    "thinking": {"type": "disabled"},
+    "max_tokens": 256,
+    "stream": false
+  }'
+```
+
+This is a small API smoke test with thinking disabled. For reasoning tasks, the [thinking-mode documentation](https://api-docs.deepseek.com/guides/thinking_mode/) supports enabling thinking and choosing `low`, `high` or `max` effort. Allow an appropriate output budget for that workload. I have checked this example against the documentation; I have not executed a paid API request for this article.
+
+If you use DeepSeek Harness, apply the release's **0.2.1-rc.1 or later** recommendation before evaluating the update.
+
+## What I would test next
+
+My first evaluation would use three small, representative tasks:
+
+1. **A reproducible bug:** give the agent a failing test and check that the fix passes without weakening the test.
+2. **A constrained refactor:** require unchanged behavior and inspect the size and clarity of the patch.
+3. **A screenshot-based UI fix:** compare the rendered result against the supplied reference and check what the agent actually changed.
+
+I would use the same repository snapshot, harness, permissions and acceptance criteria across the models, then record the complete cost and elapsed time of each run. Failed attempts belong in that measurement too.
+
+**My take:** the combination of stronger published agent results, unchanged token prices and MIT-licensed weights makes Flash 1017 worth evaluating. The part I want to verify next is whether the shorter runs also produce patches I can accept with less review work. That would be a useful improvement in everyday development.
+
+*Sources checked on October 17, 2026. The announcement screenshot is reproduced as supplied. Benchmark values and runtime claims are publisher-reported; score differences and the pricing example are calculations from the cited figures.*
