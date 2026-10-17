@@ -235,6 +235,13 @@ test("API noindex headers are narrowly scoped and all legacy redirects survive",
   const noindex = headers.filter((rule) => rule.headers.some((header) => header.key === "X-Robots-Tag"));
   assert.deepEqual(noindex, [{ source: "/api/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] }]);
   const redirects = await config.redirects();
-  assert.equal(redirects.length, 6);
-  assert.ok(redirects.every((entry) => entry.permanent && entry.destination.endsWith("/de")));
+  const [hostRedirect, ...legacyRedirects] = redirects;
+  assert.deepEqual(hostRedirect, {
+    source: "/:path*",
+    has: [{ type: "host", value: "www.livvux.dev" }],
+    destination: "https://livvux.dev/:path*",
+    permanent: true,
+  });
+  assert.equal(legacyRedirects.length, 6);
+  assert.ok(legacyRedirects.every((entry) => entry.permanent && entry.destination.endsWith("/de")));
 });
