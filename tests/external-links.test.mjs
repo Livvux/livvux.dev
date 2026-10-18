@@ -3,7 +3,16 @@ import { test } from "node:test";
 import { isExternalHref, getExternalLinkProps } from "../src/lib/external-links.ts";
 import { remarkContentLinks } from "../src/lib/remark-content-links.ts";
 
+const PORTFOLIO_HREFS = [
+  "https://serverroam.com/",
+  "https://gratisalternative.de/",
+  "https://qbcore.net/",
+  "https://codewalkermod.com/",
+  "https://down.livvux.dev/",
+];
+
 for (const href of [
+  ...PORTFOLIO_HREFS,
   "https://github.com/Livvux",
   "http://example.com/article",
   "//example.com/article",
@@ -141,6 +150,18 @@ test("production HTML uses new tabs for external links and keeps internal naviga
           assert.ok(!rel.includes("opener"), `${route}: opener must not be restored`);
         } else if (link.href && !link.href.startsWith("mailto:")) {
           assert.notEqual(link.target, "_blank", `${route}: internal link ${link.href} should stay in this tab`);
+        }
+      }
+      if (route === "/") {
+        for (const destination of PORTFOLIO_HREFS) {
+          const matching = links.filter(({ href }) => href?.replace(/\/$/, "") === destination.replace(/\/$/, ""));
+          assert.ok(matching.length >= 3, `Missing linked portfolio project: ${destination}`);
+          for (const link of matching) {
+            assert.equal(link.target, "_blank", `Project link must open a new tab: ${destination}`);
+            const rel = (link.rel ?? "").toLowerCase().split(/\s+/);
+            assert.ok(!rel.some((token) => ["nofollow", "ugc", "sponsored"].includes(token)),
+              `Project links must remain crawlable (no nofollow, ugc or sponsored): ${destination}`);
+          }
         }
       }
       if (route.includes("code-must-be-free")) {
