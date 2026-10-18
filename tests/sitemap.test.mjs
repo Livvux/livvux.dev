@@ -21,7 +21,7 @@ function loadModule(path, dependencies) {
 }
 
 const origin = "https://livvux.dev";
-const staticPaths = ["/", "/blog", "/tools", "/tools/internal-links", "/tools/crawler", "/imprint", "/imprint/en", "/privacy", "/privacy/de"];
+const staticPaths = ["/", "/blog", "/blog/de", "/tools", "/tools/internal-links", "/tools/crawler", "/imprint", "/imprint/en", "/privacy", "/privacy/de"];
 const post = (path, dates = {}) => ({
   _meta: { path },
   publishedAt: "2026-09-01",

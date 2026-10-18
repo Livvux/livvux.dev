@@ -25,12 +25,15 @@ async function archiveState(searchParams: BlogPageProps["searchParams"]) {
 
 export async function generateMetadata({ searchParams }: BlogPageProps): Promise<Metadata> {
   const { page } = await archiveState(searchParams);
-  return pageMetadata({
+  return {
+    ...pageMetadata({
     title: page === 1 ? "Blog: AI, Development & Open Source" : `Blog — Page ${page}`,
     description: `${page > 1 ? `Page ${page}: ` : ""}Practical articles on AI, software development, open-source tools and building in public by Lucas Kleipoedszus. Available in English and German.`,
     path: blogPageHref(page),
     image: "/blog/opengraph-image",
-  });
+    }),
+    alternates: { canonical: absoluteUrl(blogPageHref(page)), ...(page === 1 ? { languages: { en: absoluteUrl("/blog"), de: absoluteUrl("/blog/de") } } : {}) },
+  };
 }
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
@@ -63,7 +66,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         Blog{page > 1 ? ` — Page ${page}` : ""}
         <span className="ml-2 bg-card border border-border rounded-md px-2 py-1 text-muted-foreground text-sm">{posts.length} posts</span>
       </h1>
-      <p className="text-sm text-muted-foreground mb-8">Notes on AI, development, open source, and building in public. Articles in English and German.</p>
+      <p className="text-sm text-muted-foreground mb-3">Notes on AI, development, open source, and building in public.</p>
+      <nav aria-label="Blog language" className="mb-8 flex gap-3 text-sm"><span aria-current="page" className="font-semibold">English</span><Link href="/blog/de" hrefLang="de" className="underline underline-offset-4">Deutsch</Link></nav>
       {items.length > 0 ? (
         <ol start={(page - 1) * BLOG_PAGE_SIZE + 1} className="flex flex-col gap-6">
           {items.map((post) => (
