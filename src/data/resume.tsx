@@ -144,7 +144,7 @@ export const DATA = {
           icon: <Icons.globe className="size-3" />,
         },
       ],
-      image: "",
+      image: "/images/projects/serverroam.jpg",
       video: "",
     },
     {
@@ -162,7 +162,7 @@ export const DATA = {
           icon: <Icons.globe className="size-3" />,
         },
       ],
-      image: "",
+      image: "/images/projects/gratisalternative.jpg",
       video: "",
     },
     {
@@ -180,7 +180,7 @@ export const DATA = {
           icon: <Icons.globe className="size-3" />,
         },
       ],
-      image: "",
+      image: "/images/projects/qbcore.jpg",
       video: "",
     },
     {
@@ -198,7 +198,7 @@ export const DATA = {
           icon: <Icons.globe className="size-3" />,
         },
       ],
-      image: "",
+      image: "/images/projects/codewalkermod.jpg",
       video: "",
     },
     {
@@ -226,7 +226,7 @@ export const DATA = {
           icon: <NotebookIcon className="size-3" />,
         },
       ],
-      image: "",
+      image: "/images/projects/getdown.jpg",
       video: "",
     },
     {
