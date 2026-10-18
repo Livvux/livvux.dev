@@ -65,7 +65,7 @@ export async function safeGet(value, signal, { maxBytes = 2_000_000, resolver = 
       try {
         const status = response.statusCode ?? 0;
         const headers = response.headers;
-        if (status >= 300 && status < 400) { resolve({ url: url.href, status, headers, text: '', bytes: 0 }); return; }
+        if (status >= 300 && status < 400) { response.destroy(); request.destroy(); resolve({ url: url.href, status, headers, text: '', bytes: 0 }); return; }
         if (Number(headers['content-length']) > maxBytes) throw new AuditError('Response exceeds the per-page size limit.');
         const encoding = String(headers['content-encoding'] ?? '').toLowerCase();
         if (encoding === 'gzip' || (!encoding && url.pathname.endsWith('.gz'))) stream = response.pipe(createGunzip());
@@ -73,7 +73,7 @@ export async function safeGet(value, signal, { maxBytes = 2_000_000, resolver = 
         else if (encoding === 'br') stream = response.pipe(createBrotliDecompress());
         else if (encoding && encoding !== 'identity') throw new AuditError('Unsupported response encoding.');
         // Propagate source errors to the decoder; pipe() alone does not forward them.
-        response.on('error', (error) => stream.destroy(error));
+        if (stream !== response) response.on('error', (error) => stream.destroy(error));
         const chunks = [];
         let bytes = 0;
         let compressedBytes = 0;
