@@ -41,7 +41,7 @@ function routes(allPosts = [], url = origin) {
 }
 
 function articleEntry(document) {
-  return routes([document]).sitemap().find((entry) => entry.url.includes("/blog/"));
+  return routes([document]).sitemap().find((entry) => entry.url.includes("/blog/") && entry.url !== `${origin}/blog/de`);
 }
 
 test("includes all static, indexable pages with absolute HTTPS URLs", () => {
@@ -55,7 +55,7 @@ test("includes all static, indexable pages with absolute HTTPS URLs", () => {
 
 test("uses the real EN/DE route convention and reciprocal, self-inclusive hreflang", () => {
   const entries = routes([post("example/en"), post("example/de")]).sitemap();
-  const articles = entries.filter(({ url }) => url.includes("/blog/"));
+  const articles = entries.filter(({ url }) => url.includes("/blog/") && url !== `${origin}/blog/de`);
   const languages = {
     en: `${origin}/blog/example`,
     de: `${origin}/blog/example/de`,
