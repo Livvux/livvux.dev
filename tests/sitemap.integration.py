@@ -15,7 +15,7 @@ from xml.etree import ElementTree
 ORIGIN = "https://livvux.dev"
 BASE_URL = os.environ["SITEMAP_BASE_URL"].rstrip("/")
 NS = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9", "x": "http://www.w3.org/1999/xhtml"}
-STATIC_PATHS = {"/", "/blog", "/tools", "/tools/internal-links", "/tools/crawler"}
+STATIC_PATHS = {"/", "/blog", "/tools", "/tools/internal-links", "/tools/crawler", "/imprint", "/imprint/en", "/privacy", "/privacy/de"}
 
 
 class NoRedirects(HTTPRedirectHandler):

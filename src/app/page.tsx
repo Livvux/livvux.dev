@@ -34,6 +34,10 @@ export default function Page() {
             <div className="gap-2 flex flex-col order-2 md:order-1">
               <h1 className="text-3xl font-semibold tracking-tighter sm:text-4xl lg:text-5xl">Hi, I&apos;m {DATA.name.split(" ")[0]}</h1>
               <p className="text-muted-foreground max-w-[600px] md:text-lg lg:text-xl">{DATA.description}</p>
+              <div className="flex flex-wrap items-center gap-3 pt-3 text-sm">
+                <a href="#projects" className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-4 font-medium text-primary-foreground">Explore projects</a>
+                <a href="https://lkmedia.net/cases" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-4 font-medium hover:bg-accent">Client case studies ↗</a>
+              </div>
             </div>
             <Image src={DATA.avatarUrl} alt={DATA.name} width={128} height={128} sizes="(min-width: 768px) 128px, 96px" preload className="order-1 md:order-2 size-24 md:size-32 shrink-0 object-cover border rounded-full shadow-lg ring-4 ring-muted" />
           </div>

@@ -53,7 +53,7 @@ export default async function Blog({ params }: BlogProps) {
       <StructuredData data={postStructuredData(post)} />
       <Breadcrumbs label={de ? "Brotkrumennavigation" : "Breadcrumb"} items={[
         { name: de ? "Startseite" : "Home", href: "/" },
-        { name: "Blog", href: "/blog" },
+        { name: "Blog", href: de ? "/blog/de" : "/blog" },
         { name: post.title, href: hrefFor(post) },
       ]} />
       <header className="flex flex-col gap-4">
@@ -109,7 +109,7 @@ export default async function Blog({ params }: BlogProps) {
             </Link>
           )}
         </div>
-        <Link href="/blog" className="mt-6 inline-block text-sm underline underline-offset-4">{de ? "Alle Blogartikel" : "All blog articles"}</Link>
+        <Link href={de ? "/blog/de" : "/blog"} className="mt-6 inline-block text-sm underline underline-offset-4">{de ? "Alle Blogartikel" : "All blog articles"}</Link>
       </nav>
     </main>
   );

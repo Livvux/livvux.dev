@@ -21,7 +21,7 @@ function loadModule(path, dependencies) {
 }
 
 const origin = "https://livvux.dev";
-const staticPaths = ["/", "/blog", "/tools", "/tools/internal-links", "/tools/crawler"];
+const staticPaths = ["/", "/blog", "/tools", "/tools/internal-links", "/tools/crawler", "/imprint", "/imprint/en", "/privacy", "/privacy/de"];
 const post = (path, dates = {}) => ({
   _meta: { path },
   publishedAt: "2026-09-01",
@@ -44,7 +44,7 @@ function articleEntry(document) {
   return routes([document]).sitemap().find((entry) => entry.url.includes("/blog/"));
 }
 
-test("includes exactly the five static, indexable pages with absolute HTTPS URLs", () => {
+test("includes all static, indexable pages with absolute HTTPS URLs", () => {
   const entries = routes().sitemap();
   assert.deepEqual(
     entries.map(({ url }) => url).sort(),

@@ -6,11 +6,11 @@ import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { FlickeringGrid } from "@/components/magicui/flickering-grid";
+import { LegalFooter } from "@/components/legal-footer";
+import { DocumentLanguage } from "@/components/document-language";
 import { StructuredData } from "@/components/structured-data";
 import { siteStructuredData } from "@/lib/seo";
 import { UmamiProvider } from "@/components/umami-pageview";
-import Link from "next/link";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -68,20 +68,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body className={cn("min-h-screen bg-background font-sans antialiased relative", geist.variable, geistMono.variable)}>
         <StructuredData data={siteStructuredData()} />
+        <DocumentLanguage />
         <ThemeProvider attribute="class" defaultTheme="light">
           <TooltipProvider delayDuration={0}>
-            <div className="absolute inset-0 top-0 left-0 right-0 h-[100px] overflow-hidden z-0" aria-hidden="true">
-              <FlickeringGrid
-                className="h-full w-full"
-                squareSize={2}
-                gridGap={2}
-                style={{ maskImage: "linear-gradient(to bottom, black, transparent)", WebkitMaskImage: "linear-gradient(to bottom, black, transparent)" }}
-              />
-            </div>
             <UmamiProvider enabled={indexable}>
               <div className="relative z-10 max-w-2xl mx-auto py-12 pb-24 sm:py-24 px-6">
                 {children}
-                <footer className="mt-12 text-xs text-muted-foreground"><Link href="/privacy" className="underline underline-offset-4">Privacy</Link></footer>
+                <LegalFooter />
               </div>
             </UmamiProvider>
             <Navbar />
