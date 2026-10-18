@@ -130,6 +130,106 @@ export const DATA = {
       video: "",
     },
     {
+      title: "ServerRoam",
+      href: "https://serverroam.com/",
+      dates: "2026 - Present",
+      active: true,
+      description:
+        "A game server directory for discovering gaming communities across multiple games, with localized search, moderated listings and developer integrations.",
+      technologies: ["Next.js", "TypeScript", "PostgreSQL", "Gaming"],
+      links: [
+        {
+          type: "Website",
+          href: "https://serverroam.com/",
+          icon: <Icons.globe className="size-3" />,
+        },
+      ],
+      image: "",
+      video: "",
+    },
+    {
+      title: "GratisAlternative",
+      href: "https://gratisalternative.de/",
+      dates: "2026 - Present",
+      active: true,
+      description:
+        "A German software directory for finding free, open-source and lower-cost alternatives, featuring curated comparisons and transparent pricing.",
+      technologies: ["Next.js", "TypeScript", "PostgreSQL", "Directory"],
+      links: [
+        {
+          type: "Website",
+          href: "https://gratisalternative.de/",
+          icon: <Icons.globe className="size-3" />,
+        },
+      ],
+      image: "",
+      video: "",
+    },
+    {
+      title: "QBCore.net",
+      href: "https://qbcore.net/",
+      dates: "2026 - Present",
+      active: true,
+      description:
+        "Independent community documentation for the QBCore FiveM framework, with setup guides, API references, developer tools and troubleshooting.",
+      technologies: ["Next.js", "Fumadocs", "TypeScript", "FiveM"],
+      links: [
+        {
+          type: "Website",
+          href: "https://qbcore.net/",
+          icon: <Icons.globe className="size-3" />,
+        },
+      ],
+      image: "",
+      video: "",
+    },
+    {
+      title: "CodeWalkerMod",
+      href: "https://codewalkermod.com/",
+      dates: "2026 - Present",
+      active: true,
+      description:
+        "An independent resource for GTA V and FiveM mapping, offering CodeWalker tutorials, MLO learning paths and browser-based map tools.",
+      technologies: ["Astro", "JavaScript", "FiveM", "Documentation"],
+      links: [
+        {
+          type: "Website",
+          href: "https://codewalkermod.com/",
+          icon: <Icons.globe className="size-3" />,
+        },
+      ],
+      image: "",
+      video: "",
+    },
+    {
+      title: "GetDown",
+      href: "https://down.livvux.dev/",
+      dates: "2026 - Present",
+      active: true,
+      description:
+        "An open-source, self-hosted video and audio downloader powered by yt-dlp and FFmpeg, with MP4/MP3 exports, progress tracking and automatic file expiry.",
+      technologies: ["Next.js", "TypeScript", "yt-dlp", "FFmpeg"],
+      links: [
+        {
+          type: "Website",
+          href: "https://down.livvux.dev/",
+          icon: <Icons.globe className="size-3" />,
+        },
+        {
+          type: "Source",
+          href: "https://github.com/Livvux/getdown",
+          icon: <Icons.github className="size-3" />,
+        },
+        {
+          type: "Article",
+          href: "/blog/getdown-open-source-video-audio-downloader",
+          icon: <NotebookIcon className="size-3" />,
+        },
+      ],
+      image: "",
+      video: "",
+    },
+    {
       title: "StreamerLoft",
       href: "https://streamerloft.com",
       dates: "",
