@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { isExternalHref, getExternalLinkProps } from "../src/lib/external-links.ts";
 import { remarkContentLinks } from "../src/lib/remark-content-links.ts";
@@ -10,6 +11,34 @@ const PORTFOLIO_HREFS = [
   "https://codewalkermod.com/",
   "https://down.livvux.dev/",
 ];
+
+
+const PORTFOLIO_IMAGES = [
+  ["ServerRoam", "serverroam.jpg"],
+  ["GratisAlternative", "gratisalternative.jpg"],
+  ["QBCore.net", "qbcore.jpg"],
+  ["CodeWalkerMod", "codewalkermod.jpg"],
+  ["GetDown", "getdown.jpg"],
+];
+
+const portfolioSource = readFileSync(new URL("../src/data/resume.tsx", import.meta.url), "utf8");
+for (const [title, filename] of PORTFOLIO_IMAGES) {
+  test(`featured project ${title} has a local screenshot`, () => {
+    const start = portfolioSource.indexOf(`title: "${title}"`);
+    assert.notEqual(start, -1, `Missing project ${title}`);
+    const end = portfolioSource.indexOf("\n    {\n      title:", start + 1);
+    const entry = portfolioSource.slice(start, end === -1 ? undefined : end);
+    assert.ok(
+      entry.includes(`image: "/images/projects/${filename}"`),
+      `${title} should reference its own screenshot`,
+    );
+
+    const bytes = readFileSync(new URL(`../public/images/projects/${filename}`, import.meta.url));
+    assert.ok(bytes.length > 10000 && bytes.length < 500000, `${filename} should be a real, optimized screenshot`);
+    assert.equal(bytes.subarray(0, 3).toString("hex"), "ffd8ff", `${filename} should be JPEG`);
+    assert.equal(bytes.subarray(-2).toString("hex"), "ffd9", `${filename} should be complete`);
+  });
+}
 
 for (const href of [
   ...PORTFOLIO_HREFS,
@@ -153,6 +182,9 @@ test("production HTML uses new tabs for external links and keeps internal naviga
         }
       }
       if (route === "/") {
+        for (const [, filename] of PORTFOLIO_IMAGES) {
+          assert.ok(html.includes(filename), `Missing rendered portfolio screenshot: ${filename}`);
+        }
         for (const destination of PORTFOLIO_HREFS) {
           const matching = links.filter(({ href }) => href?.replace(/\/$/, "") === destination.replace(/\/$/, ""));
           assert.ok(matching.length >= 3, `Missing linked portfolio project: ${destination}`);
