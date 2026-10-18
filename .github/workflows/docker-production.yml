@@ -1,0 +1,40 @@
+name: Docker production smoke
+on:
+  pull_request:
+    paths:
+      - 'Dockerfile'
+      - '.dockerignore'
+      - 'next.config.mjs'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/docker-production.yml'
+permissions:
+  contents: read
+jobs:
+  production-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build production image
+        run: docker build --pull --tag livvux-site:ci .
+      - name: Start and smoke test standalone server
+        shell: bash
+        run: |
+          set -euo pipefail
+          container=$(docker run -d --init -p 127.0.0.1:3007:3000 livvux-site:ci)
+          trap 'docker logs "$container" || true; docker rm -f "$container" >/dev/null || true' EXIT
+          ready=false
+          for i in $(seq 1 80); do
+            if curl -fsS http://127.0.0.1:3007/ >/dev/null; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+          test "$ready" = true
+          docker exec "$container" sh -c 'test "$(id -u)" = "1001"'
+          for path in / /blog /blog/de /imprint /imprint/en /privacy /privacy/de /sitemap.xml /robots.txt; do
+            curl -fsS "http://127.0.0.1:3007$path" >/dev/null
+          done
