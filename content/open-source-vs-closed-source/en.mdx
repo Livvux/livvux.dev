@@ -1,0 +1,119 @@
+---
+title: "Open Source > Closed Source: Transparency, Fairness, and Freedom"
+publishedAt: "2026-10-18"
+author: "Livvux"
+summary: "Why I choose open source over proprietary software: transparency, user freedom, fair business models, less lock-in, and honest security trade-offs."
+image: "/images/blog/open-source-vs-closed-source/open-source-greater-than-closed-source.webp"
+---
+
+**Open source > closed source. Not because every open-source app is better, but because I believe people deserve control over the software they depend on.**
+
+When two tools solve the same problem well, I will choose the open-source one. I would rather pay a developer for software I can inspect, improve and keep using than rent access to a black box whose rules can change overnight.
+
+That preference is about more than code. It is about **transparency, fairness and the freedom to walk away**.
+
+<figure>
+  <img
+    src="/images/blog/open-source-vs-closed-source/open-source-greater-than-closed-source.webp"
+    alt="Black-and-white graphic showing the words open source larger and brighter than closed source, separated by a greater-than symbol."
+    width={800}
+    height={800}
+    loading="eager"
+    decoding="async"
+    style={{ display: "block", width: "100%", maxWidth: "820px", height: "auto", margin: "0 auto", borderRadius: "12px" }}
+  />
+  <figcaption>My default is simple: prefer software that gives its users meaningful rights.</figcaption>
+</figure>
+
+## Transparency should be a feature, not a promise
+
+With proprietary software, you often have to take the vendor's word for what an application does. You can read its privacy policy, inspect its network traffic and trust outside audits, but you usually cannot examine its full implementation.
+
+Open source changes the starting point. Independent developers can inspect how data is handled, identify mistakes, review changes and challenge questionable design decisions. Bugs can be discussed in public. Security patches can be examined rather than merely announced.
+
+**Visible source code does not prove that a distributed binary matches it.** Build instructions, reproducible releases, signed artifacts and independent verification still matter. And publicly posted code without permission to modify and redistribute it is not necessarily open source: the [Open Source Initiative's definition](https://opensource.org/osd) requires real rights, not just visibility.
+
+Transparency is not automatic trust. It makes trust *testable*.
+
+## Fairness means sharing power
+
+Fairness is the part of this conversation that gets overlooked. A company can offer a beautiful interface and a cheap subscription while keeping its users completely dependent on decisions they cannot influence.
+
+To me, fair software respects three groups:
+
+- **Users** should be able to inspect the rules, export their data, choose a provider and continue using or adapting software when a vendor changes direction.
+- **Contributors** should receive credit, clear licensing terms, respectful review and an understandable way to participate in decisions.
+- **Maintainers** deserve funding, sustainable workloads and the ability to build businesses around what they create.
+
+An open license gives people a foundation of rights. It does **not** guarantee fair governance, a welcoming community or a healthy funding model. Those have to be built deliberately.
+
+It is also important not to confuse fairness with a requirement to work for free. **Open source is compatible with paid development, consulting, support, hosting and commercial products.** The [OSI's FAQ](https://opensource.org/faq) explicitly distinguishes software freedom from price.
+
+## The freedom to leave is the freedom that matters most
+
+The biggest difference often appears when things go wrong: a price doubles, a feature disappears, an API is shut down or a company is acquired.
+
+In a closed ecosystem, your realistic options may be to accept the change, migrate or rebuild. With a genuinely open-source project, you may also be able to maintain your own version, hire someone to support it or move to another host. **A fork is an option, not a guarantee that maintaining it will be easy or affordable.**
+
+Data portability is separate from source-code availability. Even an open-source service can trap your information if it lacks usable exports or relies on proprietary formats. I look for both: rights over the code *and* control over my data.
+
+## Open source vs. closed source: the practical difference
+
+| Question | Open-source software | Closed-source software |
+| --- | --- | --- |
+| Can I inspect the implementation? | Yes, when the relevant source is published. | Usually not. |
+| Can I modify and share it? | Yes, under the license's conditions. | Usually requires separate permission. |
+| Can I change providers or self-host? | Often possible, depending on architecture. | Depends on the vendor. |
+| Is it automatically more secure? | No. Auditing is possible, not guaranteed. | No. Private code is not proof of security. |
+| Must it be free of charge? | No. Paid products and services are compatible. | No. Free proprietary apps also exist. |
+| Is the project necessarily fair? | No. Governance and funding still matter. | No. Policies depend on the company. |
+
+The table describes **rights and possibilities**, not a claim that every open-source product beats every proprietary one in usability, reliability or support.
+
+## Security: open code is an opportunity, not a shield
+
+I do not believe the argument that open source must be secure because everyone can read it. A neglected repository with vulnerable dependencies is still a risk. Public code can be reviewed by defenders and attackers alike.
+
+The advantage is the ability to verify and improve security without waiting for a vendor's permission. But somebody still has to do the work: maintain dependencies, review contributions, publish security fixes, test releases and verify the supply chain.
+
+The [OpenSSF's guide to evaluating open-source software](https://best.openssf.org/Concise-Guide-for-Evaluating-Open-Source-Software.html) recommends looking at authenticity, security practices, maintenance and project sustainability. The [OpenSSF Scorecard](https://scorecard.dev/) can help identify signals to investigate; it is not a universal safety certificate.
+
+**I trust evidence of good engineering, not a license label alone.**
+
+## I am not against paying for software
+
+Developers should get paid. I have no problem buying a polished app, subscribing to managed hosting or paying a team for support. My issue is with paying for convenience while being denied basic control.
+
+A healthy open-source business can sell things people genuinely value: reliable hosting, updates, support, enterprise features and expert services. Just be precise about the license and which parts are actually open. An **open-core** product with closed modules is different from a fully open-source one; a **source-available** license with restrictions on use is different again.
+
+Good businesses do not need to pretend those differences do not exist.
+
+## When would I choose closed source?
+
+When there is no credible open-source alternative for a critical workflow, when accessibility or hardware integration is significantly better, or when a specialized vendor offers support that materially reduces operational risk. Product quality, long-term maintenance and security still count.
+
+I would also avoid an abandoned open-source project just because it has a license I like. **Open source is my default, not an excuse to ignore reality.**
+
+That is why my comparison starts with the actual task, not the ideology.
+
+## My five checks before choosing a tool
+
+1. **Rights:** Is there a recognizable open-source license, and does it cover the features I need? Check the actual terms against the [OSI definition](https://opensource.org/osd).
+2. **Trust:** Is the development process inspectable? Are there releases, tests, security policies and credible maintenance?
+3. **Exit:** Can I export my data in a useful format, migrate to another provider or run the software myself?
+4. **People:** Are maintainers credited and supported? Are contributions and project decisions handled openly?
+5. **Experience:** Does it actually solve my problem reliably, without creating more work than it saves?
+
+For AI tools, I ask one extra question: **Are the application, model weights, training information and services equally open?** They are separate layers. Downloadable weights alone do not establish fully open-source AI under the [OSI's Open Source AI Definition](https://opensource.org/ai/open-source-ai-definition).
+
+## The position I will keep defending
+
+I want developers to build profitable companies. I want creators to receive credit. I want users to be able to understand what they install, challenge the rules and leave without losing everything they built.
+
+That is my meaning of **Open Source > Closed Source**. Not a universal performance ranking. A preference for software that earns trust through verifiability, treats people fairly and preserves their freedom to choose.
+
+**The best business model is one that customers stay with because they want to—not because they cannot leave.**
+
+If you want the developer-tool and open-model examples behind this position, read my earlier piece, [Code Must Be Free: Why Open Source Matters](/blog/code-must-be-free).
+
+*Further reading: [Open Source Definition](https://opensource.org/osd), [Free Software Foundation's four freedoms](https://www.gnu.org/philosophy/free-sw.html), [Reproducible Builds](https://reproducible-builds.org/), and the [OpenSSF evaluation guide](https://best.openssf.org/Concise-Guide-for-Evaluating-Open-Source-Software.html). Sources checked October 18, 2026.*
