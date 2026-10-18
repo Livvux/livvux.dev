@@ -11,7 +11,7 @@ export function remarkCodeMeta() {
 
                     node.data.hProperties["data-meta"] = meta;
 
-                    const titleMatch = meta.match(/title="([^"]+)"/);
+                    const titleMatch = meta.match(/(?:^|\s)(?:title|filename)="([^"]+)"/);
                     if (titleMatch?.[1]) {
                         node.data.hProperties["data-title"] = titleMatch[1];
                     }

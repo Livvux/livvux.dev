@@ -4,6 +4,8 @@ import { createJev } from './provider.mjs';
 import { runAudit } from './analysis.mjs';
 
 const active = new Set();
+const starts = [];
+const MAX_STARTS_PER_MINUTE = 12; // Local backstop; add a Cloudflare/ingress quota for global protection.
 const headers = { 'Cache-Control': 'no-store, private', 'X-Content-Type-Options': 'nosniff', 'X-Accel-Buffering': 'no', 'Referrer-Policy': 'no-referrer' };
 function error(message, status) { return Response.json({ error: message }, { status, headers }); }
 async function input(request) {
@@ -30,6 +32,13 @@ export async function handleAudit(request, { makeJev = createJev, audit = runAud
   } catch (cause) { return error(cause instanceof AuditError ? cause.message : 'Invalid JSON request.', 400); }
   const fingerprint = createHash('sha256').update(body.key.trim()).digest('hex');
   if (active.size >= 2 || active.has(fingerprint)) { body.key = ''; return error('The tool is busy or this key already has a running audit. Try again after the current run.', 429); }
+  const now = Date.now();
+  while (starts.length && starts[0] <= now - 60_000) starts.shift();
+  if (starts.length >= MAX_STARTS_PER_MINUTE) {
+    body.key = '';
+    return error('Audit rate limit reached. Retry in a minute.', 429);
+  }
+  starts.push(now);
   active.add(fingerprint);
   const controller = new AbortController();
   const cancel = () => controller.abort(new AuditError('Run cancelled.'));

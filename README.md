@@ -30,7 +30,11 @@ pnpm build    # production build
 
 ## Deployment
 
-Deploys via Dokploy from this private GitHub repository.
+Deploys via Dokploy from this public GitHub repository. The multi-stage Dockerfile runs the Next.js standalone server without root. When the WhatsApp blog-status feature is enabled, mount a writable persistent volume for `BLOG_STATUS_STATE_DIR`. See [deployment checks](./docs/deployment-and-privacy-review.md).
+
+## Licensing
+
+Based on Dillion Verma's MIT-licensed starter. Some third-party components have additional terms, including React Bits SpotlightCard (MIT + Commons Clause). Fonts, images, videos and editorial text are not automatically MIT-licensed. See [the license notes](./docs/licensing.md).
 
 ## Public page statistics
 

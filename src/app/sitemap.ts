@@ -8,9 +8,14 @@ import { findPost, hrefFor, postId, postLang, type Post } from "@/lib/posts";
 const staticPaths = [
   "/",
   "/blog",
+  "/blog/de",
   "/tools",
   "/tools/internal-links",
   "/tools/crawler",
+  "/imprint",
+  "/imprint/en",
+  "/privacy",
+  "/privacy/de",
 ] as const;
 
 function absoluteUrl(path: string): string {

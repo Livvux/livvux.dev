@@ -128,7 +128,7 @@ def main():
         path = urlsplit(url).path
         page = page_at(path, url)
         pages[url] = page
-        if path.startswith("/blog/"):
+        if path.startswith("/blog/") and path != "/blog/de":
             article = next(schema for schema in page.schemas if schema.get("@type") == "BlogPosting")
             lang = "de" if path.endswith("/de") else "en"
             assert lang in page.main_languages, path
@@ -150,6 +150,8 @@ def main():
             assert alternate in pages, (url, language, alternate)
             assert pages[alternate].alternates == page.alternates, (url, alternate, "nonreciprocal hreflang")
 
+    german_archive = pages[ORIGIN + "/blog/de"]
+    assert any(link.endswith("/de") for link in german_archive.links if link.startswith("/blog/"))
     archive = pages[ORIGIN + "/blog"]
     # Follow every rendered archive page, not just the first page of the sitemap.
     archive_paths = sorted({link for link in archive.links if link.startswith("/blog?page=")})

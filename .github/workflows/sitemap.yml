@@ -15,6 +15,7 @@ on:
       - 'pnpm-workspace.yaml'
       - 'tests/sitemap.*'
       - 'tests/seo.*'
+      - 'tests/mdx-rendering.test.mjs'
       - 'tests/umami.test.mjs'
       - 'tests/umami-sdk.test.mjs'
       - '.github/workflows/sitemap.yml'
@@ -57,7 +58,7 @@ jobs:
       - name: Install existing dependencies
         run: pnpm install --frozen-lockfile
       - name: Test sitemap, SEO, and pageview privacy
-        run: node --test tests/sitemap.test.mjs tests/seo.test.mjs tests/umami.test.mjs tests/umami-sdk.test.mjs
+        run: node --test tests/sitemap.test.mjs tests/seo.test.mjs tests/umami.test.mjs tests/umami-sdk.test.mjs tests/mdx-rendering.test.mjs
       - name: Lint SEO and pageview changes
         run: >-
           pnpm exec eslint src/app/sitemap.ts src/app/robots.ts
