@@ -12,11 +12,24 @@ import { useTheme } from "next-themes";
 import { useState, type CSSProperties } from "react";
 import Markdown from "react-markdown";
 
+function ProjectPlaceholder({ title }: { title: string }) {
+  return (
+    <div className="relative flex h-48 items-center justify-center bg-muted/40 px-6 text-center">
+      <span className="absolute left-4 top-4 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+        Project
+      </span>
+      <span className="text-balance text-2xl font-semibold tracking-tight text-foreground">
+        {title}
+      </span>
+    </div>
+  );
+}
+
 function ProjectImage({ src, alt }: { src: string; alt: string }) {
   const [imageError, setImageError] = useState(false);
 
   if (!src || imageError) {
-    return <div className="w-full h-48 bg-muted" />;
+    return <ProjectPlaceholder title={alt} />;
   }
 
   return (
@@ -105,7 +118,7 @@ export function ProjectCard({
           ) : image ? (
             <ProjectImage src={image} alt={title} />
           ) : (
-            <div className="w-full h-48 bg-muted" />
+            <ProjectPlaceholder title={title} />
           )}
         </Link>
         {links && links.length > 0 && (
@@ -133,7 +146,15 @@ export function ProjectCard({
       <div className="p-6 flex flex-col gap-3 flex-1">
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-col gap-1">
-            <h3 className="font-semibold">{title}</h3>
+            <h3 className="font-semibold">
+              <Link
+                href={href || "#"}
+                {...getExternalLinkProps(href)}
+                className="hover:underline hover:underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              >
+                {title}
+              </Link>
+            </h3>
             <time className="text-xs text-muted-foreground">{dates}</time>
           </div>
           <Link
