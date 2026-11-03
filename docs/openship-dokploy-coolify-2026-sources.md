@@ -1,11 +1,11 @@
 # OpenShip vs Dokploy vs Coolify (2026) — editorial verification
 
-Checked: 2026-11-03. Articles: \`content/openship-vs-dokploy-vs-coolify/{en,de}.mdx\`.
+Checked: 2026-11-03. Articles: `content/openship-vs-dokploy-vs-coolify/{en,de}.mdx`.
 
 ## Editorial scope
 
 - Neutral bilingual documentation comparison, not a hands-on deployment, performance, security, restore, or availability benchmark.
-- No synthesized speed scores, Github star counts, universal winner, release-version pin, or unsourced stability ranking.
+- No synthesized speed scores, GitHub star counts, universal winner, release-version pin, or unsourced stability ranking.
 - No exact cloud prices in prose: the three vendors package management and compute differently; refer readers to current pricing and edition pages.
 - Differences between standalone remote servers, multi-server deployments and node clusters are explained explicitly.
 - No change to the app, dependency graph, blog routing, sitemap or SEO system. Existing locale-aware MDX routing discovers both articles automatically.
@@ -17,7 +17,7 @@ Checked: 2026-11-03. Articles: \`content/openship-vs-dokploy-vs-coolify/{en,de}.
 | OpenShip architecture and license | https://github.com/oblien/openship | Desktop/web/CLI/SDK; Apache-2.0 for OpenShip-authored code with separate third-party licenses; no claim of universal Kubernetes support. |
 | OpenShip K3s | https://openship.io/features/autoscaling-load-balancing | Cluster/replica feature targets supported application workloads; self-hosted/desktop controller; policy autoscaling and gateway failover not implemented. |
 | OpenShip cluster details | https://openship.io/docs/guides/mcp-clusters-and-scaling | K3s application replication vs Compose scaling on connected Swarm; stateful topology limitations. |
-| OpenShip Actions | https://openship.io/docs/guides/actions | Github-compatible workflows with two execution modes and compatibility limits; not full Github Actions parity. |
+| OpenShip Actions | https://openship.io/docs/guides/actions | GitHub-compatible workflows with two execution modes and compatibility limits; not full GitHub Actions parity. |
 | OpenShip stateful changes | https://openship.io/docs/guides/database-migrations | Pre-deploy backup is not a substitute for an actual migration and tested restore. |
 | OpenShip MCP | https://openship.io/docs/mcp | Integrated OAuth/PAT with permission enforcement on each tool call. |
 | Dokploy remote and clusters | https://docs.dokploy.com/docs/core/deployment-options | Remote SSH-managed servers are independent. Swarm nodes can replicate workloads but require registries/storage planning. |
@@ -45,10 +45,10 @@ Checked: 2026-11-03. Articles: \`content/openship-vs-dokploy-vs-coolify/{en,de}.
 
 ## Validation
 
-The repository's existing \`.github/workflows/sitemap.yml\` is triggered by changes beneath \`content/**\`. It runs the real MDX production build, type checking, and sitemap/SEO integration checks.
+The repository's existing `.github/workflows/sitemap.yml` is triggered by changes beneath `content/**`. It runs the real MDX production build, type checking, and sitemap/SEO integration checks.
 
 Before merging, review the PR checks and rendered English/German routes:
-- \`/blog/openship-vs-dokploy-vs-coolify\`
-- \`/blog/openship-vs-dokploy-vs-coolify/de\`
+- `/blog/openship-vs-dokploy-vs-coolify`
+- `/blog/openship-vs-dokploy-vs-coolify/de`
 
 Any failed or unexecuted check should be reported as such; this file does not claim a completed build.
