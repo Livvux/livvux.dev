@@ -1,0 +1,301 @@
+---
+title: "Best Computer-Use Tools in 2026: agent-desktop vs. Open Interpreter vs. UI-TARS vs. Cua vs. OmniParser"
+publishedAt: "2026-11-03"
+author: "Livvux"
+summary: "An in-depth comparison of five computer-use projects: desktop control, visual agents, virtual machines, open-source licenses, security, cost and the best stack for personal AI."
+---
+
+**An AI that can click a button is not automatically an AI that can safely run a complete task on its own computer.** That distinction matters if you want to move from a local demo to a reliable personal assistant—or build an AI service for other people.
+
+I compared five prominent projects: [agent-desktop](https://github.com/vercel-labs/agent-desktop), [Open Interpreter](https://github.com/openinterpreter/openinterpreter), [UI-TARS](https://github.com/bytedance/UI-TARS-desktop), [Cua](https://github.com/trycua/cua), and [OmniParser](https://github.com/microsoft/OmniParser).
+
+**My conclusion:** Cua is the strongest *infrastructure starting point* for agents that need their own computers. Open Interpreter with Workstation offers the most complete *agent workspace* of these options. For a lightweight tool that controls my Mac, I would test agent-desktop first. UI-TARS and OmniParser are useful when structured controls are unavailable, not automatic replacements for the other three.
+
+This is a **technical architecture comparison as of November 3, 2026**, based on the projects' published documentation. It is **not** a controlled speed or task-success benchmark. Where I recommend a winner, that is an engineering judgment, not a measured performance claim.
+
+## Quick comparison: five projects, five different jobs
+
+| Project | What it primarily provides | Best fit | What it does not give you on its own |
+| --- | --- | --- | --- |
+| [agent-desktop](https://github.com/vercel-labs/agent-desktop) | Native desktop control through accessibility APIs | A small, precise desktop tool connected to an existing agent | Planning, memory or an agent runtime |
+| [Open Interpreter](https://github.com/openinterpreter/openinterpreter) + [Workstation](https://github.com/openinterpreter/interpreter-workstation) | Agent runtime, tools and a user-facing workspace | A complete local or remote AI work environment | A ready-made, isolated computer for every SaaS customer |
+| [UI-TARS Desktop](https://github.com/bytedance/UI-TARS-desktop) | Vision-driven mouse and keyboard operations | Interfaces an agent must understand visually | A multi-tenant infrastructure platform |
+| [Cua](https://github.com/trycua/cua) | Desktop driver, sandbox SDK, VMs and Spaces | Agent-owned computers and computer-use infrastructure | Your product's identity, billing and business logic |
+| [OmniParser](https://github.com/microsoft/OmniParser) | Screenshot-to-structured-elements perception | Improving visual grounding | A standalone general-purpose agent or computer |
+
+**The fundamental mistake would be comparing these as if they were five versions of the same app.** They occupy different layers. You can use more than one in a single system.
+
+## What changed in 2026?
+
+### Open Interpreter is no longer just the original Python project
+
+Many developers remember Open Interpreter as a Python-based way to let an LLM write and execute code. Its [current repository](https://github.com/openinterpreter/openinterpreter) describes a **Rust implementation based on Codex**, with model/provider selection, sandboxing, skills, MCP, ACP and different agent harnesses. The [original Python project lives on as a community-maintained fork](https://github.com/endolith/open-interpreter).
+
+The separate [Interpreter Workstation](https://github.com/openinterpreter/interpreter-workstation) supplies the desktop and browser workspace. The runtime owns the models and tools; Workstation owns the interface, access policies and host integrations. It also supports durable *Goals*, but a durable goal is not the same thing as a fully managed, production-grade recurring-job service.
+
+In other words, evaluating Open Interpreter without evaluating Workstation now misses an important part of the product.
+
+### Cua is more than a virtual-machine library
+
+The [Cua repository](https://github.com/trycua/cua) now contains several distinct pieces:
+
+- **Cua Driver:** native accessibility, screenshots, browser access and background desktop actions.
+- **Cua SDK / sandbox:** create or connect to Linux, Windows and macOS execution environments.
+- **Cua Spaces:** persistent, watchable desktops with human handoff, remote access and agent workflows.
+- **Lume:** local macOS virtualization on Apple silicon.
+- **Cua Bench:** evaluation tooling for computer-use agents.
+
+The distinction is important. **Cua Driver competes directly with agent-desktop; Cua SDK and Spaces solve problems that agent-desktop does not attempt to solve.** And the licensing is different across these parts, as I explain below.
+
+## 1. agent-desktop: the minimalist desktop-control layer
+
+[vercel-labs/agent-desktop](https://github.com/vercel-labs/agent-desktop) uses operating-system accessibility trees rather than asking a vision model to guess where a button is on every screen.
+
+A typical loop looks like this:
+
+~~~bash
+npm install -g agent-desktop
+agent-desktop status
+agent-desktop snapshot --app Finder -i
+# Inspect the returned element refs; then act on a real ref:
+# agent-desktop click @snapshot-id:element-id
+~~~
+
+The agent gets a structured snapshot, acts on a referenced element and reads the state again. The project also offers screenshots, keyboard operations, window management, a Rust CLI and a native C ABI for embedding it in another runtime. See the [official usage and platform matrix](https://github.com/vercel-labs/agent-desktop#readme).
+
+**Why I like it:** semantic element references are compact and usually easier to validate than raw screen coordinates. There is no need for a model call merely to inspect an accessibility tree. It is a particularly attractive component for a coding agent already running on macOS.
+
+**The trade-off:** the tool does not decide *what task to do*, remember context or schedule jobs. Accessibility quality depends on the application, and some graphical or canvas-based controls still require another approach. Linux and Windows behavior differs by desktop and API; "cross-platform" does not imply identical capabilities.
+
+**Best choice when:** I already have an agent and simply want it to control native applications with minimal overhead.
+
+## 2. Open Interpreter + Workstation: the agent and its workspace
+
+[Open Interpreter](https://github.com/openinterpreter/openinterpreter) is much closer to an **agent runtime** than a desktop driver. It executes commands, edits files, connects models and tools, works with MCP and ACP, and supports sandbox and permission controls. Its computer-use workflow can integrate other drivers rather than trying to reimplement every operating-system API.
+
+[Interpreter Workstation](https://github.com/openinterpreter/interpreter-workstation) adds a human-facing desktop application and web-capable shell, local or remote backend connections, policy boundaries and persistent work threads. The documented division of responsibilities is useful: the agent runtime and the user interface remain separate components.
+
+**Why I like it:** it provides a credible starting point for an actual AI workspace. A user can see the task, review outputs and control what the assistant may access. Supporting multiple providers and locally hosted models also reduces dependence on one model vendor.
+
+**The trade-off:** the combined stack is more complex than a single CLI. Goals, approvals and persistent threads do not automatically solve tenant isolation, queue management, retry policy, job billing or 24/7 infrastructure. You still have to design those for a commercial service.
+
+**Best choice when:** I want something closer to an open AI workbench than a low-level automation library.
+
+## 3. UI-TARS: a specialist for visual GUI interaction
+
+[ByteDance's UI-TARS Desktop](https://github.com/bytedance/UI-TARS-desktop) operates the screen using a vision-language model. The agent observes an interface, chooses a mouse or keyboard action, and inspects the resulting screen. The wider repository also contains **Agent TARS**, a general multimodal agent stack with browser and MCP tooling; the two should not be treated as identical products.
+
+**Why I like it:** screenshots can expose things an accessibility tree misses—custom drawing surfaces, unusual widgets and unlabeled controls. UI-TARS provides local and remote computer/browser operators, making it relevant as a visual fallback.
+
+**The trade-off:** screenshot-based loops add inference cost and can fail because of resolution, scaling, visual ambiguity, unexpected pop-ups or layout shifts. The repository is not a turnkey SaaS isolation and billing system. Its Apache-2.0 source-code license also does not eliminate the need to check the terms of each model and set of weights you deploy.
+
+**Best choice when:** a task can only be completed by looking at the actual pixels, or when a driver repeatedly encounters inaccessible controls.
+
+## 4. Cua: the broadest computer-use infrastructure
+
+[Cua](https://github.com/trycua/cua) is the most interesting project here if the objective is **one execution environment per AI agent**.
+
+The [Cua SDK](https://cua.ai/docs/cua-sdk) can run sandboxed work locally or on machines you control, using container and virtual-machine backends depending on the OS. Its [Driver](https://cua.ai/docs/cua-driver) combines accessibility elements, screenshots and supported Chromium DOM routes, with a preference for targeted background actions. [Spaces](https://cua.ai/docs/spaces/quickstart) adds visible desktops, sharing, takeover and persistent-agent workflows.
+
+An illustrative sandbox smoke test from the documented CLI workflow is:
+
+~~~bash
+cua runtime doctor
+cua sb create linux --name trial
+cua sb exec trial "uname -a"
+cua sb rm -f trial
+~~~
+
+This is a *sandbox test*, not a fully configured graphical desktop or SaaS deployment. On your own cloud infrastructure, you still pay the provider for the machines. Cua Spaces is **bring your own compute**, not an unlimited fleet of VMs rented by Cua. See [the SDK documentation](https://cua.ai/docs/cua-sdk) and [Spaces plans](https://cua.ai/docs/spaces/guides/plans).
+
+**Why I like it:** one ecosystem covers execution, native UI interaction, remote environments and human takeover. Cua's SDK is a serious candidate for the machine layer of a personal-AI product.
+
+**The trade-off:** many moving parts, OS-specific limitations and significant operational responsibility. Containers do not automatically provide the same security boundary as an appropriately hardened VM. Cua Spaces is also **source-available under FSL-1.1-MIT**, not MIT-licensed like the core SDK and Driver. That matters enormously for competitors.
+
+**Best choice when:** agents need isolated, inspectable desktops and my product will manage how those computers are provisioned and used.
+
+## 5. OmniParser: perception, not the agent
+
+[Microsoft's OmniParser](https://github.com/microsoft/OmniParser) turns screenshots into structured information about visible elements, locations and likely functions. It can help a vision-based agent identify targets before acting.
+
+**Why I like it:** this can improve grounding on interfaces where native accessibility metadata is incomplete. The models can be run locally, and the project offers examples and a demonstration environment.
+
+**The trade-off:** OmniParser does not itself own an agent's goals, execute a general task or provision a desktop. It adds model inference and integration complexity. It is an optional component in a larger perception-and-action loop, not an alternative to an agent runtime or a sandbox SDK.
+
+**Best choice when:** screenshot interpretation is a real bottleneck and basic accessibility or browser DOM access cannot solve the task.
+
+## Direct comparison: agent-desktop vs. Cua Driver
+
+These are the two projects I would benchmark against each other first. They overlap more than the other pairs.
+
+| Question | agent-desktop | Cua Driver |
+| --- | --- | --- |
+| How does it find controls? | Accessibility-tree snapshot and element refs | Accessibility-tree element tokens, screenshots and supported browser DOM |
+| Does each action require vision? | No | No |
+| Can it act in the background? | Yes, where the OS and element allow it | Yes, with explicit background/foreground strategies |
+| Is a visual fallback built in? | Screenshots available; external interpretation | Screenshots available; optional perception integrations |
+| Browser emphasis | Native app automation; browser-specific tools can be paired | More integrated Chrome/Edge DOM paths where supported |
+| Integration | CLI and C ABI | CLI, MCP and SDK |
+| General-purpose agent included? | No | No |
+| Core license | Apache-2.0 | MIT |
+
+The [agent-desktop platform table](https://github.com/vercel-labs/agent-desktop) and [Cua Driver's supported routes and known limits](https://cua.ai/docs/cua-driver/concepts/platform-support) matter more than a generic "works on macOS" label. For example, Cua documents cases where SwiftUI windows on other macOS Spaces lose accessibility detail, and where some Linux/Wayland input cannot be delivered in the background.
+
+**My engineering preference:** start with agent-desktop if I want the smallest possible accessibility-first tool for a single machine. Choose Cua Driver if I need its richer browser/native integration and explicit input-delivery controls. **Neither can be declared faster or more reliable without an identical-task benchmark.**
+
+## Feature comparison
+
+Here, **Yes** means the project ships the capability, **Via integration** means another component is needed, and **No** means it is not the project's job.
+
+| Capability | agent-desktop | Open Interpreter + Workstation | UI-TARS Desktop | Cua ecosystem | OmniParser |
+| --- | --- | --- | --- | --- | --- |
+| Agent planning / tool orchestration | No | Yes | Yes, GUI-focused | Via an agent; Spaces has agent workflows | No |
+| Native mouse / keyboard actions | Yes | Via tools | Yes | Yes | No |
+| Accessibility-tree element actions | Yes | Via driver | Not its main approach | Yes, Driver | No |
+| Screenshot perception | Via a model | Via tools / model | Core capability | Screenshots + optional perception | Core capability |
+| Code and shell execution | No agent shell | Yes | Not its primary role | Yes, SDK / Spaces | No |
+| Separate execution environments | No | External sandboxing / integration | Remote operator integration | Yes, SDK / Spaces | No |
+| Persisted tasks / goals | No | Workstation Goals | Not a core feature | Spaces persistent agents | No |
+| Native SaaS tenant management | No | No | No | No complete business layer | No |
+
+A checkmark for "computer use" would hide the most important differences: **who controls the machine, who plans the task and who isolates each customer's work**.
+
+## Platform support: read the fine print
+
+| Component | macOS | Windows | Linux |
+| --- | --- | --- | --- |
+| agent-desktop | Supported | Supported | Supported with desktop-session limitations |
+| Open Interpreter / Workstation | Supported | Supported | Supported |
+| UI-TARS Desktop | Supported | Supported | No standard Linux desktop release documented |
+| Cua Driver | macOS 14+ | Windows 10/11/Server | Supported with desktop limitations |
+| Cua Spaces app | macOS 26+ | Preview | Ubuntu 24.04 packages |
+| OmniParser | Python/model workflow | Python/model workflow | Python/model workflow |
+
+Sources: [agent-desktop](https://github.com/vercel-labs/agent-desktop), [UI-TARS](https://github.com/bytedance/UI-TARS-desktop), [Cua Driver](https://cua.ai/docs/cua-driver), [Cua Spaces install guide](https://cua.ai/docs/spaces/guides/install), and [OmniParser](https://github.com/microsoft/OmniParser).
+
+A Linux desktop inside a container, a macOS VM on Apple silicon and a Windows interactive session have different permissions and isolation properties. Decide which kind of computer your users actually need before selecting the SDK.
+
+## Open source and licenses: the commercial SaaS trap
+
+The word *open* is not enough. **Check the exact component, version, model weights and dependencies you would redistribute or host.**
+
+| Component | Published terms | What I would verify before commercial use |
+| --- | --- | --- |
+| agent-desktop | Apache-2.0 | Include required notices |
+| Open Interpreter (Rust runtime) | Apache-2.0 | Dependency and distribution notices |
+| Interpreter Workstation | Apache-2.0 for software; documentation has separate terms | Bundled components and submodules |
+| UI-TARS Desktop repository | Apache-2.0 | Separate model/weight licenses |
+| Cua Driver, SDK and Lume | MIT | Which packages the product actually imports |
+| **Cua Spaces app, daemon and streaming pieces** | **FSL-1.1-MIT (source-available)** | **Restriction on competing commercial services** |
+| Cua Driver Bench (current releases) | FSL-1.1-MIT | Version-specific license; older releases differed |
+| OmniParser repository | CC-BY-4.0 | Attribution and code/package suitability |
+| OmniParser newer detector/caption weights | MIT for specified model folders | Exact model revision and deployed artifacts |
+| OmniParser earlier Ultralytics detector | AGPL-3.0 | Copyleft obligations |
+
+Cua's [official licensing matrix](https://github.com/trycua/cua/blob/main/legal/LICENSING.md) is explicit: the MIT SDK and Driver are distinct from Spaces. The FSL restrictions can prohibit offering the licensed Spaces components—or something substantially similar—as a competing commercial service without separate permission. Its terms describe a two-year transition to MIT for individual releases. **Do not assume that self-hostable means unrestricted SaaS resale.**
+
+OmniParser's [model card](https://huggingface.co/microsoft/OmniParser-v2.0/blob/main/README.md) distinguishes its MIT-based newer detector and captioner from an older AGPL-based detector. Separately, Cua's optional perception extension has its own third-party and AGPL considerations. That is why I would freeze exact artifact versions and perform a license review *before* deployment, not after launch.
+
+This is an engineering risk assessment, not legal advice.
+
+## Reliability, safety and costs: what actually decides production readiness
+
+**Accessibility-first control can reduce model calls.** A program can read a button's name and invoke it without paying a vision model to rediscover the same button in a screenshot. However, a bad accessibility tree can be worse than a well-grounded visual workflow. The most reliable architecture chooses the method per task.
+
+My execution priority would be:
+
+1. **Official API / MCP integration** when supported and appropriately authorized.
+2. **Structured browser automation** for websites, with DOM locators and verifiable state.
+3. **Native accessibility APIs** for desktop applications.
+4. **Screenshot + visual reasoning** when the earlier methods cannot reach an element.
+5. **Human takeover** for ambiguous, destructive or sensitive actions.
+
+This avoids unnecessary GUI interaction. It also creates clear points for retries and post-action verification.
+
+For a commercial service, the risk list is broader than click accuracy: per-user isolation, scoped credentials, data retention, permission escalation, audit logs, resource quotas, cancellation, retries, idempotency and account abuse. Screenshots and accessibility snapshots can expose emails, tokens and private information; they should not be uploaded or logged indiscriminately.
+
+And **open-source software does not mean free operation**. A useful cost model is:
+
+| Cost driver | Examples |
+| --- | --- |
+| Model inference | Planning, code generation, screenshot interpretation, retries |
+| Compute | CPUs, memory, GPU if local vision is used, VM/container runtime |
+| Persistence | Disk images, snapshots, files, backups and agent memory |
+| Network | Remote desktop streaming, downloads, egress |
+| Operations | Monitoring, job queues, failure recovery, abuse prevention |
+| Product services | Authentication, billing, support and any licensed components |
+
+Cua Spaces itself is a bring-your-own-compute product. The cost of the customer's or operator's actual machines is separate from Spaces subscriptions. I would avoid publishing a "cheapest tool" winner without measuring a real workload and its infrastructure costs.
+
+## The stack I would use for a personal-AI SaaS
+
+For an application that combines persistent memory, scheduled work and a computer available to each assistant, I would not bet the whole product on one repository.
+
+~~~text
+Personal AI product
+Chat · identity · memory · schedules · approvals · billing
+                       |
+Agent runtime / orchestrator
+Open Interpreter or a purpose-built runtime
+                       |
+        +--------------+--------------+
+        |              |              |
+    APIs + MCP       Browser        Desktop
+    Direct tools   DOM automation   Cua Driver or agent-desktop
+                                        |
+                              Visual fallback only
+                               UI-TARS / OmniParser
+                       |
+                 Execution boundary
+            Cua SDK + owned VM/container hosts
+                       |
+           Logs · secrets · quotas · snapshots
+~~~
+
+**My preferred starting architecture:**
+
+- **Product layer:** your own user accounts, consent, memory, scheduler, job queue and clear approval rules.
+- **Runtime:** evaluate Open Interpreter for reuse, but preserve the option to run your own agent orchestrator.
+- **Computer layer:** evaluate the MIT-licensed Cua SDK for provisioned environments; compare Cua Driver with agent-desktop for native actions.
+- **Web layer:** use APIs first and a structured browser automation tool such as [agent-browser](https://github.com/vercel-labs/agent-browser) when necessary.
+- **Vision layer:** add UI-TARS or OmniParser only after tests show a recurring failure that visual grounding can fix.
+
+**Important licensing boundary:** I would **not** base a competing commercial computer-as-a-service product on Cua Spaces' FSL components without the required permission or a compatible license. The MIT SDK is a different decision from reusing Spaces' source-available UI, daemon and streaming stack.
+
+## What I would benchmark before choosing
+
+I would test the actual workflow rather than assign made-up star ratings. My initial evaluation would include:
+
+| Test | Workload | Measurements |
+| --- | --- | --- |
+| Native desktop | Finder, editor, settings and file dialogs on the same machine | Task success, median and p95 time, foreground interference |
+| Difficult visual UI | At least 20 inaccessible or custom controls | Grounding accuracy, misclicks, recovery and inference cost |
+| Browser tasks | Authenticated forms, multi-step navigation and downloads | Correct final state, error recovery, credentials handling |
+| Isolation | Ten concurrent users with distinct files and sessions | Cross-tenant leakage, memory/CPU usage, cleanup |
+| Durable jobs | Restart the agent and host during an in-progress task | Resume semantics, duplicate side effects, user notification |
+| License and security | Pin all artifacts and audit external actions | Notices, network exposure, approvals and secrets |
+
+Run the same tasks multiple times with the same model, hardware and starting conditions. Report failures as well as successes, and distinguish **vendor demos** from independently reproduced results. I have not run this head-to-head benchmark for this article.
+
+## Final verdict
+
+- **Best lightweight desktop tool:** **agent-desktop**—provided the app exposes a usable accessibility tree.
+- **Best all-round computer infrastructure starting point:** **Cua SDK + Driver**—especially for agents with dedicated execution environments.
+- **Best ready-made agent workspace:** **Open Interpreter + Interpreter Workstation**.
+- **Best visual GUI specialist:** **UI-TARS Desktop**.
+- **Best screenshot-parsing component:** **OmniParser**.
+- **Best basis for a commercial personal-AI service:** **a product-owned orchestrator + appropriately licensed isolation and desktop/browser components**, not a single all-in-one repo.
+
+The most important engineering question is not *"Which model clicks the right button?"* It is **"Can the system finish a user's task safely, recover from failure, and keep one user's machine and data separate from another's?"**
+
+That is the test I would optimize for.
+
+## Primary sources
+
+Official project repositories and documentation reviewed on **November 3, 2026**:
+
+- [agent-desktop repository and platform support](https://github.com/vercel-labs/agent-desktop)
+- [Open Interpreter runtime](https://github.com/openinterpreter/openinterpreter) and [Interpreter Workstation](https://github.com/openinterpreter/interpreter-workstation)
+- [UI-TARS Desktop and Agent TARS](https://github.com/bytedance/UI-TARS-desktop)
+- [Cua overview](https://github.com/trycua/cua), [SDK documentation](https://cua.ai/docs/cua-sdk), [Driver limitations](https://cua.ai/docs/cua-driver/concepts/platform-support), [Spaces](https://cua.ai/docs/spaces/quickstart) and [license matrix](https://github.com/trycua/cua/blob/main/legal/LICENSING.md)
+- [OmniParser repository](https://github.com/microsoft/OmniParser) and [model licensing details](https://huggingface.co/microsoft/OmniParser-v2.0/blob/main/README.md)
