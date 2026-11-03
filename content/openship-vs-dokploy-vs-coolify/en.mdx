@@ -1,0 +1,217 @@
+---
+title: "OpenShip vs Dokploy vs Coolify (2026): Self-Hosting Compared"
+publishedAt: "2026-11-03"
+author: "Livvux"
+summary: "A neutral, source-based comparison of OpenShip, Dokploy and Coolify: deployments, Docker Compose, clustering, CI/CD, databases, backups, MCP, security and costs."
+---
+
+**[OpenShip](https://github.com/oblien/openship), [Dokploy](https://github.com/Dokploy/dokploy), and [Coolify](https://github.com/coollabsio/coolify) help developers deploy applications on infrastructure they control.** All three reduce the manual work involved in building containers, connecting domains, configuring HTTPS, and operating services. They do not, however, use identical deployment or scaling models.
+
+The key distinction is between **managing several independent servers** and **orchestrating multiple replicas of one application across a cluster**. A platform can support the first without automatically providing the second.
+
+This comparison focuses on documented capabilities and operational trade-offs rather than declaring a universal winner.
+
+*Research checked November 3, 2026. Sources are the projects' documentation, repositories, and pricing pages. This is not a hands-on benchmark, security audit, availability test, or measurement of support quality. Features and prices can change, especially in actively developed releases.*
+
+## Quick comparison
+
+| Area | OpenShip | Dokploy | Coolify |
+| --- | --- | --- | --- |
+| Primary approach | Deployment platform with desktop, web, CLI and SDK interfaces | Docker-centric application management | Self-hosted PaaS for apps, databases and services |
+| Self-hosted option | Free | Free open-source edition | Free, full-featured self-hosted edition |
+| User interface | Web dashboard and desktop app | Web dashboard | Web dashboard |
+| Docker and Compose | Supported | Supported | Supported |
+| Git-based deployments | Supported | Supported | Supported |
+| Multiple independent servers | Supported | Supported | Supported |
+| Cluster-oriented deployment | K3s for supported app workloads; documented limits | Docker Swarm nodes and application replicas | Multi-server app deployments; external load balancing |
+| Reverse proxy | OpenResty | Traefik | Traefik by default; Caddy option |
+| CI and automation | Built-in Actions engine, CLI, API, SDK | Webhooks, API and external CI | Webhooks, CLI, API and external CI |
+| AI-agent integration | Integrated MCP endpoint | Separate official MCP server | Integrated MCP endpoint |
+| Database and volume backups | Documented backup and restore workflows | Database, named-volume and control-plane backups | Database, storage and control-plane backups |
+| Optional managed offering | OpenShip Cloud | Dokploy Cloud / Enterprise | Coolify Cloud |
+
+A checkmark alone would hide meaningful differences. For example, the three backup implementations have different supported database engines, storage types, and recovery procedures. Their multi-server features also do different jobs.
+
+## What each platform is designed to do
+
+### OpenShip: one deployment system through several interfaces
+
+OpenShip combines a browser dashboard, desktop application, command-line interface, REST API, and JavaScript/TypeScript SDK. It can discover application configuration, build and deploy workloads, manage domains, and operate databases and backups. Its documentation also describes an integrated mail server.
+
+An unusual part of OpenShip is **[Actions](https://openship.io/docs/guides/actions)**. It can execute GitHub-compatible workflows on authorized runners. Workflows managed independently by OpenShip have compatibility boundaries; they are not guaranteed to reproduce every GitHub Actions feature.
+
+For multi-node use, OpenShip documents **[K3s cluster setup and application replicas](https://openship.io/features/autoscaling-load-balancing)**. This is not blanket Kubernetes support for every workload. Its documentation explicitly says that policy-driven autoscaling, automatic gateway failover, and scaling Compose applications through the Kubernetes application path are not implemented. Some Compose scaling workflows use connected Docker Swarm managers instead. See its [cluster limitations](https://openship.io/docs/guides/mcp-clusters-and-scaling).
+
+This makes the platform worth evaluating when desktop administration, programmable deployment workflows, or experimentation with its cluster tooling is important. The trade-off is a broader system whose specific features and release maturity should be verified before production adoption.
+
+### Dokploy: Docker-oriented deployments with an explicit Swarm path
+
+Dokploy manages applications, databases, Docker Compose stacks, domains, and deployment workflows. Its documented [deployment options](https://docs.dokploy.com/docs/core/deployment-options) clearly distinguish three configurations:
+
+- **Dokploy server:** the management interface and applications share a machine.
+- **Remote servers:** independent Docker hosts are managed over SSH. They are not automatically joined into one cluster.
+- **Swarm nodes:** servers participate in a Docker Swarm cluster, where replicas can run on multiple nodes and Traefik distributes traffic.
+
+The Swarm option is useful only when replicas across hosts are needed. It also introduces infrastructure obligations: a registry reachable by the nodes, compatible architectures, working networking, and a storage design for stateful services. Dokploy's documentation notes that automatic storage cleanup is not performed on additional Swarm nodes.
+
+Dokploy also provides [GitHub pull-request preview deployments](https://docs.dokploy.com/docs/core/applications/preview-deployments). Its documentation cautions against enabling previews indiscriminately for public repositories because untrusted changes can trigger builds on the server.
+
+For organizations, distinguish the free self-hosted edition from paid enterprise capabilities such as SSO, SCIM, custom roles, and audit logs. See the [official edition comparison](https://docs.dokploy.com/docs/core/differences).
+
+### Coolify: app and server management without requiring a cluster
+
+Coolify coordinates deployment to connected Docker servers over SSH. As explained in [How Coolify works](https://coolify.io/docs/core/how-coolify-works), applications run on the destination hosts; the Coolify control plane does not proxy all application requests through itself.
+
+Its default proxy is Traefik, and Caddy is an integrated alternative. Both choices are documented in the [proxy overview](https://coolify.io/docs/core/networking/proxy/overview).
+
+Coolify supports [multi-server application deployments](https://coolify.io/docs/core/infrastructure/scaling/overview), in which an image can be deployed to attached application servers. An external load balancer is required to distribute public requests across those servers and handle unhealthy instances. This is different from managing a single shared cluster.
+
+Coolify also has legacy Docker Swarm functionality, but the project explicitly [deprecates Swarm for new deployments](https://coolify.io/docs/core/infrastructure/scaling/docker-swarm) and plans its removal in version 5. A new installation should not be designed around that legacy integration.
+
+Coolify's approach can be a good fit where independent Docker hosts and conventional deployment workflows are enough. Organizations requiring automated cross-node scheduling must plan that layer separately.
+
+## Deployment workflows and CI/CD
+
+All three can deploy containerized applications and Docker Compose configurations, but the build and automation experience differs.
+
+| Question | OpenShip | Dokploy | Coolify |
+| --- | --- | --- | --- |
+| Deploy from Git? | Yes | Yes | Yes |
+| Deploy a prebuilt container? | Yes | Yes | Yes |
+| Use Docker Compose? | Yes | Yes | Yes |
+| Automate on source changes? | Supported | Supported | Supported |
+| Run CI workflow jobs inside the platform? | OpenShip Actions | Normally through external CI | Normally through external CI |
+| Integrate with scripts or agents? | REST API, CLI, SDK, MCP | API and official MCP package | API, CLI and built-in MCP |
+
+For an existing application, preserving a known-good Dockerfile and Compose configuration can be more predictable than relying entirely on automatic framework detection. A separate CI pipeline can test the application, publish a versioned image, and hand that image to the deployment platform.
+
+**Deployment rollback is not database rollback.** Reverting a container image does not undo schema changes or restore lost data. If a release changes persistent state, the migration and recovery procedure must be designed separately. OpenShip addresses this distinction in its [database migration guide](https://openship.io/docs/guides/database-migrations).
+
+## Multi-server management is not high availability
+
+This is the comparison that most strongly affects architecture.
+
+**A single VPS:** Any of these tools can be evaluated without introducing a cluster. The limiting factors will often be memory, CPU, disk, application design, and backup quality rather than the dashboard.
+
+**Several independent servers:** All three can manage workloads on different machines. This is useful for separating environments, customers, regions, or databases. It does not imply that a failed service restarts elsewhere.
+
+**Replicas of the same app across machines:** Dokploy documents a dedicated Swarm workflow. OpenShip documents K3s replication for supported application types. Coolify documents multi-server application deployment paired with external load balancing. These paths are not interchangeable.
+
+**Stateful applications:** PostgreSQL, Redis, and uploaded files introduce additional constraints. Replicating a web process is much easier than coordinating database writes, shared storage, failover, and consistent recovery.
+
+None of those designs should be called automatically highly available merely because two servers are present. Test what happens when a worker, the load balancer, a database primary, or the management server fails.
+
+## Databases, persistent storage and backups
+
+All three platforms provide database-related features. What matters is the **scope of the backup** and whether the restore process has been tested.
+
+### OpenShip
+
+OpenShip documents scheduled backups, recovery, and **pre-deployment backup workflows**. Its cluster documentation also covers managed PostgreSQL and Redis topologies with explicit restrictions and recovery operations. These facilities should not be confused with a managed database service that eliminates all operational responsibility.
+
+### Dokploy
+
+Dokploy supports database backups and separate [control-plane backups](https://docs.dokploy.com/docs/core/backups). Its [volume backups](https://docs.dokploy.com/docs/core/volume-backups) target **Docker named volumes**, not arbitrary host bind mounts. The documentation also explains consistency risks when a running container writes during a volume backup.
+
+### Coolify
+
+Coolify documents scheduled [database backups](https://coolify.io/docs/databases/backups) with S3-compatible destinations for supported engines. Its database-backup workflow does **not** cover Redis, Dragonfly, or KeyDB; those need their own persistence and backup procedure. Coolify's control-plane backup is separate from the contents of application databases and volumes.
+
+For any of the three, a reasonable production recovery checklist includes:
+
+1. An off-server database backup with a clear retention policy.
+2. A separate copy of persistent files and uploads.
+3. A backup of the deployment platform's configuration and required recovery secrets.
+4. A successful restore into a disposable environment.
+5. A documented recovery-time objective and an owner for failures.
+
+An S3-compatible backup destination is not, by itself, proof that data can be restored.
+
+## Security, access and MCP for AI agents
+
+Deployment tools are privileged infrastructure software. A compromised dashboard, token, runner, or Docker host can have consequences far beyond one application.
+
+All three expose automation capabilities, including MCP, but their implementations differ:
+
+- **[OpenShip MCP](https://openship.io/docs/mcp)** is integrated and supports OAuth and permission-scoped tokens; tools are checked against the same authorization model as its API.
+- **[Dokploy MCP](https://github.com/Dokploy/mcp)** is an official separate package communicating with the Dokploy API. It offers tool filters and optional response-field redaction. Effective access still depends on the API credential and deployment configuration.
+- **[Coolify MCP](https://coolify.io/docs/mcp/how-mcp-works)** is integrated, uses team-bound API tokens, and restricts operations according to token permissions. It must be explicitly enabled on self-hosted instances.
+
+For automated administration, use dedicated, least-privilege credentials. A read-only agent that lists deployments is a different risk from one authorized to delete resources or modify secrets. Keep management interfaces behind appropriate network controls, limit SSH access, and test updates before applying them to production.
+
+## Open source, editions and ongoing costs
+
+**Self-hosted software is not the same as free infrastructure.** All three offer a free self-hosting path, but CPU, RAM, disks, networking, backup storage, and operational time still cost money.
+
+| Question | OpenShip | Dokploy | Coolify |
+| --- | --- | --- | --- |
+| Free self-hosted deployment path? | Yes | Yes, OSS edition | Yes |
+| Paid managed option? | OpenShip Cloud | Dokploy Cloud | Coolify Cloud |
+| Edition considerations | Check packaged components and Cloud terms | Some enterprise controls require a paid license | Official self-hosted pricing says all platform features are included |
+| What still needs budgeting? | Servers, backups, operations | Servers, backups, operations | Servers, backups, operations |
+
+OpenShip describes its own code as Apache-2.0 while noting that bundled third-party components retain their licenses. Dokploy separates OSS functionality from enterprise licensing. Coolify offers a free self-hosted edition with its feature set available, according to its [pricing page](https://coolify.io/pricing). For Dokploy, use the [pricing](https://dokploy.com/pricing) and [edition](https://docs.dokploy.com/docs/core/differences) pages together.
+
+The paid services are **not identical products**: some primarily manage a control plane connected to your own servers, while others may include hosted compute. Compare the actual service boundary and infrastructure bill rather than only the advertised monthly fee. Refer to [OpenShip pricing](https://openship.io/pricing) for its current Cloud offer.
+
+## Which one fits which requirement?
+
+Instead of a universal ranking, use the specific requirement to narrow the shortlist.
+
+| Requirement | Platform to examine closely | Reason |
+| --- | --- | --- |
+| Desktop app, SDK and integrated workflow execution | OpenShip | Multiple interfaces and built-in Actions |
+| Docker Swarm and replicas across nodes | Dokploy | Documented Swarm cluster workflow |
+| Independent Docker hosts with a managed deployment dashboard | Coolify or Dokploy | Established standalone and remote-host models |
+| K3s deployment for supported workloads | OpenShip | Documented cluster setup with explicit limitations |
+| Self-hosted platform without paid feature tiers for the core dashboard | Coolify or OpenShip | Free self-hosted path; review licensing boundaries |
+| Enterprise identity provisioning and custom roles | Dokploy Enterprise | Dedicated paid organization controls |
+| AI-agent access | All three | Different MCP implementation and permission models |
+
+These are **starting points for evaluation**, not scores from a controlled comparison. A deployment platform with fewer features can be a better operational fit if it reduces the components a team must maintain.
+
+## A practical evaluation before migrating
+
+Use the **same application and server class** for each candidate:
+
+1. Deploy one production-like application from Git, preferably using its existing Dockerfile or Compose file.
+2. Configure a real domain, HTTPS, secrets, health checks, and a repeatable release.
+3. Add a persistent database and uploaded files; run an off-server backup and restore it elsewhere.
+4. Test rollback, server reboot, failed deployment, expired credentials, and loss of the management dashboard.
+5. If a cluster is required, repeat the test with multiple nodes and deliberately terminate one worker and one stateful dependency.
+
+Record total operator time, failure modes, permissions, recovery results, and actual infrastructure costs. Do not interpret a successful demo deployment as proof of high availability.
+
+## Frequently asked questions
+
+### Do I need Docker Swarm or Kubernetes to use these tools?
+
+No. A single Linux server running ordinary Docker workloads is sufficient for common deployment scenarios. Introduce orchestration only when its scheduling and replication benefits justify the added complexity.
+
+### Can I move an existing Docker Compose application?
+
+All three support Compose-based workflows, but their networking, proxy labels, volumes, secrets, and deployment lifecycles differ. Review the Compose definition and test storage persistence before switching platforms.
+
+### Does multi-server support mean automatic failover?
+
+No. Failover depends on how traffic is routed, whether replicas are actually running on separate hosts, how state is shared, and whether failed components are detected and replaced.
+
+### Does MCP make unattended deployments safe?
+
+No. MCP is an interface to privileged operations, not a safety guarantee. Apply token scoping, secret management, approval gates, and change logging just as you would for scripts or CI.
+
+## Bottom line
+
+OpenShip, Dokploy, and Coolify cover substantial common ground, but their differences matter most in **deployment control, cluster design, and operations**. OpenShip combines a broad set of developer interfaces and newer cluster capabilities; Dokploy provides an explicit Docker Swarm path; Coolify focuses on managing applications across independent Docker infrastructure.
+
+There is no defensible overall winner without a defined workload and a comparable test. Choose the platform whose documented architecture matches the required topology, then verify upgrades, backups, recovery, and day-to-day operation on your own infrastructure.
+
+## Sources and scope
+
+Primary sources reviewed for this article:
+
+- [OpenShip repository](https://github.com/oblien/openship), [Actions](https://openship.io/docs/guides/actions), [K3s/replicas](https://openship.io/features/autoscaling-load-balancing), and [MCP](https://openship.io/docs/mcp).
+- [Dokploy repository](https://github.com/Dokploy/dokploy), [deployment options](https://docs.dokploy.com/docs/core/deployment-options), [editions](https://docs.dokploy.com/docs/core/differences), and [official MCP package](https://github.com/Dokploy/mcp).
+- [Coolify repository](https://github.com/coollabsio/coolify), [architecture](https://coolify.io/docs/core/how-coolify-works), [multi-server overview](https://coolify.io/docs/core/infrastructure/scaling/overview), and [Swarm deprecation](https://coolify.io/docs/core/infrastructure/scaling/docker-swarm).
+
+*This is a documentation-based comparison as of November 3, 2026, not an independent deployment or stress test. The comparison does not claim equal feature maturity, independent security assurance, universal zero-downtime deployment, or a benchmarked ranking. Check the linked documentation before making infrastructure decisions.*
