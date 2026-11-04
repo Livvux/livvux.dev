@@ -1,0 +1,214 @@
+---
+title: "Wi-Fi Can See Through Walls: The Real Science Behind CSI and RuView"
+publishedAt: "2026-11-04"
+author: "Livvux"
+summary: "Wi-Fi sensing through walls is real. Explore CSI physics, MIT's research, DensePose, RuView's actual capabilities, ESP32 experiments, limitations and privacy risks."
+---
+
+**A wall blocks visible light. It does not necessarily block Wi-Fi.** And the radio waves that cross a room carry more information than the messages sent over them: they also reveal how the environment has changed. With suitable hardware and signal processing, those changes can indicate whether someone is present, moving or breathing—even when that person is outside a camera's view.
+
+That is not science fiction. Researchers have demonstrated through-wall sensing for more than a decade. But there is a crucial difference between **detecting movement behind a wall**, **estimating a human skeleton from wireless measurements**, and **producing a camera-like image of somebody in another room**. The first is established; the second is an active research area; the third is what the viral headlines often imply, not what an ordinary Wi-Fi router provides.
+
+The open-source project [RuView](https://github.com/ruvnet/RuView) makes the subject accessible to developers. It also makes a useful case study in how to separate real radio physics, reproducible benchmarks, simulations and unfinished product capabilities.
+
+*Research checked November 4, 2026. This article draws on primary research, IEEE and Espressif documentation, RuView's own published limitations, and two technical explainers. It is an evidence review, not an independent hardware test of RuView.*
+
+## The short answer: what can Wi-Fi actually detect?
+
+| Capability | State of the evidence | Important qualification |
+| --- | --- | --- |
+| Movement and presence | Demonstrated in research, including through some walls | Detection depends on material, signal paths, hardware, calibration and noise |
+| Direction, rough location and occupancy | Demonstrated with suitable radio geometry | Not equivalent to locating every person precisely in every room |
+| Breathing rate | Demonstrated in controlled Wi-Fi CSI studies | Subtle movement can be lost in other movement or interference |
+| Heart rate | Possible under constrained conditions | Much harder to measure reliably; not automatically medical-grade |
+| Activity and fall classification | Studied using learned models and temporal signals | Real-world false alarms require separate evaluation |
+| 17-keypoint body pose | Demonstrated on particular datasets and hardware setups | Benchmark accuracy does not transfer automatically to a cheap live sensor |
+| Faces, clothing, or photographic video | Not supplied by ordinary Wi-Fi CSI | A skeleton or heatmap is a statistical reconstruction, not a photograph |
+
+The key word is **inference**. The receiver measures changes in electromagnetic propagation; an algorithm estimates what may have caused them.
+
+## 1. Why a Wi-Fi signal contains information about people
+
+Wi-Fi devices transmit radio-frequency electromagnetic waves. At 2.4 GHz, their wavelength is approximately 12.5 cm. Walls, furniture, floors and human bodies change how those waves travel. A receiver observes a mixture of direct, reflected, scattered and attenuated paths, a phenomenon called **multipath propagation**.
+
+Consider a room with a transmitter and a receiver. When nothing moves, its multipath pattern may be relatively stable. When a person walks between two signal paths, the amplitude and phase of received radio components change. Even small movements, such as the rise and fall of a chest during breathing, may create periodic changes that a sensitive receiver can measure.
+
+A simplified description of one Wi-Fi subcarrier is:
+
+`H[k,t] = A[k,t] × e^(jφ[k,t])`
+
+Here, `A` is the measured amplitude, `φ` is the phase, `k` identifies a frequency subcarrier and `t` is time. The value is complex: it encodes more than a single signal-strength number. Comparing these values across time, frequencies and antenna pairs is the foundation of Wi-Fi sensing.
+
+There are two important constraints. First, **penetration is not unlimited**: metal and reinforced structures can obstruct or heavily attenuate signals, while ordinary building materials vary in loss. Second, the radio measurement does not tell you directly *which* object moved. Humans, pets, fans, doors and changes in equipment can all affect the channel.
+
+For a clear introduction to these physical effects, see [Digital Intelligence's CSI explainer](https://www.digitalintelligence.at/wifi-signals-can-see-you-how-csi-sensing-works/) and [HackproofHacks' hands-on discussion](https://hackproofhacks.com/blog/seeing-through-walls-with-wifi-csi/).
+
+## 2. RSSI versus CSI: why your normal router is not an X-ray camera
+
+**RSSI (Received Signal Strength Indicator)** is a coarse measurement of received signal power. It can help detect changes but discards much of the structure needed for richer sensing.
+
+**CSI (Channel State Information)** measures a channel's response across multiple subcarriers and, on supported hardware, antenna combinations. Modern Wi-Fi uses OFDM modulation, which divides a channel into multiple frequency components. The channel estimates the receiver uses for communication can also become sensing inputs—if the chipset and driver expose them.
+
+A typical processing chain looks like this:
+
+**Transmitter → radio propagation through the space → CSI-capable receiver → phase/amplitude cleanup → temporal features → classifier or pose model → estimate with uncertainty.**
+
+Engineers may use filters, principal-component analysis, spectral methods such as the fast Fourier transform (FFT), or trained neural networks. A respiration estimate, for example, may depend on a stable, periodic component in a particular frequency band. A pose model is more demanding: it must learn a mapping from many noisy radio measurements to plausible body joints or surface correspondences.
+
+This explains the hardware misconception. **Owning a Wi-Fi router and a laptop is not the same as having access to usable raw CSI.** Most ordinary laptop interfaces expose coarse network measurements rather than the CSI streams required by the experimental systems discussed here. Dedicated receivers, supported chipsets or modified firmware are usually necessary. Espressif publishes an official [ESP-CSI toolkit](https://github.com/espressif/esp-csi) for compatible ESP32 devices.
+
+## 3. The research: this did not start with a viral GitHub repository
+
+### 2013: MIT's Wi-Vi demonstrated the principle
+
+In [*See Through Walls with Wi-Fi!*](https://www.media.mit.edu/publications/see-through-walls-with-wifi/), Fadel Adib and Dina Katabi described a system that detected moving people and simple gestures through walls using reflected radio signals. It was a research prototype built with software-defined radios, not a feature silently available on every home router.
+
+### 2018: RF-Pose recovered human skeletons from radio signals
+
+MIT researchers published [*Through-Wall Human Pose Estimation Using Radio Signals*](https://openaccess.thecvf.com/content_cvpr_2018/html/Zhao_Through-Wall_Human_Pose_CVPR_2018_paper.html) at CVPR 2018. They trained a model using synchronized camera-based supervision; after training, it estimated 2D human poses using radio input alone, including scenarios with people obscured by walls. **Training with a camera does not mean the camera must be present at inference time.** The system nevertheless used a purpose-built RF sensing setup. It was not a demonstration that an arbitrary stock router could do the same.
+
+### 2022/2023: *DensePose From WiFi* went further
+
+The frequently cited paper [*DensePose From WiFi*](https://arxiv.org/abs/2301.00250), by Jiaqi Geng, Dong Huang and Fernando De la Torre, was submitted on **December 31, 2022** and circulated as a 2023 preprint. Its model predicted body-part regions and dense surface coordinates from the amplitude and phase of Wi-Fi signals, together with 17 human keypoint heatmaps.
+
+Its experimental setup matters:
+
+- **Three transmitting antennas and three receiving antennas**, yielding nine antenna links.
+- **30 measured subcarriers and 100 CSI samples per second**, with five successive CSI samples aligned to each 20-fps video frame.
+- **16 spatial layouts**, with a total of **eight participants** and between one and five people in individual recordings.
+- Camera-based models produced **pseudo-ground-truth labels during training**. At inference, the pose model used Wi-Fi signals alone.
+
+This is serious experimental work, but its published numbers are more informative than the abstract's optimistic language:
+
+| Detection average precision (AP) | Wi-Fi model | Image baseline |
+| --- | ---: | ---: |
+| Same layout | 43.5 | 84.7 |
+| Previously unseen layout | 27.3 | 60.6 |
+
+*Source: Tables 3 and 7 of [DensePose From WiFi](https://arxiv.org/html/2301.00250v1). AP is a detection metric, not a percentage of frames in which a complete skeleton is correct. The image baseline and Wi-Fi model were evaluated against automatically generated labels.*
+
+The decline from **43.5 to 27.3 AP** when testing an unseen layout is particularly important. It demonstrates a generalization problem: the radio signature of a body is entangled with the room, furniture, antennas and their placement. The authors also reported failures with uncommon poses and scenes containing three or more people.
+
+**An important distinction:** this paper establishes Wi-Fi-based dense pose inference in its reported indoor settings. It should not be presented as a standalone measurement of reliable skeleton tracking *through arbitrary walls*. For direct through-wall pose evidence, the 2018 RF-Pose work is the more appropriate citation.
+
+### 2023: MM-Fi made broader benchmarking possible
+
+The peer-reviewed [MM-Fi dataset paper](https://proceedings.neurips.cc/paper_files/paper/2023/hash/3baf7a39d07e9f4f1e258a412df94521-Abstract-Datasets_and_Benchmarks.html), published in the NeurIPS 2023 Datasets and Benchmarks track, introduced more than 320,000 synchronized frames across five sensing modalities, 40 subjects and 27 activity categories. It offers an important reference for evaluating wireless human sensing—but the way a dataset is split between training and testing remains just as important as the headline score.
+
+## 4. RuView: an open-source implementation, with real caveats
+
+[RuView](https://github.com/ruvnet/RuView) combines Wi-Fi sensing software, ESP32 firmware, a Rust-based processing pipeline, dashboards, model workflows and integrations. Its documentation describes presence and motion sensing, vital-sign heuristics, occupancy, pose research, local automation and various hardware adapters.
+
+The interesting question is not whether the underlying field is real. It is **which RuView capabilities are backed by measurements on which devices**.
+
+| RuView component or claim | What the project currently documents |
+| --- | --- |
+| Raw CSI and signal processing | ESP32 capture paths and a deterministic DSP pipeline are documented; the verification script tests signal processing, not human-pose accuracy |
+| Encoder and presence-related model | Published weights exist; **82.3% held-out temporal-triplet accuracy** measures an embedding task, **not** a universally validated 82.3% occupied/empty detection rate |
+| Research pose model | The project reports **82.69% torso-PCK@20 on MM-Fi** under a particular random-split evaluation protocol, with separate published model weights |
+| Live single-ESP32 17-joint pose | The project's first-cut on-device model reports **3.0% PCK@20** on its stated holdout; its documented inference path still contains a placeholder returning zero confidence |
+| Breathing and heart rate | The sensing server employs heuristic digital signal processing; those outputs should not be treated as clinically validated |
+| Browser demos and default Docker fallback | Can display synthetic or simulated measurements. An animated skeleton is **not proof** of live radio sensing |
+
+These qualifications come directly from the project's [user guide](https://github.com/ruvnet/RuView/blob/main/docs/user-guide.md), [proof-of-capabilities document](https://github.com/ruvnet/RuView/blob/main/docs/proof-of-capabilities.md), and [pose benchmark notes](https://github.com/ruvnet/RuView/blob/main/docs/benchmarks/pose-estimation-cog.md).
+
+**Why the two pose scores are not contradictory:** they refer to different models, data formats, hardware assumptions and evaluation protocols. A model that performs well on recorded multi-antenna MM-Fi data does not automatically work on a live, single-antenna ESP32 stream. Simply resizing the input tensor cannot reconstruct missing spatial information.
+
+RuView's documentation also records corrections to earlier overstated performance figures, including a retracted “100% presence” claim. Publishing corrections is useful, but a reproducible DSP checksum or model checkpoint is not a substitute for an independent, real-world through-wall evaluation.
+
+My assessment: **RuView is a compelling open-source research and experimentation platform, not yet evidence of a universally reliable, inexpensive X-ray-like room scanner.** Its strongest contribution is the accessible stack and increasingly explicit separation of prototype, benchmark and supported feature.
+
+## 5. What would you need to try it yourself?
+
+There are three useful levels of experimentation:
+
+| Setup | What it is useful for | What not to assume |
+| --- | --- | --- |
+| Standard computer, without CSI access | Exploring a simulated interface or coarse RSSI changes | Real CSI sensing, accurate pose or breathing from the demo alone |
+| CSI-capable ESP32 board and a suitable transmitter | Recording raw CSI, experimenting with motion and presence in a controlled space | Reliable vital signs or 17-joint pose in every room |
+| Multiple CSI-capable nodes or a research NIC | More spatial viewpoints; serious activity or pose research with recorded ground truth | Automatic generalization to other people, rooms or wall types |
+
+[Espressif's ESP-CSI examples](https://github.com/espressif/esp-csi/tree/master/examples) are a useful place to start with genuine received measurements rather than visualizations. [HackproofHacks](https://hackproofhacks.com/blog/seeing-through-walls-with-wifi-csi/) describes a low-cost hands-on approach; treat its example measurements as setup-dependent, not guaranteed outcomes for every ESP32 or building.
+
+### Start by clearly separating simulation and hardware
+
+RuView documents a Docker demonstration. To make the test mode explicit, a simulation-only invocation looks like this:
+
+~~~bash
+# Visualization and software pipeline only: NOT live Wi-Fi sensing.
+docker pull ruvnet/wifi-densepose:latest
+export RUVIEW_API_TOKEN="$(openssl rand -hex 32)"
+docker run --rm -p 127.0.0.1:3000:3000 \
+  -e RUVIEW_API_TOKEN -e CSI_SOURCE=simulated \
+  ruvnet/wifi-densepose:latest
+~~~
+
+Open `http://localhost:3000` and inspect the interface. **Everything in that session is simulated unless a real, authenticated and configured CSI input is connected.** RuView's [live-hardware instructions](https://github.com/ruvnet/RuView/blob/main/docs/user-guide.md) should be followed separately, including its source restrictions and API-token controls. Do not expose a sensing endpoint publicly just to make a local demo easier.
+
+For a defensible real-world experiment, recruit willing participants, capture genuine CSI with timestamps, record a separate ground-truth log, and evaluate empty-room and occupied-room sessions across different days. Then change the layout or introduce a permitted interior wall and repeat. Report **false positives, false negatives, latency, distance and wall material**; never judge accuracy by how persuasive the visualization looks. If studying breathing, compare against a consensually collected reference and do not infer clinical validity from a matching spectral peak.
+
+## 6. What makes through-wall sensing succeed or fail?
+
+The answer is not a universal range in meters. Results depend on the **link budget**, transmitter–receiver geometry, antenna count, channel bandwidth, multipath, interference, building material and whether the subject is moving. A single sensing link can observe strong motion while failing to distinguish two people. A sensor that works in an empty office may give false positives near a rotating fan or miss subtle respiration when several people move.
+
+Walls are especially variable. Drywall and wood may permit useful radio propagation; thick reinforced concrete, metalized insulation and steel can attenuate or redirect it dramatically. Frequency and geometry also matter. A claim such as “works through a 30 cm wall” cannot be generalized without stating the material, setup and measured conditions.
+
+The biggest software limitation is often **domain shift**: a model can learn a room's peculiar reflections rather than a transferable representation of human motion. The DensePose study's unseen-layout results show why testing on new rooms and new subjects matters.
+
+## 7. The applications are useful—and the privacy risk is real
+
+Potential legitimate uses include contactless occupancy-based lighting, non-camera monitoring with informed consent, research on movement and rehabilitation, smart-building automation, and safety systems. Fall alerts and vital-sign estimates are attractive possibilities, but they require validation before being relied upon for health or emergency decisions.
+
+The same capability can become covert surveillance. A system that records where an identifiable person moves, when they sleep, or how they breathe can process **personal data even without capturing a photograph**. Under the EU's [GDPR framework](https://commission.europa.eu/law/law-topic/data-protection/information-business-and-organisations/application-gdpr_en), data about identifiable people must be assessed under the applicable legal rules; whether particular measurements fall within the GDPR and which lawful basis applies depends on the actual deployment.
+
+Research on [one-sided through-wall Wi-Fi occupancy monitoring](https://ieeexplore.ieee.org/document/9500267) also shows why it is inadequate to imagine that only the people operating a building's network can collect useful radio observations. The experiments have specific constraints, but the surveillance threat is not purely hypothetical.
+
+**Encryption is not the same as radio invisibility.** WPA2 and WPA3 protect the confidentiality of network traffic under their respective security assumptions; they do not erase the physical multipath effects of transmitted radio signals. Conversely, a nearby stranger does **not** automatically obtain a reliable skeleton by pointing a normal phone at your wall. The threat depends on capable hardware, signal access, placement and processing.
+
+For responsible deployments, the minimum design principles are straightforward: inform the people affected, establish a lawful purpose, collect only what is necessary, restrict access, store results locally where practical, set retention limits and make disabling the sensor easy. In shared or sensitive spaces, perform a privacy assessment before deployment. For experiments, use only spaces and participants for which you have authorization.
+
+## 8. IEEE 802.11bf: the technology is now part of Wi-Fi standardization
+
+There is another reason this is worth following beyond a GitHub trend: the IEEE published **[802.11bf-2025](https://standards.ieee.org/ieee/802.11bf/11574/)** on **September 26, 2025**. The amendment adds enhancements for WLAN sensing, including operation in spectrum below 7.125 GHz and above 45 GHz.
+
+That is an important signal of engineering maturity. It does **not** mean every Wi-Fi 7 router automatically exposes CSI, supports through-wall pose tracking, or provides a consumer-facing sensing API. Standards describe capabilities and mechanisms; products still need compatible radios, firmware, software and validation.
+
+## Frequently asked questions
+
+### Can an ordinary Wi-Fi router see me through a wall?
+
+Not like a camera. Its radio waves can contribute to a sensing setup, but useful CSI usually requires a compatible receiver and processing software. A typical unmodified router does not display a map of people in adjacent rooms.
+
+### Can this work without a camera or wearable?
+
+Yes, at inference time. RF-Pose and Wi-Fi-based DensePose research use radio measurements after models are trained. Some training procedures use synchronized camera labels; that is different from needing a camera during operation.
+
+### Can Wi-Fi identify exactly who is in the room?
+
+Detecting presence, estimating a pose and identifying a specific person are three different problems. Identification would need separate evidence and evaluation; radio sensing does not ordinarily reveal someone's face or clothing.
+
+### Is RuView's impressive skeleton demo evidence of live tracking?
+
+Not on its own. Check whether the data source is genuine CSI, whether the displayed pose comes from a trained compatible model, and whether its accuracy has been measured on a relevant holdout. RuView explicitly distinguishes its MM-Fi benchmark from its below-target live single-ESP32 path.
+
+### Is switching to WPA3 enough to prevent Wi-Fi sensing?
+
+No. Protecting packet contents does not eliminate measurable radio propagation. Whether a particular observer can make useful inferences remains strongly dependent on their hardware and environment.
+
+## Conclusion: the science is real; the claims still need testing
+
+**Wi-Fi through-wall sensing is real. Universal, photographic “seeing through walls” is not.** MIT's work established through-wall RF sensing years ago. Wi-Fi CSI research has since demonstrated impressive—and imperfect—human pose inference. RuView opens much of this technology to developers, while its own documentation shows why simulated demos, research benchmarks and real-time hardware performance must never be treated as interchangeable.
+
+The most interesting question is no longer *whether radio waves can sense people*. It is **how accurately, under what conditions, at what cost—and with whose consent**.
+
+## Sources and further reading
+
+- [Fadel Adib and Dina Katabi, *See Through Walls with Wi-Fi!* (2013)](https://www.media.mit.edu/publications/see-through-walls-with-wifi/) — original through-wall movement and gesture research.
+- [Zhao et al., *Through-Wall Human Pose Estimation Using Radio Signals* (CVPR 2018)](https://openaccess.thecvf.com/content_cvpr_2018/html/Zhao_Through-Wall_Human_Pose_CVPR_2018_paper.html) — purpose-built radio pose sensing.
+- [Geng, Huang and De la Torre, *DensePose From WiFi* (arXiv:2301.00250)](https://arxiv.org/abs/2301.00250) — Wi-Fi-based dense pose architecture, methodology and evaluation tables.
+- [Yang et al., *MM-Fi* (NeurIPS 2023)](https://proceedings.neurips.cc/paper_files/paper/2023/hash/3baf7a39d07e9f4f1e258a412df94521-Abstract-Datasets_and_Benchmarks.html) — multimodal benchmark dataset.
+- [RuView repository](https://github.com/ruvnet/RuView), [user guide](https://github.com/ruvnet/RuView/blob/main/docs/user-guide.md) and [capability evidence](https://github.com/ruvnet/RuView/blob/main/docs/proof-of-capabilities.md) — implementation, published limitations and project-reported results.
+- [Espressif ESP-CSI](https://github.com/espressif/esp-csi) — supported hardware and measurement examples.
+- [IEEE 802.11bf-2025](https://standards.ieee.org/ieee/802.11bf/11574/) — published WLAN sensing amendment.
+- [HackproofHacks: *Seeing Through Walls With WiFi*](https://hackproofhacks.com/blog/seeing-through-walls-with-wifi-csi/) and [Digital Intelligence: *WiFi Signals Can See You*](https://www.digitalintelligence.at/wifi-signals-can-see-you-how-csi-sensing-works/) — accessible technical explainers; practical claims should be read in light of experimental limits.
+- [European Commission: Application of the GDPR](https://commission.europa.eu/law/law-topic/data-protection/information-business-and-organisations/application-gdpr_en) — personal-data criteria relevant to deployment.
