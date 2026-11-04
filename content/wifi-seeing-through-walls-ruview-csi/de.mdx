@@ -1,0 +1,216 @@
+---
+title: "Mit WLAN durch Wände sehen: Die Wissenschaft hinter CSI und RuView"
+publishedAt: "2026-11-04"
+author: "Livvux"
+summary: "Menschen durch Wände mit WLAN erkennen ist real. Ein fundierter Blick auf CSI, MIT-Forschung, DensePose, RuView, ESP32-Experimente, Grenzen und Datenschutz."
+---
+
+**Eine Wand blockiert sichtbares Licht. WLAN-Funkwellen dagegen können sie unter bestimmten Bedingungen durchdringen.** Dabei übertragen die Signale nicht nur Daten zwischen Geräten: Ihre Ausbreitung verrät auch etwas darüber, was sich in einem Raum verändert. Mit geeigneter Hardware und Signalverarbeitung lässt sich daraus ableiten, ob sich ein Mensch im Raum befindet, bewegt oder sogar atmet – auch dann, wenn keine Kamera ihn sehen kann.
+
+Das ist keine Science-Fiction. Die Forschung demonstriert solche Verfahren seit mehr als zehn Jahren. Allerdings sind drei Dinge sorgfältig zu unterscheiden: **Bewegungen hinter einer Wand erkennen**, **aus Funksignalen die Körperhaltung schätzen** und **ein kamerähnliches Bild eines Menschen im Nachbarzimmer erzeugen**. Das Erste ist wissenschaftlich belegt, das Zweite ein anspruchsvolles Forschungsgebiet. Das Dritte suggerieren manche viralen Überschriften, obwohl gewöhnliche WLAN-Router genau das nicht leisten.
+
+Das Open-Source-Projekt [RuView](https://github.com/ruvnet/RuView) macht diese Technik für Entwickler greifbar. Es ist zugleich ein gutes Beispiel dafür, warum man echte Funkmessungen, Benchmarks, Simulationen und noch nicht ausgereifte Funktionen auseinanderhalten muss.
+
+*Recherche-Stand: 4. November 2026. Grundlage sind wissenschaftliche Originalarbeiten, Dokumentationen von IEEE und Espressif, die öffentlich beschriebenen Einschränkungen von RuView sowie technische Hintergrundartikel. Dies ist eine Quellenanalyse und kein eigener Hardware-Benchmark von RuView.*
+
+## Die kurze Antwort: Was kann WLAN tatsächlich erkennen?
+
+| Fähigkeit | Stand der Erkenntnisse | Entscheidende Einschränkung |
+| --- | --- | --- |
+| Bewegung und Anwesenheit | Experimentell nachgewiesen, auch durch bestimmte Wände | Abhängig von Material, Signalwegen, Hardware, Kalibrierung und Störungen |
+| Bewegungsrichtung, grobe Position und Personenzahl | Mit geeigneter Funkgeometrie demonstriert | Keine präzise Ortung beliebig vieler Personen in jedem Raum |
+| Atemfrequenz | Unter kontrollierten Bedingungen demonstriert | Kleine Bewegungen können durch andere Bewegungen oder Störungen überlagert werden |
+| Herzfrequenz | Unter besonders günstigen Bedingungen grundsätzlich schätzbar | Deutlich schwieriger und nicht automatisch medizinisch zuverlässig |
+| Aktivitäten und Stürze klassifizieren | Gegenstand von Forschung mit Zeitreihen und KI-Modellen | Fehlalarme und Ausfälle müssen für reale Umgebungen geprüft werden |
+| Körperpose mit 17 Gelenkpunkten | Auf bestimmten Datensätzen und mit spezieller Hardware gezeigt | Benchmarkwerte sind nicht auf jeden günstigen Live-Sensor übertragbar |
+| Gesichter, Kleidung oder fotografische Videos | Nicht das Ergebnis gewöhnlicher WLAN-CSI-Messungen | Ein Skelett oder eine Heatmap ist eine Modellschätzung, kein Foto |
+
+Der zentrale Begriff lautet **Inferenz**: Der Empfänger misst, wie sich Funksignale verändern. Ein Algorithmus schließt daraus auf mögliche Ursachen.
+
+## 1. Warum WLAN-Signale Informationen über Menschen enthalten
+
+WLAN nutzt elektromagnetische Wellen im Hochfrequenzbereich. Bei 2,4 GHz beträgt die Wellenlänge ungefähr 12,5 cm. Wände, Möbel, Böden und der menschliche Körper verändern die Ausbreitung dieser Wellen. Am Empfänger treffen direkte, reflektierte, gestreute und abgeschwächte Signalanteile zusammen. Man nennt das **Mehrwegeausbreitung**, auf Englisch *Multipath Propagation*.
+
+Stellen wir uns einen Sender und einen Empfänger in einer Wohnung vor. Solange sich nichts bewegt, bleibt das Muster der Funkwege möglicherweise vergleichsweise stabil. Läuft eine Person durch den Raum, ändern sich die Stärke und die Phase bestimmter Signalanteile. Selbst kleine Bewegungen, etwa das Heben und Senken des Brustkorbs beim Atmen, können periodische Veränderungen erzeugen, die ein empfindlicher Empfänger erkennt.
+
+Vereinfacht lässt sich die Messung eines WLAN-Subcarriers so ausdrücken:
+
+`H[k,t] = A[k,t] × e^(jφ[k,t])`
+
+`A` bezeichnet die Amplitude, `φ` die Phase, `k` einen Frequenz-Unterträger und `t` den Messzeitpunkt. Das Ergebnis ist ein komplexer Wert. Er enthält mehr Informationen als die eine Zahl, die uns gewöhnlich als WLAN-Signalstärke angezeigt wird. **Veränderungen dieser Werte über die Zeit, über mehrere Frequenzen und über verschiedene Antennenpaare bilden die Grundlage von WLAN-Sensing.**
+
+Dabei gelten zwei Grenzen. Erstens durchdringt Funk **nicht beliebige Hindernisse**: Metall und bewehrte Bauteile können Signale stark abschwächen oder blockieren. Zweitens steht auf einer Messung nicht, *was* sie verursacht hat. Menschen, Haustiere, Ventilatoren, Türen oder Änderungen an Geräten können das Funkmuster beeinflussen.
+
+Gute Einführungen bieten [Digital Intelligence zum CSI-Sensing](https://www.digitalintelligence.at/wifi-signals-can-see-you-how-csi-sensing-works/) und der [technische Praxisartikel von HackproofHacks](https://hackproofhacks.com/blog/seeing-through-walls-with-wifi-csi/).
+
+## 2. RSSI und CSI: Warum ein normaler Router keine Röntgenkamera ist
+
+**RSSI (*Received Signal Strength Indicator*)** beschreibt vereinfacht die empfangene Signalstärke. Daraus lassen sich grobe Veränderungen erkennen. Für eine detaillierte Auswertung fehlen jedoch wichtige Informationen.
+
+**CSI (*Channel State Information*)** beschreibt den Funkkanal über zahlreiche Unterträger und, bei entsprechender Hardware, über verschiedene Antennenkombinationen. Moderne WLAN-Verfahren verwenden OFDM: Ein Kanal wird in viele schmalere Frequenzanteile aufgeteilt. Der Empfänger schätzt für die Datenübertragung, wie der Kanal diese Anteile verändert. Werden diese Schätzungen zugänglich gemacht, lassen sie sich auch zur Umgebungserkennung nutzen.
+
+Eine typische Verarbeitungskette sieht folgendermaßen aus:
+
+**WLAN-Sender → Ausbreitung im Raum → CSI-fähiger Empfänger → Bereinigung von Amplitude und Phase → Merkmalsextraktion → Klassifikator oder Pose-Modell → Schätzung mit Unsicherheit.**
+
+Zum Einsatz kommen etwa Filter, Hauptkomponentenanalyse, Spektralverfahren wie die schnelle Fourier-Transformation (FFT) und trainierte neuronale Netze. Eine Schätzung der Atemfrequenz nutzt beispielsweise periodische Signalanteile. Ein Modell zur Ermittlung der Körperhaltung ist wesentlich komplexer: Es muss aus zahlreichen verrauschten Funksignalen plausible Gelenkpositionen oder Oberflächenkoordinaten ableiten.
+
+Hier entsteht das häufigste Missverständnis: **Ein WLAN-Router und ein Notebook reichen nicht automatisch aus, um Rohdaten für anspruchsvolles CSI-Sensing zu erhalten.** Die meisten gewöhnlichen Notebook-Schnittstellen geben nur grobe Netzwerkdaten frei. Für detailliertes Sensing braucht es normalerweise geeignete Empfänger, kompatible Chipsätze oder angepasste Firmware. Espressif stellt hierfür das Open-Source-Projekt [ESP-CSI](https://github.com/espressif/esp-csi) bereit.
+
+## 3. Die wissenschaftliche Entwicklung: Das gab es vor RuView
+
+### 2013: MIT zeigt mit Wi-Vi das Grundprinzip
+
+Bereits 2013 stellten Fadel Adib und Dina Katabi [*See Through Walls with Wi-Fi!*](https://www.media.mit.edu/publications/see-through-walls-with-wifi/) vor. Das Forschungssystem erkannte bewegte Menschen und einfache Gesten hinter Wänden anhand reflektierter Funksignale. Verwendet wurden programmierbare Funkgeräte (*Software Defined Radios*) – nicht einfach irgendein vorhandener Heimrouter mit aktivierter Spezialfunktion.
+
+### 2018: RF-Pose rekonstruiert Körperhaltungen aus Funkmessungen
+
+Auf der CVPR 2018 erschien die MIT-Arbeit [*Through-Wall Human Pose Estimation Using Radio Signals*](https://openaccess.thecvf.com/content_cvpr_2018/html/Zhao_Through-Wall_Human_Pose_CVPR_2018_paper.html). Das Team trainierte ein neuronales Netz mithilfe synchronisierter Kameradaten. Nach dem Training konnte das System zweidimensionale menschliche Körperhaltungen allein aus Funkmessungen schätzen – auch bei vollständiger Verdeckung hinter Wänden.
+
+**Eine Kamera während des Trainings bedeutet nicht, dass später eine Kamera zur Erkennung benötigt wird.** Entscheidend ist aber auch: RF-Pose nutzte ein speziell entwickeltes Funksystem. Die Arbeit ist kein Nachweis dafür, dass jeder serienmäßige WLAN-Router eine entsprechende Skelettdarstellung erzeugt.
+
+### 2022/2023: *DensePose From WiFi* geht einen Schritt weiter
+
+Besonders häufig wird [*DensePose From WiFi*](https://arxiv.org/abs/2301.00250) von Jiaqi Geng, Dong Huang und Fernando De la Torre zitiert. Das Paper wurde am **31. Dezember 2022** eingereicht und 2023 breit bekannt. Die Forschenden entwickelten ein Modell, das aus Amplitude und Phase von WLAN-Signalen Körperregionen, Oberflächenkoordinaten und Heatmaps für 17 Körperpunkte ableitet.
+
+Die Versuchsbedingungen sind für die Interpretation entscheidend:
+
+- **Drei Sende- und drei Empfangsantennen** mit insgesamt neun Antennenverbindungen.
+- **30 Frequenz-Unterträger und 100 CSI-Messungen pro Sekunde**. Je fünf Funkmessungen wurden einem Videoframe bei 20 Bildern pro Sekunde zugeordnet.
+- **16 räumliche Anordnungen** und insgesamt **acht Versuchspersonen**. In einzelnen Aufnahmen befanden sich ein bis fünf Menschen.
+- **Automatisch erzeugte Referenzdaten aus Kamerabildern** für das Training. Die spätere Modellauswertung verwendete WLAN-Signale.
+
+Die Arbeit ist wissenschaftlich relevant. Trotzdem lohnt sich ein Blick auf die konkreten Tabellen statt nur auf die Zusammenfassung:
+
+| Durchschnittliche Präzision der Personendetektion (AP) | WLAN-Modell | Bildbasiertes Vergleichsmodell |
+| --- | ---: | ---: |
+| Bekannte räumliche Anordnung | 43,5 | 84,7 |
+| Zuvor nicht getestete Anordnung | 27,3 | 60,6 |
+
+*Quelle: Tabellen 3 und 7 aus [DensePose From WiFi](https://arxiv.org/html/2301.00250v1). AP ist eine Bewertungskennzahl für Detektionen und bedeutet nicht, dass in entsprechend vielen Bildern das vollständige Skelett korrekt erkannt wurde. Die Auswertung basierte auf automatisch erzeugten Referenzdaten.*
+
+Besonders aufschlussreich ist der Abfall von **43,5 auf 27,3 AP** in einer unbekannten Anordnung. Das zeigt ein fundamentales Problem: Eine Funkmessung beschreibt nicht ausschließlich den Menschen, sondern auch die Eigenschaften des Raums, der Möbel und der Antennenpositionen. Die Forschenden dokumentierten außerdem Schwierigkeiten mit seltenen Körperhaltungen und Situationen mit drei oder mehr gleichzeitig erfassten Personen.
+
+**Wichtige Abgrenzung:** Dieses Paper belegt detaillierte Körperposenschätzung aus WLAN in den untersuchten Innenräumen. Es darf nicht allein als Beweis dafür angeführt werden, dass ein Modell beliebige Menschen zuverlässig *durch jede Wand* als Skelett verfolgen kann. Für direkte Versuche mit verdeckten Personen ist die RF-Pose-Arbeit von 2018 die passendere Quelle.
+
+### 2023: MM-Fi schafft eine breitere Benchmark-Grundlage
+
+Die wissenschaftlich begutachtete [MM-Fi-Arbeit](https://proceedings.neurips.cc/paper_files/paper/2023/hash/3baf7a39d07e9f4f1e258a412df94521-Abstract-Datasets_and_Benchmarks.html) aus dem NeurIPS-Datensatz-Track 2023 beschreibt mehr als 320.000 synchronisierte Messframes aus fünf Modalitäten, 40 Versuchspersonen und 27 Aktivitätsklassen. Der Datensatz erlaubt systematischere Vergleiche. **Ein hoher Wert auf einem zufälligen Datensatz-Split beweist jedoch nicht, dass ein Modell in einer völlig neuen Wohnung genauso gut funktioniert.**
+
+## 4. RuView: Das Open-Source-Projekt im Realitätscheck
+
+[RuView](https://github.com/ruvnet/RuView) verbindet Software für WLAN-Sensing, ESP32-Firmware, eine Rust-basierte Signalverarbeitung, Benutzeroberflächen, Modell-Workflows und Integrationen. Dokumentiert werden unter anderem Bewegung und Anwesenheit, die Schätzung von Vitalwerten, Belegungsanalyse, Pose-Forschung und lokale Automatisierung.
+
+Die Frage ist nicht mehr, ob Funkwellen grundsätzlich zur Erkennung von Menschen taugen. Entscheidend ist, **welche RuView-Funktion auf welcher Hardware mit welcher Messmethode tatsächlich belegt ist**.
+
+| RuView-Funktion oder Aussage | Was die Projektdokumentation tatsächlich belegt beziehungsweise einschränkt |
+| --- | --- |
+| CSI-Aufnahme und Signalverarbeitung | ESP32-Datenpfade und ein deterministischer DSP-Prozess sind dokumentiert. Ein Prüfsummen-Test belegt Signalverarbeitung, nicht automatisch die Genauigkeit von Körperposen |
+| Encoder und Anwesenheitsmodell | Modellgewichte sind veröffentlicht; **82,3 % Trefferquote bei zurückgehaltenen zeitlichen Triplets** beschreibt einen Embedding-Test, **keine allgemein bestätigte Anwesenheitserkennungsquote von 82,3 %** |
+| Forschungsmodell für Körperposen | RuView berichtet **82,69 % torso-PCK@20 auf MM-Fi** bei einem bestimmten Random-Split-Protokoll und bietet separate Modellgewichte an |
+| Live-Pose mit einem einzigen ESP32 | Das erste On-Device-Modell erreicht laut Dokumentation **3,0 % PCK@20** auf seinem Testdatensatz. Der dokumentierte Inferenzpfad enthält noch eine Platzhalter-Ausgabe mit Konfidenz null |
+| Atem- und Herzfrequenz | Der Server verwendet heuristische digitale Signalverarbeitung; das ist keine unabhängige klinische Validierung |
+| Browser-Demos und Docker-Fallback | Können synthetische Messdaten anzeigen. Eine animierte Figur ist **kein Beleg** für reale Live-Funkmessungen |
+
+Nachzulesen ist dies im [RuView User Guide](https://github.com/ruvnet/RuView/blob/main/docs/user-guide.md), in den [Capability-Nachweisen](https://github.com/ruvnet/RuView/blob/main/docs/proof-of-capabilities.md) sowie in der [Dokumentation des Pose-Modells](https://github.com/ruvnet/RuView/blob/main/docs/benchmarks/pose-estimation-cog.md).
+
+**Warum widersprechen sich die beiden Pose-Zahlen nicht?** Sie beschreiben verschiedene Modelle, Datenformate, Hardwarebedingungen und Auswertungsprotokolle. Ein Netz, das auf aufgezeichneten MM-Fi-Daten mit mehreren Antennen gute Ergebnisse erzielt, funktioniert nicht automatisch mit dem Live-Datenstrom eines ESP32 mit nur einer Antenne. Auch das Umformatieren von Eingabedaten kann fehlende räumliche Informationen nicht ersetzen.
+
+RuView dokumentiert zudem Korrekturen früher überzogener Angaben, darunter eine zurückgezogene Behauptung von „100 % Anwesenheitsgenauigkeit“. Diese Transparenz ist hilfreich. Trotzdem ersetzt weder eine reproduzierbare Prüfsumme noch ein veröffentlichtes Modell eine unabhängige Messung in realen Gebäuden.
+
+**Meine Einschätzung:** RuView ist eine interessante Open-Source-Plattform für Forschung, Experimente und die Weiterentwicklung von WLAN-Sensing. Das Projekt ist aber noch kein Beweis für einen universell zuverlässigen, günstigen „Röntgenscanner“ für Wohnungen. Besonders positiv ist die zunehmend klare Unterscheidung zwischen Demo, Benchmark und tatsächlich nutzbarer Funktion.
+
+## 5. Welche Hardware benötigt man für eigene Experimente?
+
+Für einen sinnvollen Einstieg lassen sich drei Stufen unterscheiden:
+
+| Aufbau | Sinnvolle Anwendung | Was daraus nicht automatisch folgt |
+| --- | --- | --- |
+| Computer ohne CSI-Zugriff | Simulationen ansehen, Oberfläche testen, grobe RSSI-Veränderungen beobachten | Reale CSI-Messung, präzise Pose oder Atemmessung allein durch die Demo |
+| CSI-fähiges ESP32-Board mit geeignetem Sender | Rohdaten aufzeichnen, Bewegung und Anwesenheit im kontrollierten Raum untersuchen | Zuverlässige Vitalwerte oder 17 Gelenkpunkte in jeder Umgebung |
+| Mehrere CSI-Knoten oder eine Forschungs-Netzwerkkarte | Mehrere Funkperspektiven, ernsthafte Aktivitäts- und Pose-Experimente mit Referenzdaten | Automatische Übertragbarkeit auf neue Personen, Räume und Wandtypen |
+
+Die offiziellen [Beispiele von Espressif](https://github.com/espressif/esp-csi/tree/master/examples) eignen sich, um mit tatsächlichen CSI-Messungen statt bloßen Animationen zu beginnen. [HackproofHacks](https://hackproofhacks.com/blog/seeing-through-walls-with-wifi-csi/) beschreibt einen preiswerten experimentellen Aufbau. Die dortigen Praxisbeispiele sind jedoch keine Garantie für Ergebnisse mit jeder ESP32-Platine oder in jedem Gebäude.
+
+### Simulation und echte Funkdaten zuerst sauber trennen
+
+RuView dokumentiert eine Docker-Demonstration. Für einen bewusst **rein simulierten** Durchlauf kann der Modus ausdrücklich gesetzt werden:
+
+~~~bash
+# Nur Oberfläche und Software-Pipeline – KEIN echtes WLAN-Sensing.
+docker pull ruvnet/wifi-densepose:latest
+export RUVIEW_API_TOKEN="$(openssl rand -hex 32)"
+docker run --rm -p 127.0.0.1:3000:3000 \
+  -e RUVIEW_API_TOKEN -e CSI_SOURCE=simulated \
+  ruvnet/wifi-densepose:latest
+~~~
+
+Danach lässt sich die Oberfläche unter `http://localhost:3000` öffnen. **Ohne korrekt angebundene und konfigurierte reale CSI-Quelle sind die dort gezeigten Signale simuliert.** Für Hardware-Aufnahmen ist die separate [RuView-Anleitung](https://github.com/ruvnet/RuView/blob/main/docs/user-guide.md) maßgeblich, einschließlich API-Token und Zugriffsbeschränkungen für Datenquellen. Ein Sensordienst sollte nicht nur für eine bequemere Demo öffentlich erreichbar gemacht werden.
+
+Ein brauchbares eigenes Experiment lässt sich verantwortungsvoll aufbauen: Freiwillige und informierte Teilnehmer einbeziehen, echte Funkmessungen samt Zeitstempeln aufzeichnen und eine getrennte Referenz dokumentieren. Anschließend leere und belegte Räume an verschiedenen Tagen messen. Danach die Möbelanordnung verändern oder eine erlaubte Innenwand in den Versuch einbeziehen. Zu dokumentieren sind **Fehlalarme, übersehene Ereignisse, Erkennungsverzögerung, Entfernung und Wandmaterial**. Die Optik der Visualisierung ist kein Genauigkeitsmaß. Wer Atemfrequenzen untersucht, benötigt zudem eine mit Einverständnis erhobene Vergleichsmessung und darf aus einem passenden Frequenzpeak keine medizinische Zuverlässigkeit ableiten.
+
+## 6. Unter welchen Bedingungen funktioniert das durch eine Wand?
+
+Eine allgemeingültige Reichweite in Metern wäre unseriös. Entscheidend sind die **Funkstreckenbilanz**, der Abstand und die Anordnung von Sender und Empfänger, Anzahl der Antennen, Kanalbandbreite, Mehrwegeausbreitung, Störungen, Baustoffe und Bewegungsmuster. Eine einzelne Funkstrecke kann deutliche Bewegung erkennen und trotzdem zwei Menschen nicht voneinander unterscheiden. Ein Sensor kann in einem Büro verlässlich reagieren, bei einem laufenden Ventilator aber Fehlalarme produzieren – oder leise Atembewegungen übersehen, wenn mehrere Personen gleichzeitig aktiv sind.
+
+Auch Wände sind sehr unterschiedlich. Trockenbau und Holz können Funkwellen vergleichsweise gut passieren lassen. Stahl, metallisierte Dämmung oder dicke Stahlbetonwände können sie erheblich dämpfen oder umlenken. Ebenso relevant sind Frequenz und Winkel der Funkstrecken. Aussagen wie „funktioniert durch 30 cm Beton“ sind ohne Materialbeschreibung, Hardware, Messaufbau und gemessene Ergebnisse nicht verallgemeinerbar.
+
+Die größte Herausforderung bei KI-Modellen ist häufig der **Domain Shift**: Statt allgemeine Bewegungsmuster zu lernen, verinnerlicht das Modell Besonderheiten des Trainingsraums. Die Ergebnisse aus dem DensePose-Paper mit unbekannten Raumkonfigurationen demonstrieren dieses Problem deutlich.
+
+## 7. Große Chancen – und ein reales Überwachungsrisiko
+
+Denkbare sinnvolle Anwendungen sind intelligente Beleuchtung über Raumanwesenheit, nichtkamerabasierte und einvernehmliche Betreuung, Bewegungs- und Rehabilitationsforschung, Gebäudeautomatisierung sowie Sicherheitssysteme. Sturzerkennung und berührungslose Vitalwertschätzung sind vielversprechend, benötigen für Entscheidungen über Gesundheit oder Notfälle aber gründliche Validierung.
+
+Dieselbe Technik lässt sich zur heimlichen Überwachung missbrauchen. Ein System, das die Bewegungen, Schlafzeiten oder Atemmuster einer identifizierbaren Person erfasst, kann **personenbezogene Daten verarbeiten, ohne jemals ein Foto aufzunehmen**. Die europäische [DSGVO](https://commission.europa.eu/law/law-topic/data-protection/information-business-and-organisations/application-gdpr_en) ist technologieneutral. Ob eine konkrete Messung personenbezogen ist und welche Rechtsgrundlage gilt, hängt von der tatsächlichen Verarbeitung und dem Einsatzkontext ab.
+
+Eine wissenschaftliche Studie zu [einseitiger WLAN-Belegungsüberwachung durch Wände](https://ieeexplore.ieee.org/document/9500267) verdeutlicht außerdem, warum nur der Betreiber eines Netzwerks nicht automatisch über alle aus der Funkumgebung ableitbaren Informationen bestimmt. Diese Experimente haben konkrete Grenzen. Das Überwachungsszenario ist aber nicht bloß hypothetisch.
+
+**Verschlüsselung macht Funksignale nicht unsichtbar.** WPA2 und WPA3 schützen die Vertraulichkeit von Netzwerkinhalten unter ihren jeweiligen Sicherheitsannahmen. Sie verhindern nicht, dass sich die physikalische Funkausbreitung durch Bewegung verändert. Umgekehrt kann ein fremder Nachbar **nicht einfach mit einem gewöhnlichen Smartphone** beliebige Menschen hinter einer Wand als zuverlässige Skelettbilder anzeigen lassen. Dafür wären geeignete Messhardware, Signalbedingungen, Positionierung und Auswertung nötig.
+
+Verantwortungsvolle Betreiber sollten betroffene Menschen informieren, einen rechtmäßigen Zweck festlegen, nur notwendige Daten erfassen, Zugriffe beschränken, Ergebnisse möglichst lokal verarbeiten, Speicherfristen definieren und das Abschalten der Sensorik einfach ermöglichen. In gemeinsam genutzten oder besonders sensiblen Räumen ist vorab eine Datenschutzprüfung wichtig. Experimente sollten ausschließlich mit Berechtigung und Einverständnis der Betroffenen stattfinden.
+
+## 8. IEEE 802.11bf: WLAN-Sensing ist inzwischen standardisiert
+
+Die Technik ist längst mehr als ein GitHub-Trend. Die IEEE veröffentlichte **[802.11bf-2025](https://standards.ieee.org/ieee/802.11bf/11574/)** am **26. September 2025**. Diese Ergänzung zur WLAN-Norm spezifiziert Verbesserungen für Wireless-LAN-Sensing in Frequenzbereichen unter 7,125 GHz sowie oberhalb von 45 GHz.
+
+Das ist ein wichtiger Schritt für die technische Weiterentwicklung. Es bedeutet aber **nicht**, dass jeder Wi-Fi-7-Router automatisch Rohdaten für CSI ausgibt, Personen durch Wände orten kann oder eine passende Programmierschnittstelle bereitstellt. Normen beschreiben Mechanismen; marktreife Systeme benötigen weiterhin kompatible Hardware, Firmware, Software und belastbare Tests.
+
+## Häufige Fragen
+
+### Kann mein normaler WLAN-Router Menschen durch Wände sehen?
+
+Nicht wie eine Kamera. Seine Funksignale können Teil eines Sensingsystems sein. Für eine sinnvolle CSI-Auswertung ist jedoch normalerweise ein kompatibler Empfänger mit entsprechender Software erforderlich. Ein üblicher Router zeigt nicht von allein, wer sich hinter einer Wand aufhält.
+
+### Geht das wirklich ohne Kamera oder Wearable?
+
+Ja, bei der späteren Erkennung. RF-Pose und DensePose-Ansätze verwenden dann Funksignale. Während des Modelltrainings können Kamerabilder zur Erzeugung von Referenzdaten eingesetzt werden. Das ist ein anderer Vorgang als eine Kamera bei jedem späteren Einsatz zu benötigen.
+
+### Kann WLAN die Identität einer bestimmten Person feststellen?
+
+Anwesenheit erkennen, eine Körperhaltung schätzen und eine Person identifizieren sind drei verschiedene Aufgaben. Eine Identifikation benötigt eigene Forschungsergebnisse und Tests. Gewöhnliches WLAN-Sensing zeigt keine erkennbaren Gesichter oder Kleidungsdetails.
+
+### Beweist die RuView-Skelettanimation bereits funktionierendes Live-Tracking?
+
+Nein. Man muss zunächst prüfen, ob echte CSI-Messungen verwendet werden, das angezeigte Modell kompatible und trainierte Gewichte besitzt und die Genauigkeit in einem passenden Test gemessen wurde. RuView unterscheidet ausdrücklich zwischen seinen MM-Fi-Benchmarkwerten und dem bislang schwachen Live-Ansatz mit einem ESP32.
+
+### Reicht WPA3, um diese Erkennung zu verhindern?
+
+Nein. Paketverschlüsselung beseitigt nicht die physikalisch messbaren Änderungen der Funkstrecke. Ob jemand daraus verwertbare Rückschlüsse gewinnen kann, hängt allerdings stark von Hardware, Umgebung und Vorgehensweise ab.
+
+## Fazit: Die Wissenschaft ist real. Die Versprechen müssen überprüft werden.
+
+**Menschen mit Funktechnik durch Wände zu erkennen, ist real. Eine universelle, fotografische „WLAN-Durchleuchtung“ ist es nicht.** Das MIT demonstrierte entsprechende Funkverfahren bereits vor vielen Jahren. Die CSI-Forschung zeigt inzwischen erstaunliche – aber keineswegs perfekte – Möglichkeiten zur Ermittlung menschlicher Körperhaltungen. RuView eröffnet Entwicklern einen praktischen Zugang, dokumentiert aber selbst, warum Simulationen, Forschungsbenchmarks und Live-Ergebnisse nicht verwechselt werden dürfen.
+
+Die spannende Frage lautet daher nicht mehr, *ob Funkwellen Menschen wahrnehmen können*, sondern **wie genau, unter welchen Bedingungen, mit welchem Aufwand – und mit wessen Einverständnis**.
+
+## Quellen und weiterführende Literatur
+
+- [Fadel Adib und Dina Katabi, *See Through Walls with Wi-Fi!* (2013)](https://www.media.mit.edu/publications/see-through-walls-with-wifi/) – Forschung zu Bewegung und Gesten hinter Wänden.
+- [Zhao et al., *Through-Wall Human Pose Estimation Using Radio Signals* (CVPR 2018)](https://openaccess.thecvf.com/content_cvpr_2018/html/Zhao_Through-Wall_Human_Pose_CVPR_2018_paper.html) – Körperhaltungsschätzung mit spezieller Funktechnik.
+- [Geng, Huang und De la Torre, *DensePose From WiFi* (arXiv:2301.00250)](https://arxiv.org/abs/2301.00250) – WLAN-Pose-Modell, Versuchsaufbau und Auswertung.
+- [Yang et al., *MM-Fi* (NeurIPS 2023)](https://proceedings.neurips.cc/paper_files/paper/2023/hash/3baf7a39d07e9f4f1e258a412df94521-Abstract-Datasets_and_Benchmarks.html) – multimodaler Forschungsdatensatz.
+- [RuView auf GitHub](https://github.com/ruvnet/RuView), [Benutzerhandbuch](https://github.com/ruvnet/RuView/blob/main/docs/user-guide.md) und [Capability-Nachweise](https://github.com/ruvnet/RuView/blob/main/docs/proof-of-capabilities.md) – Implementierung, Einschränkungen und vom Projekt gemeldete Ergebnisse.
+- [Espressif ESP-CSI](https://github.com/espressif/esp-csi) – unterstützte Hardware und Messbeispiele.
+- [IEEE 802.11bf-2025](https://standards.ieee.org/ieee/802.11bf/11574/) – veröffentlichte WLAN-Sensing-Normergänzung.
+- [HackproofHacks: *Seeing Through Walls With WiFi*](https://hackproofhacks.com/blog/seeing-through-walls-with-wifi-csi/) und [Digital Intelligence: *WiFi Signals Can See You*](https://www.digitalintelligence.at/wifi-signals-can-see-you-how-csi-sensing-works/) – praktische Einführungen, deren Aussagen im Zusammenhang mit den wissenschaftlichen Grenzen betrachtet werden sollten.
+- [Europäische Kommission: Anwendungsbereich der DSGVO](https://commission.europa.eu/law/law-topic/data-protection/information-business-and-organisations/application-gdpr_en) – Definitionen personenbezogener Daten.
