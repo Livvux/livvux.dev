@@ -1,0 +1,154 @@
+---
+title: "Audio2MIDI: Mein Open-Source-Plugin für Audio zu MIDI"
+publishedAt: "2026-11-09"
+author: "Livvux"
+summary: "Audio2MIDI ist mein lokales VST3/AU-Plugin: ganze Songs in bearbeitbare MIDI-Spuren umwandeln, ohne Cloud-Upload oder nutzungsabhängige Credits."
+image: "/images/blog/audio2midi/logo.png"
+---
+
+**Audio rein. MIDI raus. Lokal. Ohne Cloud-Uploads. Ohne Credits pro Transkription.**
+
+Ich mag KI dann, wenn sie mir die langweiligen Teile der Musikproduktion abnimmt – nicht, wenn sie die kreativen Entscheidungen übernimmt. Noten aus einer Aufnahme zu rekonstruieren, ist genau so eine Aufgabe. Ich möchte die Noten in FL Studio haben, Sounds austauschen, Arrangements verändern und selbst weiter Musik machen.
+
+Deshalb habe ich mit [awesomeAE](https://github.com/awesomeAE) **[Audio2MIDI](https://github.com/awesomeAE/audio2midi)** gebaut: ein kostenloses Open-Source-Plugin, das Audio direkt auf Deinem Rechner in MIDI umwandelt.
+
+Der erste Release ist für macOS als **VST3 und Audio Unit (AU)** verfügbar. Im Repository gibt es außerdem ein Standalone-Build-Target und Windows-Quellcode. Die Windows-Version ist allerdings noch nicht ausreichend getestet.
+
+<figure>
+  <img
+    src="/images/blog/audio2midi/preview.png"
+    alt="Audio2MIDI mit einer Piano-Roll-Ansicht und getrennten MIDI-Parts für Gitarre, Bass, Schlagzeug und Gesang."
+    width={642}
+    height={616}
+    loading="lazy"
+    decoding="async"
+    style={{ display: "block", width: "100%", maxWidth: "642px", height: "auto", margin: "0 auto", borderRadius: "12px" }}
+  />
+  <figcaption>Die Piano-Roll und Instrumenten-Parts in Audio2MIDI. Screenshot aus dem Projekt, kein unabhängiger Genauigkeits-Benchmark.</figcaption>
+</figure>
+
+## Warum ich eine lokale Alternative wollte
+
+Das [Audio-to-MIDI-Plugin von Mirelo](https://mirelo.ai/blog/audio-to-midi-vst-plugin) zeigt, wie sinnvoll dieser Workflow ist: Plugin laden, Aufnahme transkribieren und die erkannten Noten direkt in die DAW ziehen.
+
+Allerdings verarbeitet Mirelo die Aufnahmen auf eigenen Servern und berechnet Transkriptionen über Account-Credits. Ich wollte denselben praktischen Ablauf, ohne bei jeder Aufnahme von einem Cloud-Dienst abhängig zu sein.
+
+**Audio2MIDI berechnet alles lokal.** Dafür nutzt es [MuScriptor](https://github.com/muscriptor/muscriptor), das veröffentlichte Multi-Instrument-Forschungsmodell von Kyutai und Mirelo. Es verwendet **nicht** Mirelos neueres proprietäres Produktionsmodell. Das sind unterschiedliche Systeme. Ich behaupte weder identische Ergebnisse noch eine höhere Erkennungsgenauigkeit.
+
+Audio2MIDI ist ein unabhängiges Projekt und nicht mit Kyutai oder Mirelo verbunden.
+
+## Komplette Mixes rein, bearbeitbare Noten raus
+
+Du kannst **MP3, WAV, FLAC, AIFF oder OGG** hineinziehen, eine Datei auswählen oder direkt das Audio einer Spur aufnehmen. Audio2MIDI versucht, mehrere Instrumente aus einem vollständigen Mix zu transkribieren – nicht nur einzelne Melodien.
+
+Du bekommst eine **All parts**-MIDI-Datei und jeweils eine eigene MIDI-Datei für die erkannten Instrumentengruppen. So kannst Du beispielsweise die Bassnoten auf einen anderen Synthesizer legen, den Drum-Groove neu aufbauen oder Harmonien verändern.
+
+Wichtig ist die Unterscheidung: **MIDI-Transkription ist keine Audio-Stem-Separation.** Das Plugin schätzt Noten und Instrumentenkategorien. Die originalen isolierten Audiospuren stellt es nicht wieder her.
+
+Die Funktionen im Überblick:
+
+- **Multi-Instrument-Transkription:** komplette Mixes ohne vorherige Stem-Trennung analysieren.
+- **Instrumentenerkennung:** automatisch oder gezielt ausgewählte Instrumentengruppen.
+- **Piano-Roll-Vorschau:** die Noten vor dem Export prüfen.
+- **Audio/MIDI-Vergleich:** auf macOS die Transkription gegen das Original hören.
+- **Optionale Beat-Ausrichtung:** Noten ans erkannte Raster anpassen oder das Original-Timing behalten.
+- **Drag-and-drop-Export:** einzelne Parts oder die kombinierte MIDI-Datei in die DAW ziehen; Tempo und Taktart bleiben erhalten.
+- **Projekt-Wiederherstellung:** die fertige Transkription wird mit dem DAW-Projekt gespeichert.
+
+Es ist ein kleines, bewusst fokussiertes Tool. Es verwandelt Audio in etwas, das ich **wirklich bearbeiten** kann.
+
+## Mein FL-Studio-Workflow
+
+1. **Audio2MIDI** auf eine Audiospur legen.
+2. Eine Aufnahme hineinziehen oder mit **Record** die laufende Spur aufzeichnen.
+3. **Instruments** auf Auto lassen oder passende Instrumentengruppen auswählen.
+4. **Transcribe** drücken, danach die Piano-Roll ansehen und einzelne Parts vorhören.
+5. Bei Bedarf **Align to beats** aktivieren. MIDI in die DAW ziehen und eigene Instrumente zuweisen.
+
+Für ein präzise programmiertes elektronisches Arrangement kann das Beat-Raster viel Arbeit sparen. Bei einer ausdrucksstarken Melodie würde ich zuerst die unbearbeiteten Noten anhören. Wenn man alles automatisch quantisiert, geht manchmal genau das verloren, was die Aufnahme interessant gemacht hat.
+
+Die Vorschau hilft bei der Kontrolle der erkannten Noten. Apples General-MIDI-Sounds sind kein Ersatz für die Instrumente und Effekte, die Du am Ende selbst auswählst.
+
+## Die Technik: JUCE, Python und ein lokales Modell
+
+Das Plugin basiert auf **C++20 und JUCE 9**. MuScriptor ist ein PyTorch-Transformer. Statt das komplette Modell ins VST3 einzubauen, läuft es als separater Python-Prozess.
+
+```text
+DAW (VST3 / AU)
+      |
+      v
+Audio2MIDI (JUCE / C++)
+      |
+      | HTTP: 127.0.0.1:8722
+      v
+MuScriptor 0.4.0 (Python / PyTorch)
+      |
+      v
+MIDI-Spuren pro Instrument
+```
+
+Beim ersten Transkriptionslauf richtet Audio2MIDI über [uv](https://docs.astral.sh/uv/) eine isolierte Python-3.12-Umgebung ein und startet die Engine. Nachdem Du die Modellbedingungen akzeptiert hast, werden die Gewichte von Hugging Face geladen. Mehrere Plugin-Instanzen nutzen dieselbe lokale Engine. Sobald die letzte Instanz geschlossen wird, beendet das Plugin den Prozess, den es selbst gestartet hat.
+
+Das Audio geht an einen Dienst auf **127.0.0.1** – nicht an eine Audio2MIDI-Cloud-API. Nach der Einrichtung findet die eigentliche KI-Berechnung lokal statt.
+
+Für die Einrichtung brauchst Du trotzdem Internet und Downloads. **Lokal bedeutet nicht, dass es keine Abhängigkeiten oder Einrichtung gibt.**
+
+## Installation auf macOS
+
+Der [Release v0.2.0](https://github.com/awesomeAE/audio2midi/releases/tag/v0.2.0) enthält einen universellen macOS-Installer für Apple Silicon und Intel, ab macOS 11.
+
+1. [uv installieren](https://docs.astral.sh/uv/getting-started/installation/).
+2. Kostenloses [Hugging-Face-Konto](https://huggingface.co/) erstellen und die [Bedingungen für MuScriptor Medium](https://huggingface.co/MuScriptor/muscriptor-medium) akzeptieren.
+3. Einmalig authentifizieren:
+
+```bash
+uvx hf auth login
+```
+
+4. **Audio2MIDI-macOS.pkg** aus dem [aktuellen GitHub-Release](https://github.com/awesomeAE/audio2midi/releases/latest) herunterladen, installieren und die Plugins in der DAW neu scannen.
+5. Audio2MIDI öffnen und die erste Transkription starten. Für Python/PyTorch und die Modellgewichte werden laut Projekt-README etwa **2 GB** Speicherplatz benötigt.
+
+**Die aktuellen Releases sind weder signiert noch notarisiert.** macOS kann den Installer zunächst blockieren. Unter **Systemeinstellungen → Datenschutz & Sicherheit → Dennoch öffnen** lässt sich die Sperre bewusst aufheben – aber nur, wenn Du der Quelle vertraust und den Release samt veröffentlichter Prüfsumme kontrolliert hast. Das Paket installiert VST3 und AU ohne Administratorpasswort in Deiner Benutzer-Library. Alternativ gibt es eine ZIP-Datei.
+
+## Audio2MIDI vs. Mirelos Audio-to-MIDI-Plugin
+
+| | Audio2MIDI | Mirelo Audio-to-MIDI |
+| --- | --- | --- |
+| Wo wird transkribiert? | Auf Deinem Rechner | Auf Mirelos Servern |
+| Modell | Öffentliches MuScriptor-Forschungsmodell | Separates proprietäres Produktionsmodell |
+| Credits pro Nutzung | Nein | Ja |
+| Konto für Einrichtung | Kostenloses Hugging-Face-Konto für Modellgewichte | Mirelo-Konto |
+| Fertige Downloads | macOS VST3 / AU | macOS und Windows |
+| Lizenzen | Plugin AGPL-3.0; Modellgewichte CC BY-NC 4.0 | Proprietäres Cloud-Produkt |
+| DAW-Export | Einzelne und kombinierte MIDI-Dateien | Einzelne und kombinierte MIDI-Dateien |
+
+Quellen: [Audio2MIDI](https://github.com/awesomeAE/audio2midi), [MuScriptor](https://github.com/muscriptor/muscriptor) und [Mirelos Plugin-Ankündigung](https://mirelo.ai/blog/audio-to-midi-vst-plugin). Stand: 9. November 2026. **Ich habe keinen unabhängigen Vergleich der Genauigkeit oder Geschwindigkeit beider Modelle durchgeführt.**
+
+Mirelos verwalteter Dienst ist bequemer, wenn Du Dich nicht selbst um Python und Modellgewichte kümmern möchtest. Audio2MIDI gibt Dir Kontrolle darüber, wo die Berechnung stattfindet, und verzichtet auf Credits pro Transkription. Daraus folgt nicht automatisch, dass eines der Modelle genauer ist.
+
+## Was (noch) nicht funktioniert
+
+Musiktranskription ist keine Magie. Verzerrte Gitarren, dichte Arrangements, Effekte, seltene Instrumente und ungleichmäßiges Timing können die Notenerkennung stark erschweren. Rechne damit, einzelne Noten manuell zu korrigieren.
+
+Die [Modellkarte von MuScriptor Medium](https://huggingface.co/MuScriptor/muscriptor-medium) nennt weitere Grenzen: Anschlagsstärken (Velocity) werden nicht vorhergesagt, Notenenden können ungenau sein und einige Genres beziehungsweise seltene Instrumente funktionieren weniger zuverlässig. **MIDI ist hier ein bearbeitbarer Ausgangspunkt, keine perfekte Partitur.**
+
+Aktuelle Einschränkungen im Projekt:
+
+- **Windows:** Der Quellcode lässt sich grundsätzlich bauen, ist aber ungetestet. Die Inferenz läuft derzeit über die CPU, die MIDI-Vorschau bleibt stumm. Für v0.2.0 gibt es keinen Windows-Installer.
+- **Pro Tools:** kein AAX-Plugin.
+- **Audioaufnahmen:** Die fertige MIDI-Transkription bleibt beim erneuten Öffnen erhalten, eine temporäre Audioaufnahme dagegen nicht.
+- **Kommerzielle Nutzung:** Der Plugin-Code steht unter **AGPL-3.0**, die heruntergeladenen MuScriptor-Gewichte unter **CC BY-NC 4.0 (nichtkommerziell)**. Open-Source-Plugin bedeutet nicht automatisch kommerzielle Nutzungsrechte am Modell. Prüfe vor kommerziellen Anwendungen die [Modelllizenz und Nutzungsbedingungen](https://huggingface.co/MuScriptor/muscriptor-medium). Transkribiere nur Audio, für das Du die notwendigen Rechte hast.
+
+Dieser Unterschied ist mir wichtig: **Offener Code und Modellgewichte sind zwei unterschiedliche Ebenen mit unterschiedlichen Rechten.** Open Source sollte nicht als Etikett dienen, um Nutzungsbedingungen zu verschweigen.
+
+## Musik bleibt meine Entscheidung
+
+Ich will nicht, dass KI die Melodie schreibt, jeden Sound auswählt oder bestimmt, wie sich mein Track anfühlen soll. Ich möchte die mühsamen technischen Schritte abkürzen, um mehr Zeit für die wirklich wichtigen Entscheidungen zu haben.
+
+Audio2MIDI will FL Studio nicht ersetzen und auch keine Songs für mich komponieren. Es liefert bearbeitbare Noten. **Was ich daraus mache, entscheide weiterhin ich.**
+
+Bei Genauigkeit, Kompatibilität und Installation lässt sich noch einiges verbessern. Auch deshalb ist der Code öffentlich.
+
+**[Audio2MIDI auf GitHub ansehen](https://github.com/awesomeAE/audio2midi)**, [macOS-Release herunterladen](https://github.com/awesomeAE/audio2midi/releases/latest), den Code prüfen und mitentwickeln. Über meine Vorstellung von kreativer Kontrolle habe ich auch in [Mein persönlicher KI-Musik-Workspace](/blog/personal-ai-music-workspace-2026/de) geschrieben.
+
+*Weitere Quellen: [MuScriptor-Quellcode](https://github.com/muscriptor/muscriptor), [MuScriptor-Forschungsarbeit](https://arxiv.org/abs/2607.08168), [MuScriptor-Medium-Lizenz und Grenzen](https://huggingface.co/MuScriptor/muscriptor-medium) und [Mirelos VST3/AU-Dokumentation](https://mirelo.ai/blog/audio-to-midi-vst-plugin). Geprüft am 9. November 2026.*
