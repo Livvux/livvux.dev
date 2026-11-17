@@ -1,0 +1,196 @@
+---
+title: "I Built a Grok Bot for WordPress: Meet WordPress Admin"
+publishedAt: "2026-11-17"
+author: "Livvux"
+summary: "Meet my public WordPress Admin Grok Bot: what it is designed to do through the WordPress REST API, how to connect it safely, and where MCP and the xAI API differ."
+---
+
+**I published [WordPress Admin for Grok Bot](https://x.ai/bot/0LStaAgvBFXULZi3OuifT). The idea is simple: instead of asking AI how to use WordPress, give an agent carefully limited access to do the work.**
+
+The public listing describes a bot that works through the **WordPress REST API with an Application Password**. It covers posts, pages, media, comments, users, plugins, settings and site health checks, and is designed to ask before risky changes.
+
+That is an ambitious scope. It also creates a responsibility: a bot that can edit a draft is useful; a bot with full administrator credentials can do serious damage.
+
+Here is what the public bot actually promises, what WordPress and xAI document, and how I would approach a first connection without handing an AI the keys to the entire website.
+
+**[Add my WordPress Admin bot on x.ai](https://x.ai/bot/0LStaAgvBFXULZi3OuifT)** · [Read the detailed Grok/WordPress integration guide at lk media](https://lkmedia.net/en/grok-bot-wordpress)
+
+*Checked November 17, 2026. The public listing and platform documentation are verifiable; the listing is not an independent audit or a production compatibility test.*
+
+## What I built
+
+The bot is publicly listed as **“WordPress Admin” by Lucas**. xAI identifies it as a *third-party user-created bot*, not an official xAI integration.
+
+Its [public description](https://x.ai/bot/0LStaAgvBFXULZi3OuifT) says:
+
+> Runs your WordPress site for you through the REST API with an Application Password: posts, pages, media, comments, users, plugins, settings and health checks.
+
+It also describes an administrative approach that asks before risky changes. That is the **stated design**, not proof that every REST endpoint is available on every WordPress installation or that every approval rule has been exercised in a test.
+
+Why is the distinction important? Because **the bot is a reusable agent template, not a WordPress plugin**. When someone adds it from the shared link, xAI's documentation says they receive a copy of the bot's configuration. They do **not** receive my accounts, saved logins, computer, conversations or access to my websites.
+
+Users must arrange access to **their own** WordPress installation. And WordPress still decides what each authenticated user is allowed to do.
+
+## What can a WordPress admin agent do?
+
+These are the areas the bot advertises, matched to the permissions a real WordPress site must provide.
+
+| Area | Example job | The boundary that matters |
+| --- | --- | --- |
+| Posts | List posts, edit a draft, prepare a new article | A Contributor can create and manage their own drafts, **not publish** |
+| Pages | Update a landing page | Requires page-editing capabilities; a default Contributor cannot edit pages |
+| Media | Upload or inspect images | Requires the relevant media permissions, including `upload_files` for uploads |
+| Comments | Review a moderation queue | Moderation requires capabilities such as `moderate_comments` |
+| Users | Review or change accounts | User management is privileged and should not be a first-run task |
+| Plugins and settings | Inspect configuration, perform maintenance | Installation, activation and settings changes can affect the whole site |
+| Health checks | Review site status | Prefer read-only access where endpoints and permissions allow it |
+
+The table describes **possible tasks**, not a report of successful live executions. The final behavior depends on the bot's configured tools, the WordPress version, installed plugins, REST availability and the connected user's role.
+
+I would **not** grant administrator access just to make every row work. I would begin with one specific workflow and expand only when there is a concrete reason.
+
+## Why use the REST API instead of clicking around wp-admin?
+
+WordPress already exposes a [documented REST API](https://developer.wordpress.org/rest-api/). For example, the posts endpoint supports creating a post with its status set to `draft`.
+
+This gives an integration a structured interface: an agent can work with titles, content, statuses and IDs instead of relying exclusively on the layout of the WordPress dashboard.
+
+WordPress also supports [Application Passwords](https://developer.wordpress.org/rest-api/using-the-rest-api/authentication/) for external tools. They authenticate HTTPS API requests as a **particular WordPress user**, whose roles and capabilities still apply.
+
+That last part is more important than the technology itself. An Application Password is **not a new limited-permission role**. If it belongs to an Administrator, the integration receives that user's broad permissions. Create a separate WordPress user with the minimum permissions first; generate the Application Password for that user.
+
+The public bot description names REST API access. It does not provide a public source-code audit, a reproducible installation test or evidence for how every advertised action is implemented. Those parts should be validated on a staging site.
+
+## How I would connect it safely
+
+You do not need to start with a full administrator integration. A first pilot can be deliberately boring: **read content, create one draft, stop.**
+
+1. **[Open the WordPress Admin template](https://x.ai/bot/0LStaAgvBFXULZi3OuifT)** and choose **Add to Grok Bot**. Review the copied configuration and the third-party bot terms before using it.
+2. **Use staging, not your production site.** Confirm HTTPS and that your WordPress REST API is reachable.
+3. **Create a dedicated WordPress user.** Start with the **Contributor** role if the task is creating the user's own draft posts. Do not reuse your personal Administrator account.
+4. **Create an Application Password** in that WordPress user's profile. Supply it only through an appropriate secure credential mechanism, not as plain text in a chat, public template or code repository.
+5. **Test the smallest workflow.** Ask the bot to inspect available posts, create a clearly labeled draft, report the resulting post ID, and then stop. Inspect the result in wp-admin before allowing further actions.
+6. **Test the failure case.** Check that the account cannot publish, install plugins or change users. Keep logs, verify backups and revoke the Application Password when it is no longer needed.
+
+The public page does not document a universal one-click WordPress connection flow. You may need to configure the relevant connector or tools for your site. Do not assume a copied template already has access.
+
+### A draft-only REST request, outside the bot
+
+This shows the **WordPress API operation** that a minimal draft workflow needs. It is a standalone example, not a dump of the bot's internal implementation:
+
+~~~bash
+# Set WP_USER and WP_APP_PASSWORD securely in your environment.
+curl --fail-with-body -X POST \
+  "https://example.com/wp-json/wp/v2/posts" \
+  --user "$WP_USER:$WP_APP_PASSWORD" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "title": "AI-assisted draft for review",
+    "content": "<p>Editorial review required before publication.</p>",
+    "status": "draft"
+  }'
+~~~
+
+A valid response contains the created post ID and draft status. A Contributor cannot publish their own post under WordPress's default capabilities; an Editor can review and publish it later.
+
+For this first pilot, **do not connect media uploads, page editing, plugin management or customer data**. Those require different permissions and a separate risk review.
+
+## Three different things people call “Grok for WordPress”
+
+A frequent source of confusion is treating a Grok Bot, an MCP connector and the xAI API as interchangeable products. They are not.
+
+| Route | What runs the AI? | How it reaches WordPress | My view |
+| --- | --- | --- | --- |
+| **My WordPress Admin Grok Bot** | The hosted Grok Bot agent | The bot is described as using the WordPress REST API and an Application Password | A reusable starting point; test the configuration on your own site |
+| **Grok Bot + WordPress MCP Adapter** | The hosted Grok Bot agent | A custom MCP connection to public WordPress Abilities exposed by plugins or custom code | Promising for tool-based access, but the exact pairing needs site-specific testing |
+| **WordPress plugin or custom code + xAI API** | Grok models called through the separately billed API | Your own plugin or service sends requests to xAI, then writes content into WordPress | Better for a narrowly defined workflow you want to implement and control yourself |
+
+For the MCP path, the official [WordPress MCP Adapter](https://wordpress.org/plugins/mcp-adapter/) requires WordPress 6.9 or newer. It does **not** automatically provide every administrative action: the required Abilities must exist and be exposed, with appropriate permission checks. Grok Bot supports custom MCP connections, but I am not claiming the exact pairing is plug-and-play.
+
+The xAI API route is also **not the same as running Grok Bot**. It needs its own API key and billing. I explain all three routes, including prerequisites and limits, in the [lk media Grok Bot for WordPress guide](https://lkmedia.net/en/grok-bot-wordpress).
+
+## Approvals are useful. Permissions are the actual safety net.
+
+According to [xAI's approvals documentation](https://docs.x.ai/grok-bot/approvals-security-and-privacy), **Auto Review** examines a bot's proposed actions. Depending on the result and your rules, an action can run or require an approval.
+
+That does **not** mean every dangerous action is guaranteed to pause. xAI documents that Auto Review is model-based, that it can be disabled, and that an approval does not undo anything already completed.
+
+I would set explicit **Ask first** rules for publishing, deletion, user or permission changes, plugin updates and production configuration. But I would still enforce those limits at the WordPress account or endpoint level wherever possible.
+
+There is another important detail: **Bots belonging to one user share the same cloud computer**, according to xAI. Separate bots do not create separate credential vaults or operating-system security boundaries. And a bot with an existing browser login may be able to use permissions beyond the REST user you intended for a narrow workflow.
+
+For a meaningful security model:
+
+- Use a **dedicated, minimally privileged WordPress user** and review existing browser sessions.
+- Store secrets in secure credential handling, not in instructions or chat history.
+- Use staging and **tested backups** before allowing writes.
+- Log who requested a change, what endpoint was used and which WordPress object changed.
+- Treat pages, comments and tool results as **untrusted input**: prompt injection is a real risk for agents that read external content.
+
+Most importantly, **a prompt saying “never publish” is not an authorization system**.
+
+## Privacy, hosting and GDPR: do not guess
+
+Grok Bot is a managed cloud product, not a self-hosted WordPress extension. xAI's [security documentation](https://docs.x.ai/grok-bot/security) says the hosted computers run in the **United States**, the service operates through Cursor infrastructure, and model selection can include third-party providers.
+
+That matters before you connect WordPress content containing customer details, unpublished business plans or personal data. Check the applicable contracts, subprocessors, retention settings and international transfer requirements. A public template does not supply a GDPR compliance guarantee.
+
+For my first deployment, I would exclude personal customer data and WooCommerce write access entirely. Content drafts are a much safer place to establish whether the integration is worth expanding.
+
+## Who is it for?
+
+**Good initial use cases** are editorial preparation, draft creation, content inventory and other reversible, inspectable work. A small marketing team or site owner can test whether asking an agent to prepare a draft actually saves time.
+
+**Poor initial use cases** are changing plugins on a live store, modifying user permissions, deleting large volumes of content, processing customer orders or autonomously publishing legal, medical or commercial claims.
+
+If you need those higher-risk workflows, build and test narrower interfaces rather than solving every problem by granting Administrator access.
+
+## FAQ
+
+### Is WordPress Admin an official xAI or WordPress plugin?
+
+No. It is a **third-party Grok Bot template** published on x.ai. It is not presented as an official xAI product integration or a WordPress.org plugin.
+
+### Does adding the bot give it access to my WordPress site?
+
+No. Adding a shared template copies the bot's configuration, not someone else's credentials or sessions. You still need to connect and authorize your own site.
+
+### Can the bot publish posts automatically?
+
+Only when the available tools and the connected user's WordPress permissions allow it. I recommend a Contributor account for the first draft-only pilot, followed by human editorial review.
+
+### Is the bot open source?
+
+A publicly shared bot configuration is not the same thing as a publicly audited or open-source codebase. No source repository or open-source license is supplied with the public listing.
+
+### Does it work with WooCommerce?
+
+WooCommerce offers APIs, but the public bot listing does not establish a tested WooCommerce integration. Orders, prices and customer data deserve separate permissions, tests and human approvals.
+
+### Do I need an xAI API key?
+
+**Not merely to use a Grok Bot template.** The separate xAI API is relevant when your own WordPress plugin or service calls Grok models directly. Grok Bot access still depends on the applicable plan and account.
+
+## My takeaway
+
+**This is the kind of AI integration I actually want to build: useful actions, not another chat widget.** But the more an agent can do, the more precisely its access must be defined.
+
+My [WordPress Admin Grok Bot](https://x.ai/bot/0LStaAgvBFXULZi3OuifT) is a public starting point. The sensible way to evaluate it is one staging site, one low-privilege account, one draft and one clear review step. The public listing establishes the intended feature scope, **not** universal compatibility or independently verified production reliability.
+
+If you want a tailored deployment rather than a general bot template, [lk media explains the three integration options and offers a scoped WordPress/AI integration](https://lkmedia.net/en/grok-bot-wordpress).
+
+**[Try WordPress Admin on Grok Bot](https://x.ai/bot/0LStaAgvBFXULZi3OuifT)** · **[Explore WordPress + Grok integration at lk media](https://lkmedia.net/en/grok-bot-wordpress)**
+
+## Sources and further reading
+
+- [WordPress Admin — public Grok Bot template](https://x.ai/bot/0LStaAgvBFXULZi3OuifT)
+- [xAI: Create and manage Bots — sharing templates](https://docs.x.ai/grok-bot/bots)
+- [xAI: Grok Bot overview](https://docs.x.ai/grok-bot/overview)
+- [xAI: Use the computer and apps](https://docs.x.ai/grok-bot/computer-and-apps)
+- [xAI: Approvals, security and privacy](https://docs.x.ai/grok-bot/approvals-security-and-privacy)
+- [xAI: Grok Bot security](https://docs.x.ai/grok-bot/security)
+- [WordPress: REST API posts reference](https://developer.wordpress.org/rest-api/reference/posts/)
+- [WordPress: REST API authentication and Application Passwords](https://developer.wordpress.org/rest-api/using-the-rest-api/authentication/)
+- [WordPress: Roles and capabilities](https://wordpress.org/documentation/article/roles-and-capabilities/)
+- [WordPress: MCP Adapter](https://wordpress.org/plugins/mcp-adapter/)
+- [lk media: Grok Bot for WordPress — three integration routes](https://lkmedia.net/en/grok-bot-wordpress)
